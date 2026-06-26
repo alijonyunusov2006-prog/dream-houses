@@ -911,17 +911,13 @@ const cntObs = new IntersectionObserver(entries => {
 const statsEl = document.querySelector('.hero-stats');
 if(statsEl) cntObs.observe(statsEl);
 
-// ─── Telegram настройки ───────────────────────────────────────────
-// 1) Создайте бота через @BotFather в Telegram → вставьте токен сюда
-// 2) Ваш Chat ID узнайте через @userinfobot → вставьте сюда
-const TG_TOKEN   = 'ВСТАВЬТЕ_ТОКЕН_БОТА_СЮДА';   // пример: 7123456789:AAHxxx...
-const TG_CHAT_ID = 'ВСТАВЬТЕ_ВАШ_CHAT_ID_СЮДА';  // пример: 123456789
-// ──────────────────────────────────────────────────────────────────
+// Номер WhatsApp куда приходят заявки
+const WA_NUMBER = '992909808180';
 
-async function submitForm(e) {
+function submitForm(e) {
   e.preventDefault();
-  const form = e.target;
-  const btn  = form.querySelector('.form-submit');
+  const form   = e.target;
+  const btn    = form.querySelector('.form-submit');
   const fields = form.querySelectorAll('input, select, textarea');
 
   const name    = fields[0].value.trim() || '—';
@@ -929,49 +925,35 @@ async function submitForm(e) {
   const type    = fields[2].value        || '—';
   const area    = fields[3].value        || '—';
   const comment = fields[4].value.trim() || '—';
+  const time    = new Date().toLocaleString('ru-RU', {timeZone:'Asia/Dushanbe'});
 
-  const text = [
-    '🏠 *Новая заявка — Dreamhouses TJ*',
+  const msg = [
+    '🏠 *НОВАЯ ЗАЯВКА — Dreamhouses TJ*',
     '',
-    `👤 *Имя:* ${name}`,
-    `📞 *Телефон:* ${phone}`,
-    `🏢 *Тип объекта:* ${type}`,
-    `📐 *Площадь:* ${area} м²`,
-    `💬 *Пожелания:* ${comment}`,
+    `👤 Имя: ${name}`,
+    `📞 Телефон: ${phone}`,
+    `🏢 Объект: ${type}`,
+    `📐 Площадь: ${area} м²`,
+    `💬 Пожелания: ${comment}`,
     '',
-    `⏰ ${new Date().toLocaleString('ru-RU', {timeZone:'Asia/Dushanbe'})}`,
+    `🕐 ${time}`,
   ].join('\n');
 
-  btn.textContent = 'Отправляем...';
+  btn.textContent = '✓ Заявка принята! Открываем WhatsApp...';
+  btn.style.background = '#2a9d5c';
   btn.disabled = true;
+  form.reset();
 
-  try {
-    const res = await fetch(
-      `https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,
-      {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-          chat_id: TG_CHAT_ID,
-          text: text,
-          parse_mode: 'Markdown'
-        })
-      }
+  // Открываем WhatsApp с заполненным сообщением
+  setTimeout(() => {
+    window.open(
+      `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`,
+      '_blank'
     );
-    const data = await res.json();
-    if (data.ok) {
-      btn.textContent = '✓ Заявка отправлена! Скоро свяжемся.';
-      btn.style.background = '#2a9d5c';
-      form.reset();
-    } else {
-      throw new Error(data.description);
-    }
-  } catch (err) {
-    btn.textContent = 'Ошибка отправки — напишите нам в WhatsApp';
-    btn.style.background = '#c0392b';
+    btn.textContent = 'Отправить заявку';
+    btn.style.background = '';
     btn.disabled = false;
-    console.error('Telegram error:', err);
-  }
+  }, 800);
 }
 </script>
 </body>
