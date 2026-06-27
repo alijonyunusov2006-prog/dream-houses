@@ -281,10 +281,12 @@ nav{display:flex;align-items:center;justify-content:space-between}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .form-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
 .form-submit{width:100%;padding:16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;border:none;cursor:pointer;border-radius:var(--r);transition:all .3s;display:flex;align-items:center;justify-content:center;gap:10px}
-.form-submit-wa{background:var(--bg3);color:var(--text2);border:1px solid var(--line)}
-.form-submit-wa:hover{border-color:var(--gold);color:var(--text);transform:translateY(-1px)}
-.form-submit-tg{background:var(--bg3);color:var(--text2);border:1px solid var(--line)}
-.form-submit-tg:hover{border-color:var(--gold);color:var(--text);transform:translateY(-1px)}
+.form-submit-wa{background:var(--bg3);color:var(--text2);border:1px solid rgba(37,211,102,.2)}
+.form-submit-wa svg{opacity:.7;color:#25D366;fill:#25D366;stroke:#25D366}
+.form-submit-wa:hover{border-color:rgba(37,211,102,.5);color:var(--text);transform:translateY(-1px)}
+.form-submit-tg{background:var(--bg3);color:var(--text2);border:1px solid rgba(0,136,204,.2)}
+.form-submit-tg svg{opacity:.7;fill:#0088cc;stroke:#0088cc}
+.form-submit-tg:hover{border-color:rgba(0,136,204,.5);color:var(--text);transform:translateY(-1px)}
 @media(max-width:480px){.form-btns{grid-template-columns:1fr}}
 .contact-right{padding-top:92px}
 .contact-detail{display:flex;align-items:flex-start;gap:20px;padding:28px 0;border-bottom:1px solid var(--line)}
