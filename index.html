@@ -15,16 +15,16 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#080808;
-  --bg2:#0f0f0f;
-  --bg3:#141414;
-  --bg4:#1a1a1a;
-  --line:rgba(255,255,255,0.07);
-  --gold:#c9a84c;
-  --gold2:#e8c96a;
-  --text:#f0ece4;
-  --text2:rgba(240,236,228,0.55);
-  --text3:rgba(240,236,228,0.3);
+  --bg:#ffffff;
+  --bg2:#f4f4f4;
+  --bg3:#ebebeb;
+  --bg4:#e0e0e0;
+  --line:rgba(0,0,0,0.1);
+  --gold:#111111;
+  --gold2:#333333;
+  --text:#111111;
+  --text2:rgba(17,17,17,0.6);
+  --text3:rgba(17,17,17,0.35);
   --white:#fff;
   --r:2px;
 }
@@ -53,8 +53,8 @@ h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:400}
 .reveal-delay-4{transition-delay:.4s}
 
 /* CURSOR */
-.cursor{width:8px;height:8px;background:var(--gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:transform .15s ease;mix-blend-mode:difference}
-.cursor-ring{width:40px;height:40px;border:1px solid rgba(201,168,76,.5);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:all .25s ease;transform:translate(-50%,-50%)}
+.cursor{width:8px;height:8px;background:#111;border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:transform .15s ease;mix-blend-mode:difference}
+.cursor-ring{width:40px;height:40px;border:1px solid rgba(0,0,0,.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:all .25s ease;transform:translate(-50%,-50%)}
 
 /* HEADER */
 header{position:fixed;top:0;left:0;right:0;z-index:100;padding:28px 0;transition:all .4s ease}
@@ -62,9 +62,9 @@ header.solid{background:rgba(8,8,8,.95);backdrop-filter:blur(12px);padding:18px 
 nav{display:flex;align-items:center;justify-content:space-between}
 .logo{display:flex;align-items:center;gap:12px;text-decoration:none}
 .logo-mark{width:38px;height:38px;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;transition:background .3s}
-.logo-mark::before{content:'';position:absolute;inset:3px;border:1px solid rgba(201,168,76,.25)}
+.logo-mark::before{content:'';position:absolute;inset:3px;border:1px solid rgba(0,0,0,.15)}
 .logo-mark svg{width:22px;height:22px}
-.logo:hover .logo-mark{background:rgba(201,168,76,.08)}
+.logo:hover .logo-mark{background:rgba(0,0,0,.05)}
 .logo-text{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;letter-spacing:.04em;color:var(--text);line-height:1}
 .logo-text span{display:block;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);font-family:'Inter',sans-serif;font-weight:400;margin-top:2px}
 .nav-links{display:flex;align-items:center;gap:40px;list-style:none}
@@ -72,7 +72,7 @@ nav{display:flex;align-items:center;justify-content:space-between}
 .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--gold);transition:width .3s}
 .nav-links a:hover{color:var(--text)}
 .nav-links a:hover::after{width:100%}
-.nav-cta{font-size:12px;color:var(--gold);border:1px solid rgba(201,168,76,.35);padding:10px 24px;border-radius:var(--r);letter-spacing:.06em;transition:all .3s}
+.nav-cta{font-size:12px;color:var(--gold);border:1px solid rgba(0,0,0,.3);padding:10px 24px;border-radius:var(--r);letter-spacing:.06em;transition:all .3s}
 .nav-cta:hover{background:var(--gold);color:#080808}
 .burger{display:none;flex-direction:column;gap:6px;cursor:pointer;padding:4px}
 .burger span{display:block;width:22px;height:1px;background:var(--text);transition:all .3s}
@@ -88,10 +88,10 @@ nav{display:flex;align-items:center;justify-content:space-between}
 /* HERO */
 .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:80px;padding-top:120px;position:relative;overflow:hidden}
 .hero-bg{position:absolute;inset:0;background:var(--bg)}
-.hero-bg-img{position:absolute;inset:0;background-image:url('images/hero.jpg');background-size:cover;background-position:center;opacity:.25;transition:opacity 1s}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,8,8,.3) 0%,rgba(8,8,8,.0) 40%,rgba(8,8,8,.8) 85%,rgba(8,8,8,1) 100%)}
+.hero-bg-img{position:absolute;inset:0;background-image:url('images/hero.jpg');background-size:cover;background-position:center;opacity:.12;transition:opacity 1s;filter:grayscale(100%)}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(255,255,255,.1) 0%,rgba(255,255,255,.0) 40%,rgba(255,255,255,.9) 85%,rgba(255,255,255,1) 100%)}
 .hero-content{position:relative;z-index:1}
-.hero-num{font-family:'Cormorant Garamond',serif;font-size:clamp(100px,18vw,220px);font-weight:300;color:rgba(201,168,76,.06);line-height:.85;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;user-select:none;letter-spacing:-.02em}
+.hero-num{font-family:'Cormorant Garamond',serif;font-size:clamp(100px,18vw,220px);font-weight:300;color:rgba(0,0,0,.04);line-height:.85;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;user-select:none;letter-spacing:-.02em}
 .hero-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:24px}
 .hero-title{font-size:clamp(48px,7.5vw,96px);font-weight:300;line-height:1.05;color:var(--text);max-width:800px;margin-bottom:40px}
 .hero-title em{color:var(--gold);font-style:italic}
@@ -154,13 +154,13 @@ nav{display:flex;align-items:center;justify-content:space-between}
 /* gradient placeholders when no img */
 .p-img.ph{background:linear-gradient(135deg,var(--bg3),var(--bg4))}
 .p-img.ph::after{content:'';position:absolute;inset:0;background:inherit;opacity:.5}
-.p-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,.9) 0%,transparent 55%);opacity:0;transition:opacity .4s}
+.p-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(17,17,17,.85) 0%,transparent 55%);opacity:0;transition:opacity .4s}
 .p-item:hover .p-overlay{opacity:1}
 .p-info{position:absolute;bottom:0;left:0;right:0;padding:28px;transform:translateY(10px);transition:transform .4s;opacity:0}
 .p-item:hover .p-info{opacity:1;transform:none}
 .p-info h4{font-family:'Cormorant Garamond',serif;font-size:20px;margin-bottom:4px}
 .p-info span{font-size:11px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
-.p-num{position:absolute;top:20px;left:20px;font-family:'Cormorant Garamond',serif;font-size:40px;color:rgba(201,168,76,.15);font-weight:300;line-height:1;pointer-events:none}
+.p-num{position:absolute;top:20px;left:20px;font-family:'Cormorant Garamond',serif;font-size:40px;color:rgba(0,0,0,.12);font-weight:300;line-height:1;pointer-events:none}
 .portfolio-footer{margin-top:48px;display:flex;justify-content:center}
 
 /* FOUNDER */
@@ -170,7 +170,7 @@ nav{display:flex;align-items:center;justify-content:space-between}
 .founder-photo-wrap{aspect-ratio:3/4;overflow:hidden;background:var(--bg4)}
 .founder-photo-wrap img{width:100%;height:100%;object-fit:cover;object-position:top;filter:grayscale(20%);transition:filter .5s}
 .founder-photo-wrap:hover img{filter:grayscale(0%)}
-.founder-photo-deco{position:absolute;bottom:-24px;right:-24px;width:60%;aspect-ratio:1;border:1px solid rgba(201,168,76,.15);pointer-events:none}
+.founder-photo-deco{position:absolute;bottom:-24px;right:-24px;width:60%;aspect-ratio:1;border:1px solid rgba(0,0,0,.12);pointer-events:none}
 .founder-photo-label{position:absolute;top:28px;left:-20px;background:var(--bg);padding:10px 20px;border:1px solid var(--line)}
 .founder-photo-label span{font-size:11px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase}
 .founder-text{display:flex;flex-direction:column}
@@ -207,7 +207,7 @@ nav{display:flex;align-items:center;justify-content:space-between}
 .process-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
 .p-step{background:var(--bg2);padding:48px 36px;position:relative;transition:background .3s}
 .p-step:hover{background:var(--bg3)}
-.p-step-n{font-family:'Cormorant Garamond',serif;font-size:72px;color:rgba(201,168,76,.1);line-height:1;margin-bottom:24px;font-weight:300}
+.p-step-n{font-family:'Cormorant Garamond',serif;font-size:72px;color:rgba(0,0,0,.07);line-height:1;margin-bottom:24px;font-weight:300}
 .p-step h3{font-size:20px;margin-bottom:12px;font-weight:400}
 .p-step p{font-size:14px;color:var(--text2);line-height:1.8;font-weight:300}
 .p-step-arrow{position:absolute;top:48px;right:-12px;width:24px;height:1px;background:var(--gold);z-index:1}
@@ -224,10 +224,10 @@ nav{display:flex;align-items:center;justify-content:space-between}
 .review-card{background:var(--bg);padding:48px 36px;transition:background .3s}
 .review-card:hover{background:var(--bg3)}
 .r-stars{display:flex;gap:4px;margin-bottom:28px}
-.r-star{width:12px;height:12px;background:var(--gold);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.r-star{width:12px;height:12px;background:#111;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
 .r-text{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:var(--text);line-height:1.6;margin-bottom:36px;font-weight:300}
 .r-author{display:flex;align-items:center;gap:16px;border-top:1px solid var(--line);padding-top:28px}
-.r-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--gold),rgba(201,168,76,.3));display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--bg);font-weight:600;flex-shrink:0}
+.r-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--gold),rgba(0,0,0,.2));display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--bg);font-weight:600;flex-shrink:0}
 .r-name{font-size:14px;color:var(--text);font-weight:400}
 .r-meta{font-size:12px;color:var(--text3);margin-top:3px;letter-spacing:.03em}
 
@@ -245,16 +245,16 @@ nav{display:flex;align-items:center;justify-content:space-between}
 .insta-cell img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s,filter .5s}
 .insta-cell:hover img{transform:scale(1.06);filter:brightness(1.1)}
 /* color palette for placeholders */
-.insta-cell:nth-child(1) .insta-ph{background:linear-gradient(135deg,#1a1510,#2a2010)}
-.insta-cell:nth-child(2) .insta-ph{background:linear-gradient(135deg,#141820,#0e1218)}
-.insta-cell:nth-child(3) .insta-ph{background:linear-gradient(135deg,#1a1514,#261e18)}
-.insta-cell:nth-child(4) .insta-ph{background:linear-gradient(135deg,#0e1218,#141820)}
-.insta-cell:nth-child(5) .insta-ph{background:linear-gradient(135deg,#201a10,#2a2214)}
-.insta-cell:nth-child(6) .insta-ph{background:linear-gradient(135deg,#1a1210,#221814)}
-.insta-cell:nth-child(7) .insta-ph{background:linear-gradient(135deg,#10141a,#0c1016)}
-.insta-cell:nth-child(8) .insta-ph{background:linear-gradient(135deg,#1e1a10,#28220e)}
-.insta-cell:nth-child(9) .insta-ph{background:linear-gradient(135deg,#0e1210,#121610)}
-.insta-hover-overlay{position:absolute;inset:0;background:rgba(8,8,8,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
+.insta-cell:nth-child(1) .insta-ph{background:linear-gradient(135deg,#d8d4cc,#ccc8c0)}
+.insta-cell:nth-child(2) .insta-ph{background:linear-gradient(135deg,#d0d4dc,#c4c8d0)}
+.insta-cell:nth-child(3) .insta-ph{background:linear-gradient(135deg,#dcdad6,#d0cec8)}
+.insta-cell:nth-child(4) .insta-ph{background:linear-gradient(135deg,#c8ccd8,#bcc0cc)}
+.insta-cell:nth-child(5) .insta-ph{background:linear-gradient(135deg,#e0dcd4,#d4d0c8)}
+.insta-cell:nth-child(6) .insta-ph{background:linear-gradient(135deg,#dad6d2,#cec8c4)}
+.insta-cell:nth-child(7) .insta-ph{background:linear-gradient(135deg,#ccd0d8,#c0c4cc)}
+.insta-cell:nth-child(8) .insta-ph{background:linear-gradient(135deg,#e2ddd4,#d6d1c8)}
+.insta-cell:nth-child(9) .insta-ph{background:linear-gradient(135deg,#ccd8cc,#c0ccc0)}
+.insta-hover-overlay{position:absolute;inset:0;background:rgba(17,17,17,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
 .insta-cell:hover .insta-hover-overlay{opacity:1}
 .insta-hover-overlay svg{width:32px;height:32px;fill:var(--white);opacity:.9}
 .insta-label-inner{font-size:12px;color:var(--text3);letter-spacing:.06em;position:absolute;bottom:12px;left:0;right:0;text-align:center;opacity:0;transition:opacity .3s;font-style:italic}
@@ -273,7 +273,7 @@ nav{display:flex;align-items:center;justify-content:space-between}
 .form-field{margin-bottom:20px}
 .form-field label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
 .form-field input,.form-field select,.form-field textarea{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;padding:16px 18px;border-radius:var(--r);outline:none;transition:border-color .3s;font-weight:300}
-.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:rgba(201,168,76,.5)}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:rgba(0,0,0,.35)}
 .form-field select option{background:var(--bg3)}
 .form-field textarea{resize:vertical;min-height:100px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -312,7 +312,7 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:60px 0 36px
 .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:36px;border-top:1px solid var(--line)}
 .footer-copy{font-size:12px;color:var(--text3);font-weight:300}
 .footer-madeby{font-size:12px;color:var(--text3);font-weight:300}
-.footer-madeby a{color:rgba(201,168,76,.5);transition:color .3s}
+.footer-madeby a{color:rgba(0,0,0,.35);transition:color .3s}
 .footer-madeby a:hover{color:var(--gold)}
 
 /* FLOATING */
@@ -397,11 +397,11 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:60px 0 36px
       <a href="#" class="logo">
         <div class="logo-mark">
           <svg viewBox="0 0 22 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M1 1H6.5C9.538 1 12 3.462 12 6.5C12 9.538 9.538 12 6.5 12H1V1Z" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
-            <line x1="1" y1="6.5" x2="12" y2="6.5" stroke="#C9A84C" stroke-width="1.2"/>
-            <line x1="14" y1="1" x2="14" y2="17" stroke="#C9A84C" stroke-width="1.2"/>
-            <line x1="21" y1="1" x2="21" y2="17" stroke="#C9A84C" stroke-width="1.2"/>
-            <line x1="14" y1="9" x2="21" y2="9" stroke="#C9A84C" stroke-width="1.2"/>
+            <path d="M1 1H6.5C9.538 1 12 3.462 12 6.5C12 9.538 9.538 12 6.5 12H1V1Z" stroke="#111111" stroke-width="1.2" fill="none"/>
+            <line x1="1" y1="6.5" x2="12" y2="6.5" stroke="#111111" stroke-width="1.2"/>
+            <line x1="14" y1="1" x2="14" y2="17" stroke="#111111" stroke-width="1.2"/>
+            <line x1="21" y1="1" x2="21" y2="17" stroke="#111111" stroke-width="1.2"/>
+            <line x1="14" y1="9" x2="21" y2="9" stroke="#111111" stroke-width="1.2"/>
           </svg>
         </div>
         <div class="logo-text">
@@ -566,7 +566,7 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:60px 0 36px
         <div class="p-info"><h4>Гостиная · Минимализм</h4><span>Душанбе · 2024</span></div>
       </div>
       <div class="p-item reveal reveal-delay-1">
-        <div class="p-img ph" style="background:linear-gradient(135deg,#141820,#0e1218)">
+        <div class="p-img ph" style="background:linear-gradient(135deg,#d0d4dc,#c4c8d0)">
           <img src="images/portfolio/2.jpg" alt="Кухня-студия" onerror="this.style.display='none'">
         </div>
         <span class="p-num">02</span>
@@ -574,7 +574,7 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:60px 0 36px
         <div class="p-info"><h4>Кухня-студия · Современный</h4><span>Душанбе · 2024</span></div>
       </div>
       <div class="p-item reveal reveal-delay-2">
-        <div class="p-img ph" style="background:linear-gradient(135deg,#1e1810,#28200c)">
+        <div class="p-img ph" style="background:linear-gradient(135deg,#e4e0d8,#d8d4cc)">
           <img src="images/portfolio/3.jpg" alt="Спальня неоклассика" onerror="this.style.display='none'">
         </div>
         <span class="p-num">03</span>
@@ -582,7 +582,7 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:60px 0 36px
         <div class="p-info"><h4>Спальня · Неоклассика</h4><span>Душанбе · 2023</span></div>
       </div>
       <div class="p-item reveal">
-        <div class="p-img ph" style="background:linear-gradient(135deg,#0e1218,#141820)">
+        <div class="p-img ph" style="background:linear-gradient(135deg,#c8ccd8,#bcc0cc)">
           <img src="images/portfolio/4.jpg" alt="Офис лофт" onerror="this.style.display='none'">
         </div>
         <span class="p-num">04</span>
@@ -590,7 +590,7 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:60px 0 36px
         <div class="p-info"><h4>Офис · Лофт</h4><span>Душанбе · 2024</span></div>
       </div>
       <div class="p-item reveal reveal-delay-1">
-        <div class="p-img ph" style="background:linear-gradient(135deg,#1a1510,#241e12)">
+        <div class="p-img ph" style="background:linear-gradient(135deg,#d8d4ca,#ccca be)">
           <img src="images/portfolio/5.jpg" alt="Детская скандинавский" onerror="this.style.display='none'">
         </div>
         <span class="p-num">05</span>
@@ -598,7 +598,7 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:60px 0 36px
         <div class="p-info"><h4>Детская · Скандинавский</h4><span>Душанбе · 2023</span></div>
       </div>
       <div class="p-item reveal reveal-delay-2">
-        <div class="p-img ph" style="background:linear-gradient(135deg,#1e1008,#28160a)">
+        <div class="p-img ph" style="background:linear-gradient(135deg,#d4cec8,#c8c2bc)">
           <img src="images/portfolio/6.jpg" alt="Ресторан арт-деко" onerror="this.style.display='none'">
         </div>
         <span class="p-num">06</span>
@@ -857,11 +857,11 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:60px 0 36px
         <div class="footer-logo">
           <div class="logo-mark">
             <svg viewBox="0 0 22 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M1 1H6.5C9.538 1 12 3.462 12 6.5C12 9.538 9.538 12 6.5 12H1V1Z" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
-              <line x1="1" y1="6.5" x2="12" y2="6.5" stroke="#C9A84C" stroke-width="1.2"/>
-              <line x1="14" y1="1" x2="14" y2="17" stroke="#C9A84C" stroke-width="1.2"/>
-              <line x1="21" y1="1" x2="21" y2="17" stroke="#C9A84C" stroke-width="1.2"/>
-              <line x1="14" y1="9" x2="21" y2="9" stroke="#C9A84C" stroke-width="1.2"/>
+              <path d="M1 1H6.5C9.538 1 12 3.462 12 6.5C12 9.538 9.538 12 6.5 12H1V1Z" stroke="#111111" stroke-width="1.2" fill="none"/>
+              <line x1="1" y1="6.5" x2="12" y2="6.5" stroke="#111111" stroke-width="1.2"/>
+              <line x1="14" y1="1" x2="14" y2="17" stroke="#111111" stroke-width="1.2"/>
+              <line x1="21" y1="1" x2="21" y2="17" stroke="#111111" stroke-width="1.2"/>
+              <line x1="14" y1="9" x2="21" y2="9" stroke="#111111" stroke-width="1.2"/>
             </svg>
           </div>
           <div class="logo-text">
