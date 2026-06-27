@@ -281,10 +281,10 @@ nav{display:flex;align-items:center;justify-content:space-between}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .form-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
 .form-submit{width:100%;padding:16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;border:none;cursor:pointer;border-radius:var(--r);transition:all .3s;display:flex;align-items:center;justify-content:center;gap:10px}
-.form-submit-wa{background:#25D366;color:#fff}
-.form-submit-wa:hover{background:#20ba58;transform:translateY(-1px)}
-.form-submit-tg{background:#0088cc;color:#fff}
-.form-submit-tg:hover{background:#0077b5;transform:translateY(-1px)}
+.form-submit-wa{background:var(--bg3);color:var(--text2);border:1px solid var(--line)}
+.form-submit-wa:hover{border-color:var(--gold);color:var(--text);transform:translateY(-1px)}
+.form-submit-tg{background:var(--bg3);color:var(--text2);border:1px solid var(--line)}
+.form-submit-tg:hover{border-color:var(--gold);color:var(--text);transform:translateY(-1px)}
 @media(max-width:480px){.form-btns{grid-template-columns:1fr}}
 .contact-right{padding-top:92px}
 .contact-detail{display:flex;align-items:flex-start;gap:20px;padding:28px 0;border-bottom:1px solid var(--line)}
@@ -318,9 +318,9 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:60px 0 36px
 .footer-madeby a:hover{color:var(--gold)}
 
 /* FLOATING */
-.wa-btn{position:fixed;bottom:32px;right:32px;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:50;box-shadow:0 4px 24px rgba(37,211,102,.3);transition:transform .3s,box-shadow .3s}
-.wa-btn:hover{transform:scale(1.1);box-shadow:0 8px 32px rgba(37,211,102,.45)}
-.wa-btn svg{width:26px;height:26px;fill:#fff}
+.wa-btn{position:fixed;bottom:32px;right:32px;width:56px;height:56px;background:var(--bg3);border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:50;box-shadow:0 4px 24px rgba(0,0,0,.4);transition:transform .3s,box-shadow .3s,border-color .3s}
+.wa-btn:hover{transform:scale(1.1);border-color:var(--gold);box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.wa-btn svg{width:26px;height:26px;fill:var(--text2)}
 .totop{position:fixed;bottom:32px;right:100px;width:44px;height:44px;border:1px solid rgba(255,255,255,.12);background:rgba(8,8,8,.8);backdrop-filter:blur(8px);border-radius:var(--r);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:50;opacity:0;transform:translateY(16px);transition:all .3s}
 .totop.show{opacity:1;transform:none}
 .totop:hover{border-color:var(--gold)}
