@@ -1,0 +1,37 @@
+# Настройки JARVIS (не секреты — секреты в .env)
+
+[owner]
+name = "Владелец"
+language = "ru"
+timezone = "Asia/Dushanbe"
+
+[paths]
+projects_root = "C:/Projects"          # новые проекты, которые разрабатывает JARVIS
+brain = "brain"
+tasks_file = "data/tasks.json"         # локальная копия очереди (этап 3 — Supabase)
+
+[models]
+planner = "opus"                       # ТЗ, план, ревью
+developer = "sonnet"
+tester = "sonnet"
+bulk = "haiku"                         # сортировка, короткие ответы
+local = "qwen3.5:4b"                   # OpenJarvis / Ollama: офлайн и рутина
+
+[budget]
+daily_usd_equivalent = 15.0            # стоп-кран раннера (эквивалент API по total_cost_usd)
+warn_at_percent = 80
+
+[claude_code]
+permission_mode = "acceptEdits"
+max_turns = 40
+default_allowed_tools = ["Read", "Edit", "Write", "Glob", "Grep", "Bash"]
+
+[telegram]
+escalation_minutes = 10                # нет ответа на срочный вопрос → позвонить (когда будут звонки)
+report_hour = 8                        # утренний дайджест
+
+[speech]
+stt_model = "large-v3"                 # faster-whisper; на слабом ПК — "medium"
+stt_language = "ru"
+tts_engine = "piper"                   # piper | silero | openai | elevenlabs
+wake_word = "джарвис"

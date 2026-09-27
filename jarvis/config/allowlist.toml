@@ -1,0 +1,44 @@
+# Политика доступа JARVIS. Читается core/jarviscore/policy.py и хуками Claude Code.
+# Пути: %VAR% и ~ раскрываются. Команды: регулярные выражения Python.
+
+[paths]
+# Где JARVIS может писать без вопросов. Всё остальное — запрет.
+allowed = [
+  "C:/jarvis",
+  "C:/Projects",
+  "%USERPROFILE%/Documents/Jarvis",
+  "%TEMP%/jarvis",
+]
+
+[programs]
+# Что можно запускать без вопросов (имя exe без пути). Остальное — с подтверждением.
+allowed = [
+  "code", "code.cmd",
+  "3dsmax", "3dsmaxbatch",
+  "python", "py", "uv", "node", "npm", "npx", "git", "claude",
+  "explorer", "notepad", "powershell", "pwsh", "cmd",
+  "ffmpeg", "magick",
+  "bambu-studio", "obsidian",
+]
+
+[commands]
+# Никогда, даже с подтверждением.
+deny = [
+  '(?i)\bformat\b\s+[a-z]:',
+  '(?i)\brm\s+-rf\s+/(\s|$)',
+  '(?i)\b(rd|rmdir)\b.*\s/s.*\s[a-z]:\\\\?(\s|$)',
+  '(?i)remove-item.*-recurse.*\s[a-z]:\\\\?(\s|$)',
+  '(?i)\bdiskpart\b',
+  '(?i)reg\s+delete\s+hk(lm|cr)',
+]
+# С подтверждением (кнопка в Telegram / ответ в чате).
+ask = [
+  '(?i)\bshutdown\b|\brestart-computer\b|\bstop-computer\b',
+  '(?i)\brm\b|\bdel\b|\berase\b|remove-item|\brmdir\b',
+  '(?i)git\s+push\s+.*--force|git\s+reset\s+--hard|git\s+clean\s+-fd',
+  '(?i)npm\s+install\s+-g|pip\s+install|uv\s+pip\s+install|winget\s+install|choco\s+install',
+  '(?i)\bcurl\b.*\|\s*(sh|bash|iex)|irm\b.*\|\s*iex',
+  '(?i)send(_|-)?message|sendMessage|publish|post\s+to',
+  '(?i)\bpay\b|payment|invoice|оплат',
+  '(?i)\.env\b|credential|token|secret|password',
+]
