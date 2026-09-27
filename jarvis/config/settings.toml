@@ -15,7 +15,12 @@ planner = "opus"                       # ТЗ, план, ревью
 developer = "sonnet"
 tester = "sonnet"
 bulk = "haiku"                         # сортировка, короткие ответы
-local = "qwen3.5:4b"                   # OpenJarvis / Ollama: офлайн и рутина
+local = "qwen3.5:27b"                  # OpenJarvis / Ollama: офлайн и рутина (RTX 3090 24 ГБ — влезает целиком)
+local_fast = "qwen3.5:4b"              # сортировка сообщений, когда GPU занят рендером
+
+[disk]
+min_free_gb = 50                       # C: почти полон (≈80 ГБ из 1,86 ТБ на 2026-09-27) — предупреждать ниже порога
+big_files_target = "D:/"               # появится позже (HDD): рендеры, архивы, модели Ollama при нехватке места
 
 [budget]
 daily_usd_equivalent = 15.0            # стоп-кран раннера (эквивалент API по total_cost_usd)
@@ -30,8 +35,25 @@ default_allowed_tools = ["Read", "Edit", "Write", "Glob", "Grep", "Bash"]
 escalation_minutes = 10                # нет ответа на срочный вопрос → позвонить (когда будут звонки)
 report_hour = 8                        # утренний дайджест
 
+[printers]
+# Имена ресурсов планировщика и способ управления. Секреты (IP, коды) — в .env.
+slicer = "orcaslicer"                  # один слайсер для обоих принтеров
+
+[printers.bambu-p1s]
+vendor = "bambu"
+control = "lan-developer-mode"         # LAN-only + Developer Mode → MQTT 8883 / FTP 990
+bed_mm = [256, 256, 256]
+multicolor = "ams"                     # уточнить: есть ли AMS
+
+[printers.creality-k1]
+vendor = "creality"
+control = "moonraker"                  # root + Creality Helper Script → Moonraker http://<ip>:7125
+bed_mm = [220, 220, 250]
+multicolor = "none"
+
 [speech]
 stt_model = "large-v3"                 # faster-whisper; на слабом ПК — "medium"
 stt_language = "ru"
-tts_engine = "piper"                   # piper | silero | openai | elevenlabs
+tts_engine = "qwen3-tts"               # qwen3-tts (основной, GPU) | chatterbox (запасной, GPU) | piper (CPU, когда GPU занят)
+tts_fallback = "piper"                 # только бесплатные локальные движки — решение владельца
 wake_word = "джарвис"

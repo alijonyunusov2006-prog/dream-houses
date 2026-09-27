@@ -12,3 +12,6 @@
 | 2026-09-27 | 3D из фото: сначала Higgsfield `generate_3d` (уже подключён) и 3ds Max; платные сервисы (Meshy/Tripo) — только после согласия | этап 6 |
 | 2026-09-27 | База OpenJarvis — компонент (память, окно, локальные модели), управляющая логика — наш код в `core/` | архитектура |
 | 2026-09-27 | Методология Claude Code — плагин **superpowers** (brainstorming → plans → TDD → subagents → verification) | harness |
+| 2026-09-27 | Голос: **только бесплатно и локально**, без подписок. Основной — Qwen3-TTS 1.7B (Apache-2.0), запасной — Chatterbox Multilingual (MIT), лёгкий — Piper. STT — faster-whisper large-v3 | речь |
+| 2026-09-27 | ПК: i9-13900K, 64 ГБ, RTX 3090 24 ГБ → локальная модель по умолчанию `qwen3.5:27b`, STT `large-v3` на GPU. Диск C: почти полон — держать ≥ 50 ГБ свободными, большие файлы позже на D: | ПК |
+| 2026-09-27 | Принтеры: **Bambu Lab P1S** и **Creality K1**. Один слайсер для обоих — OrcaSlicer. P1S управляется через LAN-only + Developer Mode (MQTT/FTP), K1 — через root + Moonraker. Подробности: `brain/70-3d-print/принтеры.md` | 3D-печать |
