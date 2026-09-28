@@ -11,7 +11,9 @@
 | Путь | Назначение |
 |---|---|
 | `brain/` | второй мозг: правила трёх уровней, вопросы, профиль, проекты, уроки, дневник |
-| `.claude/agents/` | роли: planner, developer, tester, crm, content, 3d, browser |
+| `AGENTS.md` | карта агентов: кто за что отвечает, навыки, правила совместной работы |
+| `.claude/agents/` | роли: planner, developer, tester, archicad, 3d, crm, content, browser, secretary, sysadmin |
+| `core/scripts/` | служебные скрипты (аудит диска и др.) |
 | `.claude/settings.json` | хуки политики доступа и разрешения Claude Code |
 | `skills/` | библиотека навыков (SKILL.md + tests + CHANGELOG) |
 | `core/jarviscore/` | политика, планировщик, раннер `claude -p`, отчёты, хуки, `jv` CLI |
