@@ -1,0 +1,22 @@
+# Пример для будущего ноутбука: скопировать в <COMPUTERNAME>.toml и поправить.
+
+[machine]
+name = "Laptop"
+role = "laptop"
+gpu = ""                               # без дискретной GPU — локальная модель поменьше
+gpu_vram_gb = 0
+
+[paths]
+work = "C:/Work"
+projects_root = "C:/Projects"
+archive = ""                           # архива на ноутбуке нет
+ai_models = "C:/Work/AI"
+
+[capabilities]
+render = false                         # рендер и печать — на основном ПК через очередь
+printers = []
+archicad = false
+max3ds = false
+
+[models]
+local = "qwen3.5:4b"                   # переопределение общего settings.toml для слабой машины

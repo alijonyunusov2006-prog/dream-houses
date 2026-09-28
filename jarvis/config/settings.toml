@@ -20,7 +20,10 @@ local_fast = "qwen3.5:4b"              # сортировка сообщений
 
 [disk]
 min_free_gb = 50                       # C: почти полон (≈80 ГБ из 1,86 ТБ на 2026-09-27) — предупреждать ниже порога
-big_files_target = "D:/"               # появится позже (HDD): рендеры, архивы, модели Ollama при нехватке места
+archive_target = "D:/Archive"          # HDD (≈ через 10 дней): ТОЛЬКО холодный архив; ежедневное остаётся на C: (SSD)
+
+# Настройки конкретной машины накладываются поверх этого файла: config/machines/<COMPUTERNAME>.toml
+# (пути, GPU, принтеры). См. docs/DECISIONS/0005-portability-laptop.md.
 
 [budget]
 daily_usd_equivalent = 15.0            # стоп-кран раннера (эквивалент API по total_cost_usd)
