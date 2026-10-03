@@ -516,6 +516,29 @@ Build Tools не установились или установились без
         }
     }
 
+    # ---- 9b. Claude Code всегда отвечает по-русски ----------------------
+    # Владелец не читает по-английски. Добавляем "language": "russian" в общие
+    # настройки Claude Code, не трогая остальные ключи (старый файл — в .bak).
+    Write-Step "Claude Code: язык ответов — русский"
+    try {
+        $ccDir = Join-Path $env:USERPROFILE '.claude'
+        $ccSettings = Join-Path $ccDir 'settings.json'
+        if (-not (Test-Path $ccDir)) { New-Item -ItemType Directory -Path $ccDir -Force | Out-Null }
+        $cfg = [pscustomobject]@{}
+        if (Test-Path $ccSettings) {
+            Copy-Item $ccSettings "$ccSettings.bak" -Force
+            $text = Get-Content $ccSettings -Raw -Encoding UTF8
+            if ($text -and $text.Trim()) { $cfg = $text | ConvertFrom-Json }
+        }
+        if ($cfg.PSObject.Properties.Name -contains 'language') { $cfg.language = 'russian' }
+        else { $cfg | Add-Member -NotePropertyName 'language' -NotePropertyValue 'russian' }
+        $json = $cfg | ConvertTo-Json -Depth 32
+        [System.IO.File]::WriteAllText($ccSettings, $json, (New-Object System.Text.UTF8Encoding($false)))
+        Write-Ok "В $ccSettings записано: language = russian"
+    } catch {
+        Write-Warn2 "Не удалось записать язык в настройки Claude Code: $($_.Exception.Message). Сделайте вручную: в Claude Code команда /config → Language → russian"
+    }
+
     # ---- 10. Запуск ------------------------------------------------------
     Write-Step "Запускаю Jarvis"
     if ($desktopExe) {
