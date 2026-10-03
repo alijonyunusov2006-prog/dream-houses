@@ -810,6 +810,7 @@ function problems() {
     { sev: 'warn', src: 'demo', room: 'print', t: 'K1: нить на исходе', d: 'Хватит на 6 тракторов из 12 оставшихся. Партия к ' + T(6.5) + ' под угрозой, нужна смена катушки.' },
     { sev: 'warn', src: 'fact', room: 'crm', t: 'DH OS ждёт ключ для JARVIS', d: 'Вход для помощника в DH OS готов. Ключ вы выдадите на ПК при установке, тогда JARVIS начнёт читать задачи и заявки.' },
     { sev: 'warn', src: 'fact', room: 'server', t: 'ПК ещё не подключён к JARVIS', d: 'Этап 3 не начинается без доступа к компьютеру: Claude Desktop или claude remote-control.' },
+    { sev: 'warn', src: 'demo', room: 'p:manager', t: 'Просрочки у команды: 2', d: 'Менеджер — звонки по трём заявкам, дизайнер-проектировщик — чертежи санузла. Задачи людям JARVIS ставит через DH OS после вашего «да».' },
     { sev: 'warn', src: 'fact', room: 'sysadmin', t: 'Диск D: ещё не установлен', d: 'Архив 312 ГБ некуда переносить. План переноса готов и ждёт диск.' },
     { sev: 'risk', src: 'fact', room: 'developer', t: 'Репозиторий сайта публичный', d: 'Память JARVIS туда класть нельзя. Решение: отдельный приватный репозиторий.' },
   ];
@@ -848,13 +849,13 @@ const PTRIPS = [
 const QPOOL = ['Сделай планировку по фото, 64 м²', 'Напомни про замер завтра в 11:00', 'Сколько заявок за неделю?', 'Подготовь пост про макет коттеджа', 'Хватит ли нити на 12 тракторов?', 'Найди чертёж санузла с прошлой недели', 'Пришли сводку по просрочкам', 'Отрендерь кухню, второй ракурс', 'Ответь клиенту про сроки', 'Карусель про DH Academy', 'Запусти бэкап brain/', 'Скриншот сайта на телефоне'];
 
 /* ---------- состояние и шина событий ---------- */
-const state = { selected: null, view: 'overview', pc: 'online', queue: [], k1Done: 18, p1sLayer: 212, gpu: 78, timeOverride: null, uptime0: NOW0 - (6 * H + 12 * 60e3) };
+const state = { selected: null, view: 'overview', floor: 'all', pc: 'online', queue: [], k1Done: 18, p1sLayer: 212, gpu: 78, timeOverride: null, uptime0: NOW0 - (6 * H + 12 * 60e3) };
 const bus = {};
 const DH = window.DH = {
-  ROOMS, byId, ORDER, TASKS, RES, HANDOFFS, state, REDUCED,
+  ROOMS, byId, ORDER, TASKS, RES, HANDOFFS, PEOPLE, byPid, ZONES, PTRIPS, MK_IDS, entity, state, REDUCED,
   on(e, f) { (bus[e] || (bus[e] = [])).push(f); },
   emit(e, d) { (bus[e] || []).forEach((f) => { try { f(d); } catch (err) { console.error(err); } }); },
-  statusOf, select, clearSelection, setView, pushEvent: (r, t) => pushEvent(r, t),
+  statusOf, select, clearSelection, setView, setFloor, pushEvent: (r, t) => pushEvent(r, t),
   sceneTime, ready: false,
   sceneReady() { DH.ready = true; $('#loading').hidden = true; $('#nowebgl').hidden = true; },
   noWebGL() { if (DH.ready) return; $('#loading').hidden = true; $('#nowebgl').hidden = false; },
@@ -912,9 +913,12 @@ function counts() {
   ROOMS.forEach((r) => { c[statusOf(r.id)]++; });
   return c;
 }
+function pcounts() { const c = { work: 0, free: 0, late: 0 }; PEOPLE.forEach((p) => { c[p.st]++; }); return c; }
 function renderLegend() {
-  const c = counts();
-  $('#legend').innerHTML = ['work', 'wait', 'bad', 'off'].map((k) => '<span><i class="dot ' + k + '"></i>' + ST[k] + ' <b>' + c[k] + '</b></span>').join('');
+  const c = counts(), pc = pcounts();
+  const ag = ['work', 'wait', 'bad', 'off'].map((k) => '<span><i class="dot ' + k + '"></i>' + ST[k] + ' <b>' + c[k] + '</b></span>').join('');
+  const pe = ['work', 'free', 'late'].map((k) => '<span><i class="dot ' + (k === 'work' ? 'work' : k) + '"></i>' + PST[k] + ' <b>' + pc[k] + '</b></span>').join('');
+  $('#legend').innerHTML = state.floor === '1' ? '<span class="lg-h">Люди</span>' + pe : state.floor === '2' ? ag : '<span class="lg-h">Агенты</span>' + ag + '<span class="lg-h">Люди</span>' + pe;
 }
 
 /* ---------- боковая карточка ---------- */
@@ -937,6 +941,7 @@ function renderHome() {
     ['archicad', 'wait', 'Archicad ждёт от вас размер', 'Глубина ниши в коридоре. Срок ' + T(2.2) + ' под угрозой.'],
     ['print', 'work', 'K1 печатает трактор ' + Math.min(30, state.k1Done + 1) + ' из 30', 'P1S — макет коттеджа, слой ' + state.p1sLayer + ' из 640.'],
     ['server', 'bad', 'Диск C: занят на 96 %', 'Это факт. Диск D: ещё не установлен.'],
+    ['z:open', 'late', 'Команда: просрочки у двух человек', 'Менеджер и дизайнер-проектировщик. Этаж 1 — места команды, демо.'],
   ] : [
     ['cloud', 'work', 'Облачная очередь: ' + state.queue.length + ' ' + plural(state.queue.length, 'задача', 'задачи', 'задач'), 'Telegram-бот принимает задания, ПК заберёт их после включения.'],
     ['print', 'work', 'Принтеры печатают дальше', 'Им ПК не нужен: K1 — тракторы, P1S — макет коттеджа.'],
@@ -1028,23 +1033,80 @@ function renderRoom(id) {
     '<button class="link-btn" type="button" data-act="back">← Ко всему макету</button></div>';
   $('#side-room').innerHTML = html;
 }
+function personCard(p) {
+  const late = p.tasks.filter((t) => t.late).length, open = p.tasks.filter((t) => !t.done).length;
+  const z = byZid[p.zone];
+  const stc = p.st === 'work' ? 'work' : p.st === 'free' ? 'free' : 'bad';
+  const d = loc(Date.now() + DAY);
+  const tom = d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate());
+  $('#side-room').innerHTML =
+    '<div class="eyebrow">Этаж 1 · Место ' + p.n + ' · ' + esc(z.name) + '</div>' +
+    '<h2>' + esc(p.role) + '</h2>' +
+    '<div class="pills"><span class="pill ' + stc + '"><span class="dot ' + (p.st === 'late' ? 'bad' : p.st) + '"></span>' + PST[p.st] + '</span><span class="pill">Человек · DH OS</span></div>' +
+    '<p class="name-ph">Имя придёт из DH OS</p>' +
+    '<p class="lead">' + esc(p.d) + '</p>' +
+    '<div class="sec-l"><span>Задачи сейчас</span><span>демо</span></div>' +
+    '<ul class="ptasks">' + p.tasks.map((t) => '<li class="' + (t.late ? 'late' : t.done ? 'done' : t.fresh ? 'fresh' : '') + '"><b>' + esc(t.t) + '</b><span>' + esc(t.due) + '</span></li>').join('') + '</ul>' +
+    '<dl class="facts">' +
+    '<div><dt>В работе</dt><dd>' + open + ' <small>' + plural(open, 'задача', 'задачи', 'задач') + '</small></dd></div>' +
+    '<div><dt>Просрочено</dt><dd' + (late ? ' style="color:var(--bad)"' : '') + '>' + late + '</dd></div>' +
+    '<div><dt>Роль в DH OS</dt><dd style="font-size:12.5px">' + p.enumR + '</dd></div>' +
+    '<div><dt>Задачи приходят</dt><dd style="font-size:12.5px">в Telegram от бота</dd></div>' +
+    '</dl>' +
+    '<div class="sec-l"><span>Дать задание</span><span>через DH OS</span></div>' +
+    '<form class="tform" id="tform" novalidate>' +
+    '<label for="tk-what">Что сделать</label><textarea id="tk-what" rows="2" maxlength="160" placeholder="Например: подготовить три варианта расстановки для гостиной"></textarea>' +
+    '<div class="tform-row"><div><label for="tk-due">Срок</label><input type="date" id="tk-due" value="' + tom + '"></div>' +
+    '<button class="btn primary" type="submit" data-pid="' + p.id + '">Дать задание</button></div>' +
+    '<p class="tform-err" id="tk-err" hidden></p></form>' +
+    '<div class="fact"><div class="eyebrow">По факту на 3 октября · не демо</div><dl>' +
+    '<dt>Сейчас</dt><dd>Роль есть в DH OS. Имени, задач и просрочек JARVIS пока не видит.</dd><dt>Нужно</dt><dd>Ключ DH OS на ПК (DHOS_AGENT_KEY).</dd><dt>Как</dt><dd>Задачи людям ставит агент CRM через DH OS — только после вашего «да».</dd></dl></div>' +
+    '<div class="card-actions"><button class="link-btn" type="button" data-act="back">← Ко всей студии</button></div>';
+}
+function zoneCard(z) {
+  const ppl = PEOPLE.filter((p) => p.zone === z.id || (z.id === 'open' && p.zone !== 'reception' && p.zone !== 'academy'));
+  const list = z.id === 'open' ? PEOPLE : ppl;
+  const pc = pcounts();
+  $('#side-room').innerHTML =
+    '<div class="eyebrow">Этаж 1 · Пом. ' + z.code + ' · Студия</div>' +
+    '<h2>' + esc(z.name) + '</h2>' +
+    (z.id === 'open' ? '<div class="pills"><span class="pill work"><span class="dot work"></span>На задаче ' + pc.work + '</span><span class="pill free"><span class="dot free"></span>Свободен ' + pc.free + '</span><span class="pill bad"><span class="dot bad"></span>Просрочка ' + pc.late + '</span></div>' : '') +
+    '<p class="lead">' + esc(z.d) + '</p>' +
+    (list.length ? '<div class="sec-l"><span>' + (z.id === 'open' ? 'Команда · ' + PEOPLE.length + ' мест' : 'Кто здесь') + '</span><span>демо</span></div><ul class="brief">' + list.map((p) => '<li data-room="p:' + p.id + '" tabindex="0"><span class="dot ' + (p.st === 'late' ? 'bad' : p.st) + '"></span><div><b>' + esc(p.role) + '</b>' + PST[p.st] + ' · ' + esc((p.tasks.find((t) => t.late) || p.tasks[0]).t) + '</div></li>').join('') + '</ul>' : '') +
+    (z.book ? '<div class="sec-l"><span>Брони на сегодня</span><span>демо</span></div><ul class="rel">' + z.book.map((b) => '<li><span class="dot free"></span><div><b>' + b[0] + '</b> ' + esc(b[1]) + '</div></li>').join('') + '</ul>' : '') +
+    '<p class="note">Имена не выдумываем: на табличках роли из DH OS. Имена придут после подключения ключа.</p>' +
+    '<div class="card-actions"><button class="link-btn" type="button" data-act="back">← Ко всему макету</button></div>';
+}
 function renderSide() {
-  if (state.selected) { $('#side-home').hidden = true; $('#side-room').hidden = false; renderRoom(state.selected); }
+  if (state.selected) {
+    $('#side-home').hidden = true; $('#side-room').hidden = false;
+    const id = state.selected;
+    if (id.startsWith('p:')) personCard(byPid[id.slice(2)]); else if (id.startsWith('z:')) zoneCard(byZid[id.slice(2)]); else renderRoom(id);
+  }
   else { $('#side-room').hidden = true; $('#side-home').hidden = false; renderHome(); }
 }
 
 /* ---------- выбор комнаты и виды ---------- */
 let toastTimer = 0;
+function setFloor(f, quiet) {
+  if (!['1', '2', 'all'].includes(f)) return;
+  state.floor = f; store.set('dh-office-floor', f);
+  $$('.fl-b').forEach((b) => b.classList.toggle('is-on', b.dataset.floor === f));
+  renderLegend();
+  if (!quiet && state.selected) { const e = entity(state.selected); if (f !== 'all' && e.floor !== f) { state.selected = null; store.del('dh-office-sel'); renderSide(); DH.emit('select', { id: null, fly: false }); } }
+  DH.emit('floor', { f, quiet: !!quiet });
+}
 function select(id, opts) {
   opts = opts || {};
-  if (!byId[id]) return;
+  const ent = entity(id); if (!ent) return;
+  if (state.floor !== 'all' && state.floor !== ent.floor) setFloor(ent.floor, true);
   state.selected = id;
   renderSide();
   $('#side').scrollTop = 0;
   DH.emit('select', { id, fly: opts.fly !== false });
   store.set('dh-office-sel', id);
   if (window.innerWidth <= 1040 && !opts.silent) {
-    const t = $('#toast'); t.textContent = 'Карточка «' + byId[id].short + '» — ниже ↓'; t.hidden = false;
+    const t = $('#toast'); t.textContent = 'Карточка «' + ent.short + '» — ниже ↓'; t.hidden = false;
     clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 4200);
   }
 }
@@ -1060,6 +1122,7 @@ function setView(v) {
   DH.emit('view', v);
 }
 $$('.seg-b').forEach((b) => b.addEventListener('click', () => { tourStop(); setView(b.dataset.view); }));
+$$('.fl-b').forEach((b) => b.addEventListener('click', () => { tourStop(); setFloor(b.dataset.floor); }));
 $('#toast').addEventListener('click', () => { $('#toast').hidden = true; $('#side').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }); });
 $('#side').addEventListener('click', (e) => {
   const act = e.target.closest('[data-act]');
@@ -1074,6 +1137,27 @@ $('#side').addEventListener('click', (e) => {
   const li = e.target.closest('li[data-room]');
   if (li) select(li.dataset.room);
 });
+$('#side').addEventListener('submit', (e) => {
+  if (e.target.id !== 'tform') return;
+  e.preventDefault();
+  const p = byPid[state.selected && state.selected.slice(2)]; if (!p) return;
+  const what = $('#tk-what').value.trim(), due = $('#tk-due').value, err = $('#tk-err');
+  if (what.length < 3) { err.textContent = 'Напишите, что сделать: хотя бы несколько слов.'; err.hidden = false; $('#tk-what').focus(); return; }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(due)) { err.textContent = 'Укажите срок.'; err.hidden = false; $('#tk-due').focus(); return; }
+  err.hidden = true;
+  const [yy, mm, dd] = due.split('-').map(Number);
+  const dueTxt = dd + ' ' + MONTHS[mm - 1] + (yy !== loc(Date.now()).getUTCFullYear() ? ' ' + yy : '');
+  openModal({
+    eyebrow: 'DH OS · задача сотруднику · демо', title: 'Создам задачу „' + what + '“ для ' + p.gen + ', срок ' + dueTxt + '. Подтвердите', small: true,
+    body: '', honest: null, ok: 'Подтвердить',
+    onOk: () => {
+      p.tasks.unshift({ t: what, due: 'срок ' + dueTxt + ' · новая, демо', fresh: true });
+      pushEvent('crm', 'Задание для ' + p.gen + ': «' + what + '», срок ' + dueTxt + ' — демо, никуда не ушло');
+      openModal({ eyebrow: 'Демо', title: 'Задача не отправлена', body: 'В демо задача никуда не ушла. На ПК JARVIS отправит её через DH OS, и сотрудник получит её в Telegram от бота компании.', honest: null, ok: 'Понятно', noCancel: true });
+      if (state.selected === 'p:' + p.id) renderSide();
+    },
+  });
+});
 $('#side').addEventListener('keydown', (e) => { const li = e.target.closest('li[data-room]'); if (li && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); select(li.dataset.room); } });
 
 /* ---------- полоса «Где проблемы» ---------- */
@@ -1083,7 +1167,7 @@ function renderProblems() {
   $('#pr-eyebrow').textContent = 'Где проблемы · ' + list.length + ' · критичных ' + nBad;
   $('#seg-n').textContent = list.length;
   $('#pr-list').innerHTML = list.map((p) => {
-    const r = byId[p.room];
+    const r = entity(p.room);
     return '<li class="pr"><div class="pr-head"><span class="sev ' + p.sev + '">' + SEV[p.sev] + '</span><span class="src ' + p.src + '">' + (p.src === 'fact' ? 'Факт' : 'Демо') + '</span></div>' +
       '<b>' + esc(p.t) + '</b><p>' + esc(p.d) + '</p>' +
       '<div class="pr-foot"><span class="pr-room">' + r.code + ' · ' + esc(r.short) + '</span><button class="btn" type="button" data-show="' + p.room + '">Показать →</button></div></li>';
@@ -1276,23 +1360,33 @@ function renderPower() {
     '<div class="p-actions"><button class="btn primary" type="button" id="pw-wake"' + (s === 'off' ? '' : ' disabled') + '>Включить по сети</button><button class="btn" type="button" id="pw-off"' + (on ? '' : ' disabled') + '>Выключить после задач</button></div>' +
     '<p class="note">Обе кнопки спрашивают подтверждение. В демо команда на ПК не уходит — макет только показывает, как это будет. Диски — факт на 27 сентября.</p>';
 }
+$('#dhos').addEventListener('click', (e) => { const li = e.target.closest('li[data-pid]'); if (!li) return; tourStop(); const st = $('#stage'), r = st.getBoundingClientRect(); if (r.bottom < 0 || r.top > window.innerHeight) st.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }); select('p:' + li.dataset.pid, { silent: true }); });
 $('#power').addEventListener('click', (e) => { if (e.target.closest('#pw-wake')) openModal('wake'); if (e.target.closest('#pw-off')) openModal('shutdown'); });
-let modalKind = null, modalReturn = null;
-function openModal(kind) {
-  modalKind = kind; modalReturn = document.activeElement;
-  const wake = kind === 'wake';
-  $('#m-eyebrow').textContent = 'Питание ПК · подтверждение';
-  $('#m-title').textContent = wake ? 'Включить ПК по сети?' : 'Выключить ПК после задач?';
-  $('#m-body').textContent = wake
-    ? 'В рабочей версии JARVIS из облака отправит сигнал включения по сети (Wake-on-LAN). ПК «Alijon» загрузится и заберёт задачи из облачной очереди.'
-    : 'В рабочей версии JARVIS дождётся конца текущих задач — рендера и проверки, — сохранит прогресс и выключит ПК. Новые задания с телефона будут ждать в облачной очереди.';
+let modalCfg = null, modalReturn = null;
+const HONEST_PC = 'Это демо: команда никуда не уходит, ПК не включится и не выключится. Подключение к ПК — на этапе 3. Можно показать на макете, как это будет выглядеть.';
+function openModal(cfg) {
+  if (typeof cfg === 'string') {
+    const wake = cfg === 'wake';
+    cfg = { eyebrow: 'Питание ПК · подтверждение', title: wake ? 'Включить ПК по сети?' : 'Выключить ПК после задач?',
+      body: wake ? 'В рабочей версии JARVIS из облака отправит сигнал включения по сети (Wake-on-LAN). ПК «Alijon» загрузится и заберёт задачи из облачной очереди.'
+        : 'В рабочей версии JARVIS дождётся конца текущих задач — рендера и проверки, — сохранит прогресс и выключит ПК. Новые задания с телефона будут ждать в облачной очереди.',
+      honest: HONEST_PC, ok: 'Показать на макете', onOk: wake ? pcWake : pcShutdown };
+  }
+  if ($('#modal').hidden) modalReturn = document.activeElement;
+  modalCfg = cfg;
+  $('#m-eyebrow').textContent = cfg.eyebrow;
+  $('#m-title').textContent = cfg.title; $('#m-title').classList.toggle('q', !!cfg.small);
+  $('#m-body').textContent = cfg.body || ''; $('#m-body').hidden = !cfg.body;
+  $('#m-honest').textContent = cfg.honest || ''; $('#m-honest').hidden = !cfg.honest;
+  $('#m-ok').textContent = cfg.ok || 'Подтвердить';
+  $('#m-cancel').hidden = !!cfg.noCancel;
   $('#modal').hidden = false; $('#m-ok').focus();
 }
-function closeModal() { $('#modal').hidden = true; modalKind = null; if (modalReturn && modalReturn.focus) modalReturn.focus(); }
+function closeModal() { $('#modal').hidden = true; modalCfg = null; if (modalReturn && modalReturn.focus && document.contains(modalReturn)) modalReturn.focus(); }
 $('#m-cancel').addEventListener('click', closeModal);
 $('#modal').addEventListener('click', (e) => { if (e.target === $('#modal')) closeModal(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#modal').hidden) closeModal(); });
-$('#m-ok').addEventListener('click', () => { const k = modalKind; closeModal(); if (k === 'wake') pcWake(); else if (k === 'shutdown') pcShutdown(); });
+$('#m-ok').addEventListener('click', () => { const c = modalCfg; closeModal(); if (c && c.onOk) c.onOk(); });
 let qTimer = 0;
 function addQueue() {
   if (state.pc !== 'off' || state.queue.length >= 12) return;
@@ -1329,24 +1423,37 @@ function pcWake() {
 
 /* ---------- DH OS ---------- */
 function renderDHOS() {
-  const people = [
-    ['Дизайнер', 'Концепция гостиной, квартира 78 м²', 'срок: завтра', 'work', 'В работе'],
-    ['Замерщик', 'Замер: коттедж, 2 этажа', 'завтра в 11:00', 'wait', 'Ждёт выезда'],
-    ['Менеджер', 'Перезвонить по трём новым заявкам', 'просрочено на 1 день', 'bad', 'Просрочено'],
-    ['Чертёжник', 'Рабочие чертежи санузла', 'просрочено на 2 дня', 'bad', 'Просрочено'],
-    ['3D-визуализатор', 'Рендер кухни, 2 ракурса', 'сдано сегодня', 'work', 'Готово'],
-    ['Инженер надзора', 'Выезд на объект: проверка электрики', 'срок: пятница', 'work', 'В работе'],
-  ];
+  const people = PEOPLE.map((p) => { const t = p.tasks.find((x) => x.late) || p.tasks[0]; return [p.role, t.t, t.due, t.late ? 'bad' : t.done ? 'free' : 'work', t.late ? 'Просрочено' : t.done ? 'Готово' : 'В работе', p.id]; });
   const funnel = [['Новая заявка', 6], ['Консультация', 4], ['Замер', 3], ['Договор', 2], ['Проект', 5], ['Надзор', 2]];
   const max = Math.max(...funnel.map((f) => f[1])), sum = funnel.reduce((a, f) => a + f[1], 0);
   $('#dhos').innerHTML =
     '<div class="panel-head"><div><div class="eyebrow">DH OS · управление компанией</div><h3 id="dh-h">Задачи людям и заявки</h3></div><span class="src demo">Демо</span></div>' +
-    '<div class="dh-cols"><div><div class="sec-l" style="margin-top:2px"><span>Задачи сотрудникам · ' + people.length + '</span><span>просрочено 2</span></div><ul class="people">' +
-    people.map((p) => '<li><span class="role">' + p[0] + '</span><span class="task-t">' + esc(p[1]) + '</span><span class="due">' + p[2] + '</span><span class="st"><span class="pill ' + p[3] + '">' + p[4] + '</span></span></li>').join('') +
+    '<div class="dh-cols"><div><div class="sec-l" style="margin-top:2px"><span>Задачи сотрудникам · ' + people.length + ' ролей</span><span>просрочено ' + people.filter((p) => p[3] === 'bad').length + '</span></div><ul class="people">' +
+    people.map((p) => '<li data-pid="' + p[5] + '"><span class="role">' + p[0] + '</span><span class="task-t">' + esc(p[1]) + '</span><span class="due">' + p[2] + '</span><span class="st"><span class="pill ' + p[3] + '">' + p[4] + '</span></span></li>').join('') +
     '</ul></div><div><div class="sec-l" style="margin-top:2px"><span>Заявки по статусам · ' + sum + '</span><span>сейчас</span></div><div class="funnel">' +
     funnel.map((f) => '<div class="fn" title="' + f[0] + ': ' + f[1] + '"><span>' + f[0] + '</span><div class="track"><i style="width:' + (f[1] / max * 100) + '%"></i></div><span class="num">' + f[1] + '</span></div>').join('') +
     '</div><p class="note">Работа по шагам сайта: 01 / Замеры → 02 / Планировка → 03 / Проект → 04 / Надзор. Новых заявок за сутки: 3.</p></div></div>' +
     '<p class="note">Имена не выдумываем: до подключения DH OS показаны только роли. Подключение — этап 3, агент CRM читает ключом только на чтение.</p>';
+}
+
+/* ---------- план месяца (демо) ---------- */
+function renderMonth() {
+  const d = loc(Date.now()), day = d.getUTCDate(), N = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
+  const k = day / N;
+  const oPlan = 12, oFact = Math.max(0, Math.round(oPlan * k * 0.85)), oFc = Math.round(oFact / Math.max(k, 0.05));
+  const pPlan = 85000, pFact = Math.round(pPlan * k * 0.8 / 100) * 100, pFc = Math.round(pFact / Math.max(k, 0.05) / 1000) * 1000;
+  const num = (v) => v.toLocaleString('ru-RU').replace(/\u00a0/g, '\u2009');
+  const bar = (f, pl, tick) => '<div class="mbar"><i style="width:' + Math.min(100, f / pl * 100) + '%"></i><em style="left:' + Math.min(100, tick * 100) + '%" title="Где должны быть сегодня"></em></div>';
+  const fun = [['Заявки', 64], ['Встречи', 27], ['Договоры', 11]];
+  $('#m-eyebrow-month').textContent = 'План месяца · ' + ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'][d.getUTCMonth()] + ' · день ' + day + ' из ' + N;
+  $('#month-grid').innerHTML =
+    '<div class="mcard"><div class="sec-l" style="margin-top:0"><span>Заказы · договоры</span><span class="src demo">Демо</span></div><div class="mbig num">' + oFact + '<small> из ' + oPlan + '</small></div>' + bar(oFact, oPlan, k) + '<p class="note">По темпу к концу месяца ≈ ' + oFc + '. Метка на полосе — где план должен быть сегодня.</p></div>' +
+    '<div class="mcard"><div class="sec-l" style="margin-top:0"><span>Прибыль · сомони</span><span class="src demo">Демо</span></div><div class="mbig num">' + num(pFact) + '<small> из ' + num(pPlan) + '</small></div>' + bar(pFact, pPlan, k) + '<p class="note">По темпу ≈ ' + num(pFc) + ' сомони. Прибыль считает агент «Финансы и план».</p></div>' +
+    '<div class="mcard"><div class="sec-l" style="margin-top:0"><span>Воронка · 30 дней</span><span class="src demo">Демо</span></div><div class="mfun">' +
+    fun.map((f, i) => '<div class="fn"><span>' + f[0] + '</span><div class="track"><i style="width:' + (f[1] / fun[0][1] * 100) + '%"></i></div><span class="num">' + f[1] + '</span></div>' + (i < fun.length - 1 ? '<div class="fconv">→ ' + Math.round(fun[i + 1][1] / f[1] * 100) + ' % доходят до шага «' + fun[i + 1][0].toLowerCase() + '»</div>' : '')).join('') +
+    '</div></div>' +
+    '<div class="mcard lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.3" fill="currentColor"/></svg>' +
+    '<div class="eyebrow">Только для вас</div><h3>Оплата сотрудников — только для вас</h3><p>Анализ, кому переплачиваем и кому недоплачиваем, — по вашему запросу, только вам лично.</p><p class="note">Цифр здесь нет и не будет. В DH OS зарплаты видит только руководитель.</p></div>';
 }
 
 /* ---------- лента событий (имитация) ---------- */
@@ -1354,11 +1461,12 @@ const feed = [];
 let feedPaused = false;
 function pushEvent(room, text, ts) {
   feed.unshift({ room, text, ts: ts || Date.now(), fresh: !ts });
+  if (feed.length && !byId[room] && !String(room).startsWith('p:')) feed[0].room = 'jarvis';
   if (feed.length > 9) feed.length = 9;
   renderFeed();
 }
 function renderFeed() {
-  $('#feed').innerHTML = feed.map((f) => '<li class="' + (f.fresh ? 'new' : '') + '"><time>' + hhmm(f.ts) + '</time><div><span class="who">' + esc((byId[f.room] || {}).short || 'JARVIS') + '</span>' + esc(f.text) + '</div></li>').join('');
+  $('#feed').innerHTML = feed.map((f) => '<li class="' + (f.fresh ? 'new' : '') + '"><time>' + hhmm(f.ts) + '</time><div><span class="who">' + esc((entity(f.room) || {}).short || 'JARVIS') + '</span>' + esc(f.text) + '</div></li>').join('');
   feed.forEach((f) => { f.fresh = false; });
 }
 const POOL = [
@@ -1376,6 +1484,12 @@ const POOL = [
   ['sysadmin', () => 'Здоровье SSD: 97 %, ошибок нет'],
   ['planner', () => 'Оценка: 12 тракторов — 9 часов печати на K1'],
   ['jarvis', () => 'Лимит Claude: ' + Math.round(spentAt(Date.now()) / 15 * 100) + ' % дневного порога'],
+  ['targetolog', () => 'Таргет: цена заявки по кампании «Макеты» — ниже средней на 18 % (демо)'],
+  ['marketolog', () => 'План продвижения: добавлен канал «застройщики» (демо)'],
+  ['screenwriter', () => 'Сценарий Reels: хук переписан, 3 секунды до первого света'],
+  ['analyst', () => 'Аналитик: ждёт данные DH OS и Windsor.ai, считает на примерных цифрах'],
+  ['finance', () => 'Финансы: план октября — 12 договоров, 85 000 сомони прибыли (демо)'],
+  ['strategist', () => 'Стратег: черновик совета — макеты для застройщиков отдельной услугой'],
 ];
 let lastPool = -1;
 function feedTick() {
@@ -1387,15 +1501,18 @@ function feedTick() {
 }
 $('#feed-pause').addEventListener('click', () => { feedPaused = !feedPaused; $('#feed-pause').textContent = feedPaused ? 'Дальше' : 'Пауза'; $('#feed-live').textContent = feedPaused ? 'Имитация · на паузе' : 'Имитация · обновляется сама'; });
 DH.on('handoff', (h) => { if (!feedPaused) pushEvent(h.from, h.text); });
+DH.on('ptrip', (h) => { if (!feedPaused) pushEvent('p:' + h.from, h.text); });
 
 /* ---------- экскурсия: ярлык → заголовок → факты → действие ---------- */
 const TOUR = [
-  { view: 'overview', eb: 'Общий вид', title: 'Офис JARVIS — макет под стеклом', text: () => ROOMS.length + ' зон, 10 агентов и компьютер «Alijon». Подсветка комнаты — её состояние: зелёная работает, янтарная ждёт, красная — проблема, тёмная — выключено.', act: 'Показать проблемы →', go: () => setView('problems') },
+  { view: 'overview', floor: 'all', eb: 'Общий вид · два этажа', title: 'Офис Dream House — макет под стеклом', text: () => 'Снизу студия: 8 мест команды. Сверху JARVIS: 16 агентов, компьютер «Alijon» и облако. Подсветка комнаты — её состояние: зелёная работает, янтарная ждёт, красная — проблема.', act: 'Показать проблемы →', go: () => setView('problems') },
+  { view: 'overview', floor: '1', eb: 'Этаж 1 · Студия — люди', title: 'Команда в одном зале', text: () => '8 мест — по одному на роль из DH OS. Кольцо у фигурки: зелёное — на задаче, шампань — свободен, красное — просрочка. Имена придут из DH OS.', act: 'Открыть место менеджера →', open: 'p:manager' },
   { room: 'jarvis', eb: 'Пом. 2.00 · Кабинет JARVIS', title: 'Управляющий раздаёт задачи', text: () => 'Модель Opus. Сейчас — разбор голосового задания, 60 %. В очереди 3 задачи: протокол проверки, заказ на печать, вечерний отчёт.', act: 'Открыть карточку →' },
   { rooms: ['planner', 'developer', 'tester'], eb: 'Пом. 2.01–2.03 · конвейер', title: 'План → код → проверка', text: () => 'Белая коробочка — задача. Планировщик передаёт ТЗ разработчику, тот сдаёт сборку на проверку. Сейчас проверка вернула шлюз: 2 из 9 критериев не прошли.', act: 'Открыть проверку →', open: 'tester' },
   { room: 'archicad', eb: 'Пом. 2.05 · Мастерская Archicad', title: 'Планировка 78 м² ждёт вас', text: () => 'Стены и проёмы построены, готово 45 %. Нужна глубина ниши в коридоре — без ответа срок ' + T(2.2) + ' не успеть.', act: 'Открыть карточку →' },
   { room: 'print', eb: 'Пом. 2.07 · 3D и печать', title: 'Два принтера, два заказа', text: () => 'P1S печатает макет коттеджа М 1:100, слой ' + state.p1sLayer + ' из 640. K1 — тракторы, ' + state.k1Done + ' из 30; нить на исходе.', act: 'Открыть карточку →' },
   { rooms: ['content', 'crm', 'browser', 'secretary'], eb: 'Пом. 2.08–2.11', title: 'Контент, CRM, браузер, секретарь', text: () => 'Карусель о макетах готова на 80 %. CRM ждёт ключ DH OS — это факт. Браузер свободен. Секретарь готовит напоминания на завтра.', act: 'Открыть CRM →', open: 'crm' },
+  { rooms: ['targetolog', 'marketolog', 'screenwriter', 'analyst', 'finance', 'strategist'], floor: '2', eb: 'Пом. 2.12–2.17 · Маркетинг и аналитика', title: 'Отдел, который ищет рост', text: () => 'Таргетолог, маркетолог, сценарист, аналитик, финансы и стратег. Цепочка месяца: цель → план → контент и реклама → разбор → советы руководителю.', act: 'Открыть стратега →', open: 'strategist' },
   { room: 'server', eb: 'Пом. 2.04 · Серверная', title: 'ПК «Alijon» тянет всё локально', text: () => 'i9-13900K · 64 ГБ · RTX 3090. Видеокарта занята на ' + state.gpu + ' % — рендер фасада. Диск C: занят на 96 %, диск D: ещё не установлен.', act: 'Открыть карточку →' },
   { room: 'cloud', eb: 'Пом. 2.20 · Облачный павильон', title: 'Связь, когда ПК выключен', text: () => 'Telegram-бот и очередь на Vercel и Supabase. Выключите ПК в карточке «Питание ПК» — задачи начнут копиться здесь.', act: 'К питанию ПК ↓', go: () => $('#power').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'center' }) },
   { view: 'problems', eb: 'Итог', title: 'Где проблемы', text: () => { const l = problems(); return l.length + ' пунктов, критичных ' + l.filter((p) => p.sev === 'bad').length + '. У каждого — кнопка «Показать»: камера подлетит к комнате.'; }, act: 'К списку проблем ↓', go: () => $('#problems').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }) },
@@ -1408,9 +1525,10 @@ function tourShow() {
   $('#t-text').textContent = s.text();
   $('#t-act').textContent = s.act;
   $('#t-next').textContent = tour.i === TOUR.length - 1 ? 'Сначала' : 'Дальше →';
+  if (s.floor) setFloor(s.floor, true);
   if (s.room) select(s.room, { silent: true });
   else if (s.rooms) { if (state.selected) clearSelection(true); DH.emit('focus', { rooms: s.rooms }); }
-  else if (s.view) { state.view = s.view; $$('.seg-b').forEach((b) => b.classList.toggle('is-on', b.dataset.view === s.view)); if (state.selected) clearSelection(true); DH.emit('view', s.view); }
+  else if (s.view || s.floor) { state.view = s.view || 'overview'; $$('.seg-b').forEach((b) => b.classList.toggle('is-on', b.dataset.view === state.view)); if (state.selected) clearSelection(true); DH.emit('view', state.view); }
   tour.t = 0;
 }
 function tourStart() {
@@ -1459,8 +1577,11 @@ DH.refresh = refresh;
 (function init() {
   const d = loc(Date.now()); $('#time-range').value = d.getUTCHours() + d.getUTCMinutes() / 60;
   themeIcon(); clockTick(); renderGanttLegend(); renderDHOS();
+  const sf = store.get('dh-office-floor'); if (['1', '2', 'all'].includes(sf)) state.floor = sf;
+  $$('.fl-b').forEach((b) => b.classList.toggle('is-on', b.dataset.floor === state.floor));
   const saved = store.get('dh-office-sel');
-  if (saved && byId[saved]) state.selected = saved;
+  if (saved && entity(saved)) { state.selected = saved; const e = entity(saved); if (state.floor !== 'all' && state.floor !== e.floor) state.floor = e.floor; $$('.fl-b').forEach((b) => b.classList.toggle('is-on', b.dataset.floor === state.floor)); }
+  renderMonth();
   refresh(); renderGantt();
   const seed = [['cloud', 'Telegram: голосовое от владельца, 0:42 — передано на ПК'], ['developer', 'Коммит 3 из 5: фильтр по тегам, 14 тестов зелёные'], ['tester', 'Протокол готов: 7 из 9 критериев прошли'],
     ['archicad', 'Остановлено: нет размера ниши в коридоре'], ['print', 'K1: трактор 18 из 30 готов'], ['content', 'Тексты слайдов 1–7 готовы, ждут утверждения'], ['jarvis', 'Раздал 4 задачи: планировщику, Archicad, контенту, печати']];
@@ -1468,7 +1589,7 @@ DH.refresh = refresh;
   renderFeed();
   setInterval(feedTick, 4600);
   setInterval(clockTick, 15e3);
-  setInterval(() => { renderKPIs(); renderGantt(); renderProblems(); if (!state.selected) renderHome(); }, 60e3);
+  setInterval(() => { renderKPIs(); renderGantt(); renderProblems(); renderMonth(); if (!state.selected) renderHome(); }, 60e3);
   setInterval(() => {
     if (pcOn()) state.gpu = Math.max(64, Math.min(94, state.gpu + Math.round((Math.random() - 0.5) * 8)));
     state.p1sLayer = state.p1sLayer >= 640 ? 1 : state.p1sLayer + 1;
