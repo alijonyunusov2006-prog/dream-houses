@@ -119,3 +119,17 @@
 | учите показом | 5 областей, где важен именно ваш способ |
 
 Порядок появления — по этапам из `PLAN.md` §9. Каталог живой: новая возможность = строка здесь + папка в `skills/`.
+
+## Навыки владельца из его аккаунта Claude (подключены 2026-10-03)
+Владелец уже собрал эти навыки в своих чатах. Агенты JARVIS пользуются ими по имени.
+
+| Навык | Кто пользуется |
+|---|---|
+| `meta-ads-targetolog`, `targetolog-pro`, `competitive-ads-extractor` | targetolog, analyst |
+| `screenwriter`, `reels-maker`, `instagram-stories-maker`, `video-director`, `carousel-post-designer` | screenwriter, content |
+| `content-navigator`, `content-zavod`, `humanizer-ru`, `infographic-maker` | marketolog, content |
+| `deep-research`, `lead-research-assistant`, `presentation-pro` | analyst, strategist, marketolog |
+| `photo-enhancer`, `3dsmax-mcp`, `3d-modeling`, `apartment-planner` | 3d, archicad, content |
+
+Свои навыки JARVIS: `skills/monthly-plan` (план месяца), `skills/payroll-review` (оплата сотрудников, только по запросу).
+Если на ПК навыки аккаунта не видны в Claude Code — скопировать их в **приватный** репозиторий, не в публичный `dream-houses`.
