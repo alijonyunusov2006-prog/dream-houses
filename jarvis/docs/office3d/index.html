@@ -1,16 +1,19 @@
-<title>Офис Dreamhouses</title>
+<title>Офис Dream House</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Cormorant+Garamond:wght@500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-  /* Фирменный стиль Dreamhouses TJ: тёмно-синий, тёплый латте, Cormorant + Inter.
+  /* Фирменный стиль Dream House (тёмная тема сайта dh-os /site): уголь, алебастр, шампань; Cormorant + Archivo + IBM Plex.
      Макет: шапка · 3D-офис слева · карточка выбранного объекта справа · внизу «где проблемы». */
   :root {
-    --navy: #1a1a2e; --navy-2: #22223a; --navy-3: #2b2b47;
-    --latte: #d4b08c; --latte-soft: rgba(212,176,140,.16); --latte-line: rgba(212,176,140,.35);
-    --beige: #f5f0e8; --text: #efe9df; --text-2: #b7b1a8; --text-3: #7a7a8c;
-    --ok: #6fcf97; --warn: #f2b35a; --bad: #ef6f6f; --off: #6b6b80;
+    /* Dream House, тёмная тема сайта: уголь, алебастр, шампань. Cormorant — заголовки, Archivo — цифры, IBM Plex — текст и ярлыки. */
+    --navy: #1a1816; --navy-2: #211e1c; --navy-3: #2a2622;
+    --latte: #c4a675; --latte-soft: rgba(196,166,117,.14); --latte-line: rgba(196,166,117,.32);
+    --beige: #faf8f5; --text: #ece7df; --text-2: #a49a8e; --text-3: #7a7166;
+    --ok: #6fb98a; --warn: #d79a45; --bad: #e0705c; --off: #6a625a;
     --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
-    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-num: "Archivo", "IBM Plex Sans", system-ui, sans-serif;
+    --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
     color-scheme: dark;
   }
   html, body { height: 100%; }
@@ -23,11 +26,11 @@
   .brand { display: flex; align-items: baseline; gap: 12px; }
   .brand .dh { font-family: var(--font-display); font-size: 30px; font-weight: 600; letter-spacing: 1px; color: #fff; line-height: 1; }
   .brand .dh em { color: var(--latte); font-style: normal; }
-  .brand .sub { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--latte); }
+  .brand .sub { font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--latte); }
   .kpis { display: flex; flex-wrap: wrap; gap: 8px; }
   .kpi { min-width: 118px; padding: 8px 12px; border: 1px solid var(--latte-line); background: rgba(255,255,255,.03); }
-  .kpi .l { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); }
-  .kpi .v { font-family: var(--font-display); font-size: 24px; font-weight: 600; line-height: 1.1; color: #fff; font-variant-numeric: tabular-nums; }
+  .kpi .l { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); }
+  .kpi .v { font-family: var(--font-num); font-size: 22px; font-weight: 600; letter-spacing: -.02em; line-height: 1.1; color: #fff; font-variant-numeric: tabular-nums; }
   .kpi .v small { font-family: var(--font-body); font-size: 11px; color: var(--text-2); margin-left: 4px; font-weight: 400; }
   .kpi.nodata .v { color: var(--text-3); }
   .kpi.warn { border-color: var(--warn); } .kpi.warn .v { color: var(--warn); }
@@ -35,11 +38,11 @@
   /* сцена + панель */
   .main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; min-height: 0; }
   @media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
-  .stage { position: relative; min-height: 420px; height: clamp(420px, 62vh, 760px); background: radial-gradient(ellipse at 50% 20%, #2a2a48 0%, var(--navy) 65%); overflow: hidden; }
+  .stage { position: relative; min-height: 420px; height: clamp(420px, 62vh, 760px); background: radial-gradient(ellipse at 50% 20%, #2a2622 0%, var(--navy) 65%); overflow: hidden; }
   .stage canvas { display: block; }
   .labels { position: absolute; inset: 0; pointer-events: none; }
-  .tag { pointer-events: auto; cursor: pointer; transform: translate(-50%, -100%); white-space: nowrap; font-size: 11px; letter-spacing: .02em; padding: 3px 8px; border: 1px solid var(--latte-line); background: rgba(26,26,46,.82); color: var(--text); backdrop-filter: blur(4px); }
-  .tag.room { border: 0; background: transparent; color: var(--latte); letter-spacing: .18em; text-transform: uppercase; font-size: 10.5px; }
+  .tag { pointer-events: auto; cursor: pointer; transform: translate(-50%, -100%); white-space: nowrap; font-size: 11px; letter-spacing: .02em; padding: 3px 8px; border: 1px solid var(--latte-line); background: rgba(26,24,22,.84); color: var(--text); backdrop-filter: blur(4px); }
+  .tag.room { border: 0; background: transparent; color: var(--latte); font-family: var(--font-mono); letter-spacing: .18em; text-transform: uppercase; font-size: 10.5px; }
   .tag.boss { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: #fff; border-color: var(--latte); }
   .tag .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
   .dot.ok { background: var(--ok); box-shadow: 0 0 8px var(--ok); } .dot.now { background: var(--warn); box-shadow: 0 0 8px var(--warn); } .dot.todo { background: var(--off); } .dot.bad { background: var(--bad); box-shadow: 0 0 8px var(--bad); }
@@ -52,12 +55,12 @@
   .panel { border-left: 1px solid var(--latte-line); background: var(--navy-2); padding: 18px 18px 22px; min-width: 0; overflow: auto; }
   @media (max-width: 900px) { .panel { border-left: 0; border-top: 1px solid var(--latte-line); } }
   .panel h2 { font-family: var(--font-display); font-weight: 600; font-size: 26px; line-height: 1.1; margin: 0 0 4px; color: #fff; text-wrap: balance; }
-  .panel .eyebrow { font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--latte); margin-bottom: 6px; }
-  .pill { display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 999px; margin: 6px 0 12px; border: 1px solid; }
+  .panel .eyebrow { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--latte); margin-bottom: 6px; }
+  .pill { display: inline-block; font-family: var(--font-mono); font-size: 11px; padding: 3px 9px; border-radius: 4px; margin: 6px 0 12px; border: 1px solid; }
   .pill.ok { color: var(--ok); border-color: var(--ok); } .pill.now { color: var(--warn); border-color: var(--warn); } .pill.todo { color: var(--text-2); border-color: var(--off); } .pill.bad { color: var(--bad); border-color: var(--bad); }
   .panel p { margin: 0 0 10px; color: var(--text); }
   .panel dl { margin: 12px 0 0; display: grid; grid-template-columns: 64px 1fr; gap: 6px 10px; font-size: 13px; }
-  .panel dt { color: var(--text-3); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; padding-top: 3px; }
+  .panel dt { font-family: var(--font-mono); color: var(--text-3); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; padding-top: 3px; }
   .panel dd { margin: 0; }
   .panel .path { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--text-2); word-break: break-all; }
   .owner-list { margin: 0; padding: 0; list-style: none; }
@@ -69,7 +72,7 @@
   /* проблемы */
   .alerts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1px; background: var(--latte-line); border-top: 1px solid var(--latte-line); }
   .alert { background: var(--navy); padding: 12px 16px 14px; min-width: 0; }
-  .alert .t { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 4px; }
+  .alert .t { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 4px; }
   .alert.bad .t { color: var(--bad); } .alert.warn .t { color: var(--warn); } .alert.ok .t { color: var(--ok); }
   .alert b { display: block; color: #fff; font-weight: 600; margin-bottom: 2px; }
   .alert span { color: var(--text-2); font-size: 12.5px; }
@@ -83,7 +86,7 @@
     <div class="brand">
       <div class="dh">d<em>h</em></div>
       <div>
-        <div class="sub">Dreamhouses · офис Jarvis</div>
+        <div class="sub">Dream House · офис Jarvis</div>
         <div style="font-size:12px;color:var(--text-2)">Один взгляд: что идёт, где стоит, где проблема. 3 октября 2026.</div>
       </div>
     </div>
@@ -204,7 +207,7 @@ const ITEMS = [
   { id:'questions', room:'archive', label:'Вопросы · 6', s:'now', x:2, z:8, kind:'shelf', t:'Вопросы к вам', d:'Приватный репозиторий, версия Archicad, объём HDD, версия 3ds Max, аудит диска сейчас?, кто работает в Archicad.', now:'Отвечать можно голосом.', need:'Ваши ответы.', where:'brain/00-inbox/questions.md' },
   { id:'skills', room:'archive', label:'Навыки · уроки', s:'ok', x:5.5, z:8, kind:'shelf', t:'Навыки и уроки', d:'Чему Jarvis научился: инструкции, тесты, история. Уроки — ошибки, ставшие правилами.', now:'archicad, disk-audit, learn-from-owner. Уроков пока нет.', need:'Реальная работа на ПК.', where:'skills/, brain/90-lessons/' },
 ];
-const COLORS = { ok: 0x6fcf97, now: 0xf2b35a, todo: 0x6b6b80, bad: 0xef6f6f };
+const COLORS = { ok: 0x6fb98a, now: 0xd79a45, todo: 0x6a625a, bad: 0xe0705c };
 
 // ---------- сцена ----------
 const stage = document.getElementById('stage');
@@ -223,7 +226,7 @@ stage.insertBefore(renderer.domElement, labelsEl);
 const labelRenderer = new CSS2DRenderer({ element: labelsEl });
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0x1a1a2e, 40, 80);
+scene.fog = new THREE.Fog(0x1a1816, 40, 80);
 const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
 camera.position.set(14, 20, 24);
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -233,22 +236,22 @@ controls.target.set(-2, 0, 1);
 controls.autoRotate = true; controls.autoRotateSpeed = 0.35;
 controls.addEventListener('start', () => { controls.autoRotate = false; });
 
-scene.add(new THREE.HemisphereLight(0xcfd8ff, 0x1a1a2e, 0.9));
+scene.add(new THREE.HemisphereLight(0xf3efe9, 0x1a1816, 0.9));
 const key = new THREE.DirectionalLight(0xfff1dc, 1.4);
 key.position.set(10, 22, 8); key.castShadow = true;
 key.shadow.mapSize.set(2048, 2048); key.shadow.camera.left = -22; key.shadow.camera.right = 22; key.shadow.camera.top = 22; key.shadow.camera.bottom = -22;
 scene.add(key);
-const fill = new THREE.PointLight(0xd4b08c, 40, 30); fill.position.set(-4, 6, -6); scene.add(fill);
+const fill = new THREE.PointLight(0xc4a675, 40, 30); fill.position.set(-4, 6, -6); scene.add(fill);
 
 // пол
-const floorMat = new THREE.MeshStandardMaterial({ color: 0x24243c, roughness: 0.9, metalness: 0.05 });
+const floorMat = new THREE.MeshStandardMaterial({ color: 0x26221f, roughness: 0.9, metalness: 0.05 });
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 28), floorMat);
 floor.rotation.x = -Math.PI / 2; floor.position.set(-2, 0, 1.5); floor.receiveShadow = true; scene.add(floor);
-const grid = new THREE.GridHelper(40, 40, 0x3a3a5c, 0x2c2c48); grid.position.set(-2, 0.01, 1.5); scene.add(grid);
+const grid = new THREE.GridHelper(40, 40, 0x3b352f, 0x2d2824); grid.position.set(-2, 0.01, 1.5); scene.add(grid);
 
 // комнаты: низкие стены цвета латте
-const wallMat = new THREE.MeshStandardMaterial({ color: 0xd4b08c, roughness: 0.6, metalness: 0.1, transparent: true, opacity: 0.55 });
-const edgeMat = new THREE.LineBasicMaterial({ color: 0xd4b08c, transparent: true, opacity: 0.9 });
+const wallMat = new THREE.MeshStandardMaterial({ color: 0xc4a675, roughness: 0.6, metalness: 0.1, transparent: true, opacity: 0.55 });
+const edgeMat = new THREE.LineBasicMaterial({ color: 0xc4a675, transparent: true, opacity: 0.9 });
 function room(r) {
   const h = 0.9, t = 0.12;
   const g = new THREE.Group();
@@ -269,11 +272,11 @@ function room(r) {
 Object.values(ROOMS).forEach(room);
 
 // стол
-const deskMat = new THREE.MeshStandardMaterial({ color: 0xf5f0e8, roughness: 0.55 });
-const legMat = new THREE.MeshStandardMaterial({ color: 0x3a3a5c, roughness: 0.8 });
-const screenMat = new THREE.MeshStandardMaterial({ color: 0x0f0f1c, emissive: 0x2a3a60, emissiveIntensity: 0.9, roughness: 0.3 });
-const shelfMat = new THREE.MeshStandardMaterial({ color: 0x8c6a4a, roughness: 0.7 });
-const printerMat = new THREE.MeshStandardMaterial({ color: 0x3b3b55, roughness: 0.5, metalness: 0.2 });
+const deskMat = new THREE.MeshStandardMaterial({ color: 0xfaf8f5, roughness: 0.55 });
+const legMat = new THREE.MeshStandardMaterial({ color: 0x4a433d, roughness: 0.8 });
+const screenMat = new THREE.MeshStandardMaterial({ color: 0x141210, emissive: 0x5a4a34, emissiveIntensity: 0.9, roughness: 0.3 });
+const shelfMat = new THREE.MeshStandardMaterial({ color: 0x7d6549, roughness: 0.7 });
+const printerMat = new THREE.MeshStandardMaterial({ color: 0x4a433d, roughness: 0.5, metalness: 0.2 });
 const pickables = [];
 function lamp(status) {
   const c = COLORS[status];
@@ -301,11 +304,11 @@ function desk(it) {
     const chair = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.1, 20), legMat); chair.position.set(0, 0.45, d / 2 + 0.45); g.add(chair);
     const l = lamp(it.s); l.position.set(w / 2 - 0.25, 0.98, d / 2 - 0.25); g.add(l);
     if (it.kind === 'emp') { // пустое кресло — человека пока нет
-      const ghost = new THREE.Mesh(new THREE.CapsuleGeometry(0.22, 0.5, 4, 10), new THREE.MeshStandardMaterial({ color: 0x6b6b80, transparent: true, opacity: 0.25 }));
+      const ghost = new THREE.Mesh(new THREE.CapsuleGeometry(0.22, 0.5, 4, 10), new THREE.MeshStandardMaterial({ color: 0x6a625a, transparent: true, opacity: 0.25 }));
       ghost.position.set(0, 0.95, d / 2 + 0.45); g.add(ghost);
     }
     if (isBoss) {
-      const glow = new THREE.PointLight(0xd4b08c, 8, 6); glow.position.set(0, 1.6, 0); g.add(glow);
+      const glow = new THREE.PointLight(0xc4a675, 8, 6); glow.position.set(0, 1.6, 0); g.add(glow);
     }
   }
   // подпись
