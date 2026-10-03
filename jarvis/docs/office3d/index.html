@@ -435,6 +435,7 @@
   .dl:hover, .dl.is-sel { background: var(--brand-soft); color: var(--ink); }
   .dl small { font: 500 9px var(--f-mono); color: var(--muted); letter-spacing: .1em; margin-left: 6px; }
   .labels:not(.far) .dl { display: none; }
+  @media (max-width: 640px) { .dl { font-size: 7.5px; letter-spacing: .1em; padding: 3px 5px; box-shadow: none; } .dl small { display: none; } .labels.far .rl.st-wait:not(.is-sel):not(.pl), .labels.far .rl.st-bad:not(.is-sel):not(.pl) { padding: 4px; border-radius: 50%; } .labels.far .rl.st-wait:not(.is-sel):not(.pl) .rl-top > :not(.dot), .labels.far .rl.st-bad:not(.is-sel):not(.pl) .rl-top > :not(.dot) { display: none; } }
   .labels.far .rl.st-work:not(.is-sel):not(.pl), .labels.far .rl.st-off:not(.is-sel):not(.pl) { padding: 5px; border-radius: 50%; }
   .labels.far .rl.st-work:not(.is-sel):not(.pl) .rl-top > :not(.dot), .labels.far .rl.st-off:not(.is-sel):not(.pl) .rl-top > :not(.dot) { display: none; }
   /* план месяца */
@@ -906,7 +907,7 @@ const ZONES = [
   { id: 'open', code: '1.01', name: 'Общий зал', d: 'Один большой зал: команда сидит рядом, вопросы решаются за минуту. Здесь же библиотека материалов и плоттер.' },
   { id: 'reception', code: '1.02', name: 'Ресепшн и шоурум', d: 'Стойка менеджера, диван для клиентов и витрина архитектурных макетов с подсветкой. Заходите в гости — обсудим ваш проект.' },
   { id: 'meet', code: '1.03', name: 'Переговорная', d: 'Встречи с клиентами: планировки на экране, образцы материалов на столе, 8 мест.', book: [['11:00', 'Встреча с клиентом: коттедж, 2 этажа'], ['16:00', 'Планёрка команды']] },
-  { id: 'academy', code: '1.04', name: 'Класс DH Academy', d: 'Курсы чертёжника и 3D-визуализатора, 6 учебных мест и экран преподавателя.' },
+  { id: 'academy', code: '1.04', name: 'Класс DH Academy', d: 'Курсы чертёжника и 3D-визуализатора: учебные места с компьютерами и экран преподавателя.' },
 ];
 const byZid = Object.fromEntries(ZONES.map((z) => [z.id, z]));
 function entity(id) {
@@ -2497,7 +2498,7 @@ function buildAcademy() {
   }
   const el = document.createElement('div'); el.className = 'acl';
   el.innerHTML = 'DH Academy · курс <b>«' + esc3(A.course) + '»</b><br>урок: ' + esc3(A.lesson) + ' · ' + n + ' студ.';
-  const lo = new CSS2DObject(el); lo.center.set(0.5, 1); lo.position.set(10, 2.45, -0.45); ROOT.add(lo); STUDIO.acl = lo;
+  const lo = new CSS2DObject(el); lo.center.set(0, 1); lo.position.set(11.6, 2.5, -0.45); ROOT.add(lo); STUDIO.acl = lo;
 }
 function esc3(t) { return String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 function plantG(x, z, k) { k = k || 1; add(M.model, cylG(0.17 * k, 0.13 * k, 0.32 * k, x, 0.16 * k, z, 16)); const sp = new THREE.SphereGeometry(0.3 * k, 16, 12); sp.translate(x, 0.32 * k + 0.26 * k, z); add(M.figure, sp); }
@@ -2803,7 +2804,7 @@ function updateLabels() {
     lb.el.className = 'rl pl st-' + (st === 'late' ? 'bad' : st) + (selected === id ? ' is-sel' : '') + (hoverId === id ? ' is-hover' : '') + (ps && !ps.has(id) ? ' is-muted' : '');
     lb.dot.className = 'dot ' + (st === 'late' ? 'bad' : st);
   }
-  if (STUDIO.acl) STUDIO.acl.visible = floor !== '2';
+  if (STUDIO.acl) STUDIO.acl.visible = floor === '1';
   for (const id in STUDIO.zlabels) { const z = STUDIO.zlabels[id]; z.o.visible = showF1 && floor === '1'; z.el.classList.toggle('is-sel', selected === 'z:' + id); }
 }
 
