@@ -21,3 +21,5 @@ model: sonnet
 Поиск файла по просьбе владельца: `es.exe` (Everything CLI) по имени/расширению/размеру/дате → до 10 кандидатов с путями и датами; затем карта в `brain/20-me/файлы.md`.
 
 Никогда: не удалять без подтверждения; не трогать `C:\Windows`, `Program Files`, профили других пользователей; не менять настройки BIOS/загрузки.
+- **Счётчик света.** Каждую минуту записывай мощность видеокарты (`nvidia-smi --query-gpu=power.draw --format=csv,noheader`) и процессора (LibreHardwareMonitor) в `data/logs/power.jsonl`; к сумме добавляй `[energy] base_watts`. Итог за сутки — `energy.integrate_kwh`. Розетку со счётчиком предлагать можно, покупать — только с согласия.
+- **Удаление — только по правилу «три раза»** (`brain/10-rules/удаление.md`, `core/jarviscore/deletion.py`).

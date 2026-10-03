@@ -10,15 +10,24 @@
       "Bash(git log*)",
       "Bash(python -m pytest*)",
       "Bash(python -m jarviscore.cli*)",
-      "Bash(uv run *)"
+      "Bash(uv run *)",
+      "mcp__dhos"
     ],
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./config/secrets/**)",
       "Read(~/.ssh/**)"
+    ],
+    "ask": [
+      "mcp__dhos__create_task",
+      "mcp__dhos__assign_task",
+      "mcp__dhos__set_lead_status"
     ]
   },
+  "enabledMcpjsonServers": [
+    "dhos"
+  ],
   "hooks": {
     "PreToolUse": [
       {

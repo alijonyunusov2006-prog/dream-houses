@@ -22,8 +22,10 @@ ROOT = Path(__file__).resolve().parents[2]          # .../jarvis
 ALLOWLIST = ROOT / "config" / "allowlist.toml"
 LOG_DIR = ROOT / "data" / "logs"
 ACTIONS_LOG = LOG_DIR / "actions.jsonl"
+DELETION_STATE = ROOT / "data" / "deletion.json"
 
 sys.path.insert(0, str(ROOT / "core"))
+from jarviscore.deletion import DeletionGuard  # noqa: E402
 from jarviscore.policy import Decision, Policy  # noqa: E402
 
 
@@ -42,7 +44,22 @@ def _append_log(record: dict) -> None:
 def pre_tool_use(event: dict) -> dict | None:
     policy = Policy.load(ALLOWLIST)
     tool = event.get("tool_name", "")
-    verdict = policy.check_tool_call(tool, event.get("tool_input") or {})
+    tool_input = event.get("tool_input") or {}
+    verdict = policy.check_tool_call(tool, tool_input)
+    if verdict.decision is Decision.ASK and tool in {"Bash", "shell_exec"}:
+        # Команда, которую владелец разрешил по правилу «три раза», проходит один раз.
+        guard = DeletionGuard.from_allowlist(ALLOWLIST, DELETION_STATE, root=ROOT)
+        unlock = guard.consume_unlock(str(tool_input.get("command", "")))
+        if unlock is not None:
+            _append_log({"hook": "pre", "tool": tool, "decision": "allow", "reason": "разрешено владельцем (правило удаления)",
+                         "target": unlock.target, "backup_required": unlock.backup_required, "session": event.get("session_id")})
+            return {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "allow",
+                    "permissionDecisionReason": f"JARVIS: владелец разрешил удаление «{unlock.target}»",
+                }
+            }
     _append_log({"hook": "pre", "tool": tool, "decision": verdict.decision.value, "reason": verdict.reason,
                  "session": event.get("session_id")})
     if verdict.decision is Decision.ALLOW:

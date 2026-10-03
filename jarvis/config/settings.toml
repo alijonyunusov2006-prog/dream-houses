@@ -60,3 +60,10 @@ stt_language = "ru"
 tts_engine = "qwen3-tts"               # qwen3-tts (основной, GPU) | chatterbox (запасной, GPU) | piper (CPU, когда GPU занят)
 tts_fallback = "piper"                 # только бесплатные локальные движки — решение владельца
 wake_word = "джарвис"
+
+[energy]
+# Свет — отдельная строка в отчётах (core/jarviscore/energy.py). Тарифы с 01.02.2026, постановление № 709.
+tariff = "population"                  # population = 0,4137 сомони/кВт·ч (дом) | business = 0,9465 (студия). Уточнить у владельца
+base_watts = 60                        # плата, память, диски, вентиляторы — добавка к замерам GPU и CPU
+report_daily = true                    # «⚡ Свет за сутки: … кВт·ч ≈ … сомони» в утреннем отчёте
+
