@@ -377,6 +377,32 @@
   .m-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 
 
+
+  /* «Скажите Джарвису» */
+  .say { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; align-items: center; padding: 12px 14px; border-radius: var(--r-card); border: 1px solid color-mix(in oklab, var(--champ) 45%, var(--line)); background: var(--surface); }
+  .say-l { font: 600 20px/1.1 var(--f-display); letter-spacing: -.01em; white-space: nowrap; }
+  .say-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; min-width: 0; }
+  .say-row input { width: 100%; min-width: 0; font: 400 14px/1.3 var(--f-body); color: var(--ink); background: var(--surface-2); border: 1px solid var(--line-2); border-radius: var(--r-btn); padding: 10px 12px; }
+  .say-row input:focus { outline: 2px solid var(--champ); outline-offset: 0; }
+  .say-mic { width: auto; padding: 0 10px; gap: 6px; display: inline-flex; align-items: center; color: var(--muted); }
+  .say-mic span { font: 500 10px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; }
+  .say-mic:disabled { cursor: not-allowed; opacity: .75; }
+  .say-hint, .say-card, .say-honest { grid-column: 2; margin: 0; }
+  .say-hint { font-size: 12px; color: var(--muted); }
+  .say-card { padding: 12px 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line-2); }
+  .say-card h3 { font: 600 22px/1.15 var(--f-display); margin: 4px 0 8px; }
+  .say-dl { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 6px 12px; margin: 0; font-size: 13.5px; }
+  .say-dl dt { font: 500 9.5px/1.9 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .say-dl dd { margin: 0; color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+  .say-honest { font-size: 12.5px; color: var(--ink); padding: 8px 10px; border-radius: 9px; border: 1px dashed color-mix(in oklab, var(--warn) 60%, var(--line)); background: color-mix(in oklab, var(--warn) 8%, transparent); }
+  @media (max-width: 760px) { .say { grid-template-columns: minmax(0, 1fr); padding: 10px 12px; } .say-hint, .say-card, .say-honest { grid-column: 1; } .say-l { font-size: 18px; } .say-mic span { display: none; } .say-mic { padding: 0; width: 40px; justify-content: center; } .say-dl { grid-template-columns: 92px minmax(0, 1fr); } }
+  /* таблички офисов */
+  .ol { pointer-events: auto; cursor: pointer; display: grid; justify-items: center; gap: 2px; padding: 8px 14px 9px; border-radius: 10px; background: var(--overlay-2); border: 1px solid color-mix(in oklab, var(--champ) 60%, var(--line)); box-shadow: var(--shadow); white-space: nowrap; }
+  .ol b { font: 600 22px/1 var(--f-display); letter-spacing: -.01em; color: var(--ink); }
+  .ol small { font: 500 9px/1.2 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--champ-ink); }
+  .ol.is-on { border-color: var(--champ); }
+  .ol:hover { background: var(--brand-soft); }
+  @media (max-width: 640px) { .ol { padding: 5px 9px 6px; } .ol b { font-size: 16px; } .ol small { font-size: 7.5px; letter-spacing: .08em; } }
   /* этажи */
   .floors { align-items: center; }
   .fl-l { font: 500 9.5px/1 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); padding: 0 8px 0 6px; }
@@ -386,7 +412,12 @@
   .fl-b.is-on { background: var(--surface-2); color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, .12); }
   .fl-s { display: none; }
   @media (max-width: 1280px) { .fl-t { display: none; } .fl-s { display: inline; } }
-  @media (max-width: 760px) { .fl-l { display: none; } .fl-b { padding: 7px 8px; font-size: 12px; } }
+  @media (max-width: 760px) {
+    .hud-tl { gap: 6px; }
+    .floors { order: 3; width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .fl-b { padding: 11px 4px; font-size: 13px; font-weight: 600; text-align: center; white-space: normal; line-height: 1.1; }
+    .tour-t { display: none; } .btn-tour { padding: 9px 11px; }
+  }
   .lg-h { font: 500 9.5px/1 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
   .dot.free { background: var(--champ); box-shadow: 0 0 0 3px color-mix(in oklab, var(--champ) 24%, transparent); }
   .pill.free { color: var(--champ-ink); border-color: color-mix(in oklab, var(--champ) 55%, var(--line)); }
@@ -394,8 +425,10 @@
   .rl.pl { background: color-mix(in oklab, var(--brand-soft) 70%, var(--overlay)); border-color: color-mix(in oklab, var(--champ) 40%, var(--line)); }
   .rl.pl .rl-sub { font-style: italic; }
   .labels.f1 .rl.pl .rl-sub { display: block; }
-  .labels.fall .rl.pl { padding: 4px 7px; }
-  .labels.fall .rl.pl .rl-top > span:last-child { display: none; }
+  .labels.fall .rl:not(.is-sel) { padding: 4px; border-radius: 50%; }
+  .labels.fall .rl:not(.is-sel) .rl-top > :not(.dot), .labels.fall .rl:not(.is-sel) .rl-sub { display: none !important; }
+  .labels.fall .rl .dot { width: 9px; height: 9px; }
+  @media (max-width: 640px) { .labels.fall .rl.pl:not(.is-sel), .labels.fall .dl, .labels.fall .zl, .labels.fall .mini { display: none !important; } .labels.fall .rl:not(.is-sel) { padding: 3px; } .labels.fall .rl .dot { width: 7px; height: 7px; box-shadow: none; } }
   .rl.st-free { border-color: color-mix(in oklab, var(--champ) 50%, var(--line)); }
   .zl { pointer-events: auto; cursor: pointer; font: 500 10px/1.2 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--earth); padding: 3px 7px; border-radius: 6px; background: var(--overlay); border: 1px solid var(--line); white-space: nowrap; }
   .zl span { color: var(--faint); margin-right: 6px; letter-spacing: .06em; }
@@ -486,6 +519,18 @@
     </div>
   </header>
 
+  <form class="say" id="say" autocomplete="off" novalidate>
+    <label class="say-l" for="say-in">Скажите Джарвису</label>
+    <div class="say-row">
+      <input id="say-in" type="text" maxlength="200" placeholder="Например: дай менеджеру задачу обзвонить три новые заявки до 18:00" aria-describedby="say-hint">
+      <button type="button" class="icon-btn say-mic" id="say-mic" disabled aria-label="Микрофон: голос — на ПК" title="голос — на ПК"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg><span>голос — на ПК</span></button>
+      <button class="btn primary" type="submit" id="say-go">Передать</button>
+    </div>
+    <p class="say-hint" id="say-hint">Джарвис разбирает фразу по ключевым словам: кому, что сделать, срок. Демо — ничего не отправляется.</p>
+    <div class="say-card" id="say-card" hidden aria-live="polite"></div>
+    <p class="say-honest" id="say-honest" hidden></p>
+  </form>
+
   <section class="main">
     <div class="stage" id="stage" aria-label="Трёхмерный макет офиса JARVIS">
       <div class="labels" id="labels"></div>
@@ -497,14 +542,13 @@
           <button class="seg-b" type="button" data-view="plan">Сверху (план)</button>
           <button class="seg-b" type="button" data-view="problems">Проблемы <b class="seg-n" id="seg-n">0</b></button>
         </div>
-        <div class="seg floors" role="group" aria-label="Этажи макета">
-          <span class="fl-l">Этажи</span>
-          <button class="fl-b" type="button" data-floor="1" title="1 · Студия — люди"><b>1</b><span class="fl-t"> · Студия — люди</span><span class="fl-s"> · Люди</span></button>
-          <button class="fl-b" type="button" data-floor="2" title="2 · JARVIS — агенты"><b>2</b><span class="fl-t"> · JARVIS — агенты</span><span class="fl-s"> · Агенты</span></button>
-          <button class="fl-b is-on" type="button" data-floor="all" title="Оба этажа">Все</button>
+        <div class="seg floors" role="group" aria-label="Какой офис показать">
+          <button class="fl-b is-on" type="button" data-floor="all">Оба рядом</button>
+          <button class="fl-b" type="button" data-floor="1">Реальный офис</button>
+          <button class="fl-b" type="button" data-floor="2">Мои агенты</button>
         </div>
-        <button class="btn primary btn-tour" type="button" id="tour-btn">
-          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5v11l9-5.5z"/></svg>Экскурсия
+        <button class="btn primary btn-tour" type="button" id="tour-btn" aria-label="Экскурсия">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5v11l9-5.5z"/></svg><span class="tour-t">Экскурсия</span>
         </button>
       </div>
 
@@ -1123,7 +1167,7 @@ function renderHome() {
     ['archicad', 'wait', 'Archicad ждёт от вас размер', 'Глубина ниши в коридоре. Срок ' + T(2.2) + ' под угрозой.'],
     ['print', 'work', 'K1 печатает трактор ' + Math.min(30, state.k1Done + 1) + ' из 30', 'P1S — макет коттеджа, слой ' + state.p1sLayer + ' из 640.'],
     ['server', 'bad', 'Диск C: занят на 96 %', 'Это факт. Диск D: ещё не установлен.'],
-    ['z:open', 'bad', 'Команда: просрочки у двух человек', 'Менеджер и дизайнер-проектировщик. Этаж 1 — места команды, демо.'],
+    ['z:open', 'bad', 'Команда: просрочки у двух человек', 'Менеджер и дизайнер-проектировщик. Реальный офис — места команды, демо.'],
   ] : [
     ['cloud', 'work', 'Облачная очередь: ' + state.queue.length + ' ' + plural(state.queue.length, 'задача', 'задачи', 'задач'), 'Telegram-бот принимает задания, ПК заберёт их после включения.'],
     ['print', 'work', 'Принтеры печатают дальше', 'Им ПК не нужен: K1 — тракторы, P1S — макет коттеджа.'],
@@ -1223,7 +1267,7 @@ function personCard(p) {
   const d = loc(Date.now() + DAY);
   const tom = d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate());
   $('#side-room').innerHTML =
-    '<div class="eyebrow">Этаж 1 · Место ' + p.n + ' · ' + esc(z.name) + '</div>' +
+    '<div class="eyebrow">Реальный офис · Место ' + p.n + ' · ' + esc(z.name) + '</div>' +
     '<h2>' + esc(p.role) + '</h2>' +
     '<div class="pills"><span class="pill ' + stc + '"><span class="dot ' + (p.st === 'late' ? 'bad' : p.st) + '"></span>' + PST[p.st] + '</span><span class="pill">Человек · DH OS</span></div>' +
     (p.name ? '<p class="name-ph is-name">' + esc(p.name) + '</p>' : '<p class="name-ph">Имя придёт из DH OS</p>') +
@@ -1252,7 +1296,7 @@ function zoneCard(z) {
   const list = z.id === 'open' ? PEOPLE : ppl;
   const pc = pcounts();
   $('#side-room').innerHTML =
-    '<div class="eyebrow">Этаж 1 · Пом. ' + z.code + ' · Студия</div>' +
+    '<div class="eyebrow">Реальный офис · Пом. ' + z.code + ' · Студия</div>' +
     '<h2>' + esc(z.name) + '</h2>' +
     (z.id === 'open' ? '<div class="pills"><span class="pill work"><span class="dot work"></span>На задаче ' + pc.work + '</span><span class="pill free"><span class="dot free"></span>Свободен ' + pc.free + '</span><span class="pill bad"><span class="dot bad"></span>Просрочка ' + pc.late + '</span></div>' : '') +
     '<p class="lead">' + esc(z.d) + '</p>' +
@@ -1264,7 +1308,7 @@ function zoneCard(z) {
 }
 function studentCard(n) {
   $('#side-room').innerHTML =
-    '<div class="eyebrow">Этаж 1 · Класс DH Academy · Стол ' + pad(n) + ' из ' + ACADEMY.students + '</div>' +
+    '<div class="eyebrow">Реальный офис · Класс DH Academy · Стол ' + pad(n) + ' из ' + ACADEMY.students + '</div>' +
     '<h2>Студент курса «' + esc(ACADEMY.course) + '»</h2>' +
     '<div class="pills"><span class="pill work"><span class="dot work"></span>На уроке</span><span class="pill">DH Academy · демо</span></div>' +
     '<p class="name-ph">Имя придёт из DH OS</p>' +
@@ -1276,7 +1320,7 @@ function studentCard(n) {
 function deptCard(d) {
   const c = { work: 0, wait: 0, bad: 0, off: 0 }; d.rooms.forEach((id) => { c[statusOf(id)]++; });
   $('#side-room').innerHTML =
-    '<div class="eyebrow">Этаж 2 · Отдел · ' + d.rooms.length + ' ' + plural(d.rooms.length, 'комната', 'комнаты', 'комнат') + '</div>' +
+    '<div class="eyebrow">Мои агенты · Отдел · ' + d.rooms.length + ' ' + plural(d.rooms.length, 'комната', 'комнаты', 'комнат') + '</div>' +
     '<h2>' + esc(d.name) + '</h2>' +
     '<div class="pills">' + ['work', 'wait', 'bad', 'off'].filter((k) => c[k]).map((k) => '<span class="pill ' + k + '"><span class="dot ' + k + '"></span>' + ST[k] + ' ' + c[k] + '</span>').join('') + '</div>' +
     '<ul class="brief">' + d.rooms.map((id) => { const r = byId[id], st = statusOf(id); return '<li data-room="' + id + '" tabindex="0"><span class="dot ' + st + '"></span><div><b>' + r.code + ' · ' + esc(r.role) + '</b>' + esc(r.model) + ' · ' + (r.task && r.task.t ? esc(r.task.t) : 'задач нет') + '</div></li>'; }).join('') + '</ul>' +
@@ -1645,6 +1689,69 @@ function renderDHOS() {
     '<p class="note">Имена не выдумываем: до подключения DH OS показаны только роли. Подключение — этап 3, агент CRM читает ключом только на чтение.</p>';
 }
 
+/* ---------- «Скажите Джарвису»: разбор по ключевым словам (демо) ---------- */
+const SAY_PEOPLE = { owner: ['руководител', 'владельц', 'владелец'], manager: ['менеджер'], designer: ['дизайнер', 'проектировщик'], viz: ['визуализатор'], supervisor: ['надзор'], smm: ['smm', 'смм'], teacher: ['преподавател', 'учител'], maker: ['макетчик'] };
+const SAY_AGENTS = { targetolog: ['таргетолог', 'таргет'], marketolog: ['маркетолог'], screenwriter: ['сценарист'], content: ['контент-студи', 'контентщик'], analyst: ['аналитик'], finance: ['финансист', 'финансам', 'финансы'], hr: ['кадрам', 'кадры', 'кадров', 'hr'], procurement: ['снабжен'], sales: ['продажам', 'продажник', 'отдел продаж'], quality: ['отдел качеств', 'контролю качества'], academy: ['академи'], planner: ['планировщик'], developer: ['разработчик', 'программист'], tester: ['тестировщик'], archicad: ['archicad', 'архикад'], print: ['принтер', '3d-печат'], crm: ['crm', 'срм'], browser: ['браузер'], secretary: ['секретар'], sysadmin: ['сисадмин', 'админ'], strategist: ['стратег'] };
+const SAY_TOPICS = { marketolog: ['контент-план', 'контент план', 'продвижен', 'оффер', 'акци'], targetolog: ['реклам', 'кампани'], screenwriter: ['сценари', 'reels', 'рилс', 'сторис', 'ролик', 'видео'], content: ['пост', 'карусел', 'публикац'], analyst: ['конкурент', 'анализ', 'статистик'], finance: ['прибыл', 'план месяца', 'бюджет', 'выручк', 'деньг'], hr: ['ваканси', 'подбор', 'собеседован', 'новичк', 'рабочее время', 'нагрузк'], procurement: ['смет', 'поставщик', 'материал', 'закуп', 'пластик', 'нить'], quality: ['отзыв', 'гарант', 'качеств'], academy: ['студент', 'курс', 'урок', 'набор'], archicad: ['планировк', 'чертеж', 'чертёж'], print: ['печат', '3d', 'модел'], developer: ['код', 'сайт'], tester: ['провер', 'тест'], secretary: ['напомн', 'календар', 'встреч', 'письм', 'дайджест'], sysadmin: ['диск', 'бэкап', 'файл', 'компьютер'], strategist: ['совет', 'стратеги', 'рост'], sales: ['заявк', 'кп', 'коммерческ', 'дожим', 'клиент'] };
+const MONTHS_RE = MONTHS.join('|');
+function sayFind(text, dict) { let best = null; for (const id in dict) for (const k of dict[id]) { const i = text.indexOf(k); if (i >= 0 && (!best || i < best.i)) best = { id, i, k }; } return best; }
+function sayParse(raw) {
+  const text = ' ' + raw.toLowerCase().replace(/ё/g, 'е') + ' ';
+  let hit = sayFind(text, SAY_PEOPLE), kind = 'person';
+  if (!hit) { hit = sayFind(text, SAY_AGENTS); kind = 'agent'; }
+  if (!hit) { hit = sayFind(text, SAY_TOPICS); kind = 'agent'; }
+  if (!hit) return null;
+  let due = '', w = raw;
+  const tm = raw.match(/до\s+(\d{1,2})[:.](\d{2})/i), th = raw.match(/до\s+(\d{1,2})\s*(?:часов|час|ч)\b/i), dm = raw.match(new RegExp('(?:до|к)?\\s*(\\d{1,2})\\s+(' + MONTHS_RE + ')', 'i')), wd = raw.match(/к\s+(понедельник|вторник|сред|четверг|пятниц|суббот)\S*/i);
+  const tomorrow = /послезавтра/i.test(raw) ? 'послезавтра' : /завтра/i.test(raw) ? 'завтра' : '';
+  if (tm) { due = (tomorrow || 'сегодня') + ' до ' + pad(+tm[1]) + ':' + tm[2]; w = w.replace(tm[0], ''); }
+  else if (th) { due = (tomorrow || 'сегодня') + ' до ' + pad(+th[1]) + ':00'; w = w.replace(th[0], ''); }
+  else if (dm) { due = 'до ' + (+dm[1]) + ' ' + dm[2].toLowerCase(); w = w.replace(dm[0], ''); }
+  else if (wd) { due = wd[0].toLowerCase(); w = w.replace(wd[0], ''); }
+  else if (tomorrow) due = tomorrow;
+  else if (/сегодня|срочно/i.test(raw)) due = 'сегодня';
+  w = w.replace(/\b(послезавтра|завтра|сегодня)\b/gi, '');
+  // убрать слово-адресата, глаголы-команды и «задачу»
+  const lw = w.toLowerCase().replace(/ё/g, 'е'); const pos = lw.indexOf(hit.k);
+  if (pos >= 0 && kind === 'person' || (pos >= 0 && SAY_AGENTS[hit.id] && SAY_AGENTS[hit.id].includes(hit.k))) { let a = pos, b = pos; while (a > 0 && /\S/.test(w[a - 1])) a--; while (b < w.length && /\S/.test(w[b])) b++; w = w.slice(0, a) + w.slice(b); w = w.replace(/\b(для|у)\s+(?=\s|$)/i, ''); }
+  w = w.replace(/^\s*(джарвис|jarvis)[,!:\s]*/i, '').replace(/\b(пожалуйста)\b/gi, '')
+    .replace(/^\s*(дай|дайте|поставь|поставьте|передай|передайте|поручи|поручите|скажи|скажите|попроси|попросите|пусть|нужно|надо|сделай|сделайте|подготовь)\s+/i, (m) => (/сделай|подготовь/i.test(m) ? m : ''))
+    .replace(/\b(задачу|задание|поручение)\b\s*/i, '').replace(/^\s*(чтобы|:|—|-)\s*/i, '').replace(/\s{2,}/g, ' ').trim().replace(/[.,;!]+$/, '');
+  if (w.length < 3) w = raw.trim();
+  w = w.charAt(0).toUpperCase() + w.slice(1);
+  if (kind === 'person') { const p = byPid[hit.id]; return { kind, id: 'p:' + p.id, p, what: w, due: due || 'не указан — поставлю на завтра', to: p.role + ' · реальный офис, место ' + p.n, via: 'DH OS → Telegram от бота компании, после вашего «да»' }; }
+  const r = byId[hit.id]; return { kind, id: r.id, r, what: w, due: due || 'не указан — поставлю на завтра', to: r.role + ' · мои агенты, пом. ' + r.code + ' · ' + ((deptOf(r.id) || {}).name || ''), via: 'Очередь JARVIS на ПК → агент «' + r.role + '»' };
+}
+let sayPending = null;
+$('#say').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const raw = $('#say-in').value.trim(), card = $('#say-card');
+  $('#say-honest').hidden = true;
+  if (raw.length < 3) { card.hidden = false; card.innerHTML = '<div class="eyebrow">Вот что я понял</div><p style="margin:4px 0 0">Напишите, что нужно сделать и кому.</p>'; return; }
+  const r = sayParse(raw); sayPending = r;
+  card.hidden = false;
+  if (!r) { card.innerHTML = '<div class="eyebrow">Вот что я понял</div><h3>Не понял, кому это. Уточните</h3><p class="note" style="margin:0">Назовите адресата: «менеджеру», «дизайнеру», «макетчику» — или тему: «реклама», «контент-план», «смета», «отзывы».</p>'; return; }
+  card.innerHTML = '<div class="eyebrow">Вот что я понял · демо</div>' +
+    '<dl class="say-dl"><dt>Кому</dt><dd>' + esc(r.to) + '</dd><dt>Что сделать</dt><dd>' + esc(r.what) + '</dd><dt>Срок</dt><dd>' + esc(r.due) + '</dd><dt>Через что</dt><dd>' + esc(r.via) + '</dd></dl>' +
+    '<div class="card-actions" style="margin-top:12px"><button class="btn primary" type="button" data-say="ok">Подтвердить</button><button class="btn ghost" type="button" data-say="no">Отмена</button></div>';
+  card.querySelector('[data-say="ok"]').focus();
+});
+$('#say-card').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-say]'); if (!b) return;
+  const r = sayPending; $('#say-card').hidden = true; sayPending = null;
+  if (b.dataset.say !== 'ok' || !r) return;
+  if (r.kind === 'person') r.p.tasks.unshift({ t: r.what, due: r.due + ' · новая, демо', fresh: true });
+  else r.r.queue.unshift(r.what + ' (новая, демо)');
+  const ent = entity(r.id);
+  if (state.floor !== 'all' && ent && ent.floor !== state.floor) setFloor('all');
+  DH.emit('say-send', { id: r.id });
+  pushEvent(r.kind === 'person' ? r.id : r.id, 'Задание: «' + r.what + '», ' + r.due + ' — демо, никуда не ушло');
+  const h = $('#say-honest');
+  h.textContent = 'Демо: задача «' + r.what + '» никуда не ушла — коробочка полетела на макете. В реальном режиме задача людям уходит через DH OS в Telegram от бота компании, агентам — в очередь JARVIS на ПК. Каждая — после вашего «да».';
+  h.hidden = false; $('#say-in').value = '';
+  if (state.selected === r.id) renderSide();
+});
+
 /* ---------- план месяца (демо) ---------- */
 function renderMonth() {
   const d = loc(Date.now()), day = d.getUTCDate(), N = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
@@ -1720,8 +1827,8 @@ DH.on('ptrip', (h) => { if (!feedPaused) pushEvent('p:' + h.from, h.text); });
 
 /* ---------- экскурсия: ярлык → заголовок → факты → действие ---------- */
 const TOUR = [
-  { view: 'overview', floor: 'all', eb: 'Общий вид · два этажа', title: 'Офис Dream House — макет под стеклом', text: () => 'Снизу студия: места команды из DH OS. Сверху JARVIS и 21 агент в шести отделах, компьютер «Alijon», облако и павильон DH OS. Подсветка комнаты — её состояние: зелёная работает, янтарная ждёт, красная — проблема.', act: 'Показать проблемы →', go: () => setView('problems') },
-  { view: 'overview', floor: '1', eb: 'Этаж 1 · Студия — люди', title: 'Команда в одном зале', text: () => '8 мест — по одному на роль из DH OS. Кольцо у фигурки: зелёное — на задаче, шампань — свободен, красное — просрочка. Имена придут из DH OS.', act: 'Открыть место менеджера →', open: 'p:manager' },
+  { view: 'overview', floor: 'all', eb: 'Общий вид · два офиса рядом', title: 'Офис Dream House — макет под стеклом', text: () => 'Слева реальный офис: команда студии и DH Academy. Справа мои агенты: JARVIS и 21 агент в шести отделах. Между ними мост и павильон DH OS — по ним задачи идут людям. Подсветка комнаты — её состояние: зелёная работает, янтарная ждёт, красная — проблема.', act: 'Показать проблемы →', go: () => setView('problems') },
+  { view: 'overview', floor: '1', eb: 'Реальный офис · Dream House', title: 'Команда в одном зале', text: () => '8 мест — по одному на роль из DH OS. Кольцо у фигурки: зелёное — на задаче, шампань — свободен, красное — просрочка. Имена придут из DH OS.', act: 'Открыть место менеджера →', open: 'p:manager' },
   { room: 'jarvis', eb: 'Пом. 2.00 · Кабинет JARVIS', title: 'Управляющий раздаёт задачи', text: () => 'Модель Opus. Сейчас — разбор голосового задания, 60 %. В очереди 3 задачи: протокол проверки, заказ на печать, вечерний отчёт.', act: 'Открыть карточку →' },
   { rooms: ['planner', 'developer', 'tester'], eb: 'Пом. 2.01 · 2.10–2.11 · план → код → проверка', title: 'План → код → проверка', text: () => 'Белая коробочка — задача. Планировщик передаёт ТЗ разработчику, тот сдаёт сборку на проверку. Сейчас проверка вернула шлюз: 2 из 9 критериев не прошли.', act: 'Открыть проверку →', open: 'tester' },
   { room: 'archicad', eb: 'Пом. 2.12 · Производство · Archicad', title: 'Планировка 78 м² ждёт вас', text: () => 'Стены и проёмы построены, готово 45 %. Нужна глубина ниши в коридоре — без ответа срок ' + T(2.2) + ' не успеть.', act: 'Открыть карточку →' },
@@ -1876,7 +1983,8 @@ const labelRenderer = new CSS2DRenderer({ element: labelsEl });
 const scene = new THREE.Scene();
 const F1 = new THREE.Group(), F2 = new THREE.Group(); F1.name = 'этаж 1'; F2.name = 'этаж 2';
 scene.add(F1, F2);
-const FH = 2.65; F2.position.y = FH;
+const FH = 2.65, X1 = -21.15, X2 = 15.05; F1.position.x = X1; F2.position.x = X2;
+const W1 = (v) => v.clone().add(new V3(X1, 0, 0)), W2 = (v) => v.clone().add(new V3(X2, 0, 0));
 let ROOT = scene;
 const camera = new THREE.PerspectiveCamera(36, 1, 0.5, 600);
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -1991,7 +2099,7 @@ const L = {
 };
 const OL = { planner: { cx: -11.25, cz: -7.2 }, developer: { cx: -3.75, cz: -7.2 }, tester: { cx: 3.75, cz: -7.2 }, secretary: { cx: 12.75, cz: 7.2, xb: 14.88 } };
 for (const id in L) { const r = L[id]; r.xa = r.x0 + INS; r.xb = r.x1 - INS; r.za = r.z0 + INS; r.zb = r.z1 - INS; r.cx = (r.x0 + r.x1) / 2; r.cz = (r.z0 + r.z1) / 2; r.w = r.xb - r.xa; r.d = r.zb - r.za; }
-const PAV = new V3(27.8, 4.3, -5.8), DPV = new V3(27.6, 3.4, 7.0);
+const PAV = new V3(-22.55, 5.0, -15.2), DPV = new V3(-18.1, 4.1, -5.6);
 
 const RM = {};
 const POOL = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const gr = g.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.55, '#8a8a8a'); gr.addColorStop(1, '#141414'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
@@ -2602,8 +2710,8 @@ function buildCables() {
   }
   add(M.cable, mergeGeometries(geos), { cast: false, receive: false });
 }
-const mainCurve = new THREE.CatmullRomCurve3([new V3(12.6, 1.25, -8.7), new V3(12.6, 3.4, -8.7), new V3(12.9, 7.0, -8.7), new V3(17.0, 9.6, -8.3), new V3(23.0, 8.6, -7.2), new V3(25.0, 4.3, -6.4)], false, 'centripetal');
-const dhCurve = new THREE.CatmullRomCurve3([new V3(12.3, 0.9, 7.2), new V3(12.6, 3.4, 7.6), new V3(13.6, 6.95, 8.2), new V3(17.5, 8.4, 8.4), new V3(23.2, 7.0, 7.6), new V3(25.0, 3.5, 7.1)], false, 'centripetal');
+const mainCurve = new THREE.CatmullRomCurve3([new V3(12.6, 1.25, -8.7), new V3(12.6, 4.0, -9.4), new V3(5, 6.2, -14.8), new V3(-8, 6.4, -18.2), new V3(-17, 6.1, -17.4), new V3(-20.3, 5.0, -15.4)], false, 'centripetal');
+const dhCurve = new THREE.CatmullRomCurve3([new V3(12.3, 0.9, 7.2), new V3(12.6, 3.6, 7.4), new V3(4, 5.4, 5.2), new V3(-8, 5.6, -1.2), new V3(-14.8, 5.0, -4.6), new V3(-16.0, 4.1, -5.5)], false, 'centripetal');
 const N_IN = 110, N_MAIN = 22, N_BEAM = 10, N_DH = 16;
 const parts = { mesh: null, list: [] };
 function buildParticles() {
@@ -2620,7 +2728,7 @@ function buildParticles() {
 const flyBoxes = [];
 
 /* ---------- подиум, витрина, павильон ---------- */
-const PW = 41.3, PD = 32.1, PH = 1.6, PTOP = -0.25, ZC = -3.35, XC = 2.95, VH = 9.85, VD = 31.1, VW = 40.3;
+const PW = 76.7, PD = 32.1, PH = 1.6, PTOP = -0.25, ZC = -3.35, XC = 0, VH = 7.2, VD = 31.1, VW = 75.7;
 let glassBox, plaqueMat, northMat, floorMesh, contact;
 function buildBase() {
   add(M.podium, boxG(PW, PH, PD, XC, PTOP - PH / 2, ZC));
@@ -2633,8 +2741,9 @@ function buildBase() {
   add(M.slab, boxG(31.2, 0.25, 21.2, 0, -0.125, 0));
   floorMesh = new THREE.Mesh(new THREE.CircleGeometry(160, 64), M.floor); floorMesh.rotation.x = -Math.PI / 2; floorMesh.position.y = -2.0; floorMesh.receiveShadow = true; ROOT.add(floorMesh);
   const ct = tex(256, 256, (g) => { g.clearRect(0, 0, 256, 256); const gr = g.createRadialGradient(128, 128, 30, 128, 128, 128); gr.addColorStop(0, 'rgba(0,0,0,.55)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256); });
-  contact = new THREE.Mesh(new THREE.PlaneGeometry(58, 47), new THREE.MeshBasicMaterial({ map: ct, transparent: true, depthWrite: false })); contact.rotation.x = -Math.PI / 2; contact.position.set(XC, -1.995, ZC); ROOT.add(contact);
-  const pc = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshBasicMaterial({ map: ct, transparent: true, depthWrite: false, opacity: 0.6 })); pc.rotation.x = -Math.PI / 2; pc.position.set(PAV.x, -1.993, PAV.z); ROOT.add(pc);
+  contact = new THREE.Mesh(new THREE.PlaneGeometry(92, 47), new THREE.MeshBasicMaterial({ map: ct, transparent: true, depthWrite: false })); contact.rotation.x = -Math.PI / 2; contact.position.set(XC, -1.995, ZC); ROOT.add(contact);
+  const pc = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshBasicMaterial({ map: ct, transparent: true, depthWrite: false, opacity: 0.6 })); pc.rotation.x = -Math.PI / 2; pc.position.set(PAV.x + X2, -1.993, PAV.z); ROOT.add(pc);
+  const pc2 = pc.clone(); pc2.position.set(DPV.x + X2, -1.992, DPV.z); ROOT.add(pc2);
   glassBox = new THREE.Mesh(new THREE.BoxGeometry(VW, VH, VD), Q === 'high' ? glassHigh : glassLow); glassBox.position.set(XC, PTOP + VH / 2, ZC); glassBox.renderOrder = 5; ROOT.add(glassBox);
   const exR = XC + VW / 2, exL = XC - VW / 2, ez1 = ZC + VD / 2, ez0 = ZC - VD / 2, yb = PTOP, t = 0.05;
   [[VW + t, 0.08, t, XC, yb + 0.04, ez1], [VW + t, 0.08, t, XC, yb + 0.04, ez0], [t, 0.08, VD + t, exR, yb + 0.04, ZC], [t, 0.08, VD + t, exL, yb + 0.04, ZC],
@@ -2642,21 +2751,23 @@ function buildBase() {
   plaqueMat = new THREE.MeshStandardMaterial({ transparent: true, roughness: 0.4, metalness: 0.4, emissive: 0xffffff, emissiveIntensity: 0.25 });
   const plaque = new THREE.Mesh(new THREE.PlaneGeometry(13, 1.2), plaqueMat); plaque.position.set(XC, PTOP - PH / 2 + 0.05, ZC + PD / 2 + 0.008); ROOT.add(plaque);
   northMat = new THREE.MeshStandardMaterial({ transparent: true, roughness: 0.4, metalness: 0.6 });
-  const north = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.1), northMat); north.rotation.x = -Math.PI / 2; north.position.set(-16.2, PTOP + 0.003, 11.35); ROOT.add(north);
-  for (let i = 0; i < 5; i++) add(i % 2 ? M.model : M.dark, boxG(0.8, 0.02, 0.12, 17.4 + i * 0.8, PTOP + 0.01, 11.6));
+  const north = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.1), northMat); north.rotation.x = -Math.PI / 2; north.position.set(-37.2, PTOP + 0.003, 11.35); ROOT.add(north);
+  for (let i = 0; i < 5; i++) add(i % 2 ? M.model : M.dark, boxG(0.8, 0.02, 0.12, 32.6 + i * 0.8, PTOP + 0.01, 11.6));
   // деревья макета на подиуме
   const R = rng(17);
-  const trees = [[-16.4, -18.2], [-16.4, -12.5], [-16.4, -6], [-16.4, 0.5], [-16.4, 6.5], [-16.4, 11.5], [-11, 11.6], [-4, 11.6], [5, 11.6], [11.5, 11.6], [22.1, 11.5], [22.1, 5], [22.1, -2], [22.1, -8], [22.1, -14], [-10, -18.6], [-2, -18.6], [6, -18.6], [13, -18.6], [20, -18.6], [16.4, 11.6]];
+  const trees = []; for (let x = -37; x <= 37.01; x += 6.2) { if (Math.abs(x - X1) > 3.2 && Math.abs(x - X2 - 3) > 3.2) trees.push([x, 11.75]); trees.push([x, -18.6]); } for (let z = -16; z <= 9; z += 5) { trees.push([-37.3, z]); trees.push([37.3, z]); } trees.push([-3.05, 7.5], [-3.05, -12.5]);
   trees.forEach(([x, z]) => { const r0 = 0.32 + R() * 0.16; add(M.brass, cylG(0.025, 0.03, 0.75, x, -0.25 + 0.375, z, 6), { cast: false }); const sp = new THREE.SphereGeometry(r0, 18, 12); sp.translate(x, -0.25 + 0.75 + r0 * 0.8, z); add(M.figure, sp); });
   drawPlaques();
 }
 function buildF2Base() {
   add(M.slab2, boxG(37.3, 0.25, 27.9, 3.05, -0.125, -3.35));
-  const port = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.04, 8, 24), M.frame); port.rotation.x = Math.PI / 2; port.position.set(12.9, PTOP + VH - FH, -8.7); ROOT.add(port);
-  // колонны под консолью отдела маркетинга
-  for (const z of [-16.9, -13.9]) for (let x = -15; x <= 21.01; x += 6) add(M.brass, cylG(0.07, 0.07, FH, x, -0.25 - FH / 2, z, 12));
-  for (const z of [-8.5, -3, 2.5, 8, 10.4]) for (const x of [16.5, 21.4]) add(M.brass, cylG(0.07, 0.07, FH, x, -0.25 - FH / 2, z, 12));
-  const port2 = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.04, 8, 24), M.frame); port2.rotation.x = Math.PI / 2; port2.position.set(13.6, PTOP + VH - FH, 8.2); ROOT.add(port2);
+
+  // мост между офисами: стеклянная галерея, по ней идут задачи
+  const bx0 = -15.6 - 5.0, bx1 = -15.6, bl = bx1 - bx0, bc = (bx0 + bx1) / 2;
+  add(M.model, boxG(bl, 0.14, 2.4, bc, -0.07, 0));
+  add(M.pglass, boxG(bl, 0.8, 0.03, bc, 0.4, -1.2), { cast: false }); add(M.pglass, boxG(bl, 0.8, 0.03, bc, 0.4, 1.2), { cast: false });
+  add(M.brass, boxG(bl, 0.04, 0.05, bc, 0.82, -1.2), { cast: false }); add(M.brass, boxG(bl, 0.04, 0.05, bc, 0.82, 1.2), { cast: false });
+  add(M.glow, boxG(bl, 0.02, 0.06, bc, 0.012, 0), { cast: false, receive: false });
 }
 function drawPlaques() {
   const ink = C.champHex;
@@ -2714,6 +2825,47 @@ function buildDhPavilion() {
   add(M.dark, boxG(0.5, 1.3, 0.3, P.x + 2.25, P.y + 0.65, P.z - 0.9)); add(M.glow, boxG(0.04, 1.1, 0.012, P.x + 2.25, P.y + 0.65, P.z - 0.74), { cast: false });
   const hit = new THREE.Mesh(new THREE.CylinderGeometry(3.1, 3.1, 1.8, 24), new THREE.MeshBasicMaterial()); hit.position.set(P.x, P.y + 0.7, P.z); hit.visible = false; hit.userData.room = 'dhos'; hit.userData.floor = '2'; ROOT.add(hit); hits.push(hit);
 }
+const OSIGN = {};
+function buildOfficeSigns() {
+  [['1', X1, -11.2, 'Реальный офис', 'Dream House · люди студии'], ['2', X2 + 3.0, -17.9, 'Мои агенты', 'JARVIS · 21 агент · 6 отделов']].forEach(([k, x, z, nm, sub]) => {
+    const el = document.createElement('div'); el.className = 'ol'; el.setAttribute('role', 'button'); el.tabIndex = 0;
+    el.innerHTML = '<b>' + nm + '</b><small>' + sub + '</small>';
+    el.addEventListener('click', (e) => { e.stopPropagation(); DH.setFloor(k); });
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); DH.setFloor(k); } });
+    const o = new CSS2DObject(el); o.center.set(0.5, 1); o.position.set(x, 2.5, z); scene.add(o); OSIGN[k] = { o, el };
+  });
+}
+/* коробочки-задачи: из кабинета JARVIS через DH OS к столам людей и отчёты обратно */
+const taskFlights = [];
+const tboxGeo = new THREE.BoxGeometry(0.34, 0.26, 0.34), tboxEdges = new THREE.EdgesGeometry(tboxGeo);
+function seatWorld(pid) { const sl = STUDIO.slots.find((q) => q.p.id === pid); return sl ? W1(sl.pos).setY(1.2) : null; }
+function launchTask(toId, kind) {
+  const J = W2(new V3(0, 1.7, 0)), D = W2(DPV.clone().add(new V3(0, 1.0, 0)));
+  let pts;
+  if (toId.startsWith('p:')) { const S = seatWorld(toId.slice(2)); if (!S) return; pts = [J, new V3(J.x - 6, 5.2, -4), D, new V3((D.x + S.x) / 2, 5.4, (D.z + S.z) / 2), S]; }
+  else if (L[toId] || toId === 'cloud' || toId === 'dhos') { const c = roomBox(toId, new THREE.Box3()).getCenter(new V3()).setY(1.3); pts = [J, new V3((J.x + c.x) / 2, 4.6, (J.z + c.z) / 2), c]; }
+  else return;
+  if (kind === 'report') pts.reverse();
+  const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
+  const g = new THREE.Group(); const m = new THREE.Mesh(tboxGeo, M.model); m.castShadow = true;
+  const em = new THREE.LineBasicMaterial({ toneMapped: false }); em.color.copy(kind === 'report' ? C.champ : C.glow).multiplyScalar(kind === 'say' ? 3 : 2);
+  g.add(m, new THREE.LineSegments(tboxEdges, em)); if (kind === 'say') g.scale.setScalar(1.35); scene.add(g);
+  taskFlights.push({ curve, u: 0, speed: 1 / Math.max(2.2, curve.getLength() / 9), g });
+}
+let nextTaskFlight = 3;
+function updTaskFlights(dt, t) {
+  nextTaskFlight -= dt;
+  if (nextTaskFlight <= 0) {
+    nextTaskFlight = 5 + Math.random() * 4;
+    if (!REDUCED && DH.state.pc === 'online' && STUDIO.slots.length) { const sl = STUDIO.slots[Math.floor(Math.random() * STUDIO.slots.length)]; launchTask('p:' + sl.p.id, Math.random() < 0.6 ? 'task' : 'report'); }
+  }
+  for (let i = taskFlights.length - 1; i >= 0; i--) {
+    const f = taskFlights[i]; f.u += dt * f.speed;
+    if (f.u >= 1) { scene.remove(f.g); taskFlights.splice(i, 1); continue; }
+    f.curve.getPointAt(Math.min(1, f.u), f.g.position); f.g.rotation.y += dt * 1.5;
+  }
+}
+DH.on('say-send', ({ id }) => launchTask(id, 'say'));
 const qPos = (i) => new V3(PAV.x + 0.15 + (i % 4) * 0.52, PAV.y + 0.18, PAV.z - 0.15 + Math.floor(i / 4) * 0.45);
 
 /* ---------- маяки над проблемными комнатами, подписи ---------- */
@@ -2767,10 +2919,7 @@ function buildLabels() {
   mk('gpu', 'Видеокарта', new V3(12.6, 1.5, -8.6));
 }
 let hoverId = null, selected = DH.state.selected, view = DH.state.view, floor = DH.state.floor || 'all';
-const LIFT = { '2': 0, all: 5.6, '1': 15 };
-let liftCur = LIFT[floor];
-const f2y = (f) => FH + LIFT[f || floor];
-function applyFloorShadows() { const cast = floor !== 'all'; F2.traverse((o) => { if (o.isMesh) o.castShadow = cast && !!o.userData.cs; }); }
+const f2y = () => 0;
 function problemSet() {
   const out = new Set();
   if (floor !== '1') DH.ROOMS.filter((r) => ['bad', 'wait'].includes(DH.statusOf(r.id))).forEach((r) => out.add(r.id));
@@ -2805,18 +2954,19 @@ function updateLabels() {
     lb.dot.className = 'dot ' + (st === 'late' ? 'bad' : st);
   }
   if (STUDIO.acl) STUDIO.acl.visible = floor === '1';
-  for (const id in STUDIO.zlabels) { const z = STUDIO.zlabels[id]; z.o.visible = showF1 && floor === '1'; z.el.classList.toggle('is-sel', selected === 'z:' + id); }
+  for (const k in OSIGN) OSIGN[k].el.classList.toggle('is-on', floor === k);
+  for (const id in STUDIO.zlabels) { const z = STUDIO.zlabels[id]; z.o.visible = showF1; z.el.classList.toggle('is-sel', selected === 'z:' + id); }
 }
 
 /* ---------- свет: солнце Душанбе (38,56° с. ш.), ночью — свет витрины ---------- */
 const hemi = new THREE.HemisphereLight(0xfff6ea, 0x2a2622, 0.6); scene.add(hemi);
 const sun = new THREE.DirectionalLight(0xfff3e2, 2.4);
 sun.castShadow = Q === 'high';
-sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03;
-Object.assign(sun.shadow.camera, { left: -30, right: 30, top: 30, bottom: -30, near: 1, far: 160 });
+sun.shadow.mapSize.set(3072, 3072); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03;
+Object.assign(sun.shadow.camera, { left: -46, right: 46, top: 46, bottom: -46, near: 1, far: 200 });
 scene.add(sun, sun.target);
-const spot = new THREE.SpotLight(0xffe4c2, 1.4, 0, 0.42, 0.85, 0); spot.position.set(4, 46, 30); spot.target.position.set(4, 0, -1); scene.add(spot, spot.target);
-const TARGET = new V3(5, 0, -1);
+const spot = new THREE.SpotLight(0xffe4c2, 1.4, 0, 0.7, 0.85, 0); spot.position.set(0, 50, 34); spot.target.position.set(0, 0, -2); scene.add(spot, spot.target);
+const TARGET = new V3(0, 0, -3);
 let night = 0;
 function sunAt(ms) {
   const d = new Date(ms), start = Date.UTC(d.getUTCFullYear(), 0, 0), N = (ms - start) / 864e5;
@@ -2870,20 +3020,20 @@ function applyTheme() {
 
 /* ---------- камера: виды и перелёты ---------- */
 const box3 = new THREE.Box3();
-function roomBox(id, out) {
-  const y = f2y();
+function roomBox(id, out) { roomBoxL(id, out); const dx = id.startsWith('p:') || id.startsWith('s:') || id.startsWith('z:') ? X1 : X2; out.min.x += dx; out.max.x += dx; return out; }
+function roomBoxL(id, out) {
+  const y = 0;
   if (id === 'cloud') return out.set(new V3(PAV.x - 3.4, y + PAV.y - 0.3, PAV.z - 3.4), new V3(PAV.x + 3.4, y + PAV.y + 2.4, PAV.z + 3.4));
   if (id.startsWith('s:')) { const st = (STUDIO.students || []).find((q) => q.id === id); const c = st ? st.h.root.position : new V3(); return out.set(new V3(c.x - 1.7, 0, c.z - 1.7), new V3(c.x + 1.7, 1.9, c.z + 1.7)); }
   if (id.startsWith('p:')) { const sl = STUDIO.slots.find((q) => 'p:' + q.p.id === id); const c = sl ? sl.pos : new V3(); return out.set(new V3(c.x - 1.7, 0, c.z - 1.7), new V3(c.x + 1.7, 1.9, c.z + 1.7)); }
   if (id.startsWith('z:')) { const g = ZG[id.slice(2)]; return out.set(new V3(g.x0, 0, g.z0), new V3(g.x1, H1, g.z1)); }
-  if (id.startsWith('d:')) { const d = (DH.DEPTS || []).find((x) => x.id === id.slice(2)); const rs = d ? d.rooms.filter((x) => L[x] || x === 'cloud' || x === 'dhos') : []; out.makeEmpty(); rs.forEach((x) => out.union(roomBox(x, new THREE.Box3()))); return out; }
+  if (id.startsWith('d:')) { const d = (DH.DEPTS || []).find((x) => x.id === id.slice(2)); const rs = d ? d.rooms.filter((x) => L[x]) : []; out.makeEmpty(); rs.forEach((x) => out.union(roomBoxL(x, new THREE.Box3()))); return out; }
   if (id === 'dhos') return out.set(new V3(DPV.x - 3.2, y + DPV.y - 0.3, DPV.z - 3.2), new V3(DPV.x + 3.2, y + DPV.y + 1.6, DPV.z + 3.2));
   const r = L[id]; return out.set(new V3(r.x0, y, r.z0), new V3(r.x1, y + 2.0, r.z1));
 }
 function floorBox(f) {
-  const y2 = f2y(f);
-  const b2 = new THREE.Box3(new V3(-16.2, y2 - 0.3, -17.6), new V3(31.2, y2 + 2.4, 11.0));
-  const b1 = new THREE.Box3(new V3(-16.2, -0.3, -11.0), new V3(16.2, 2.4, 11.0));
+  const b2 = new THREE.Box3(new V3(X2 - 16.0, -0.3, -17.4), new V3(X2 + 22.0, 2.4, 11.0));
+  const b1 = new THREE.Box3(new V3(X1 - 16.0, -0.3, -10.8), new V3(X1 + 16.0, 2.4, 11.0));
   return f === '1' ? b1 : f === '2' ? b2 : b1.union(b2);
 }
 const tmpCam = new THREE.PerspectiveCamera();
@@ -2905,14 +3055,13 @@ function fit(bx, dir, margin, tgt) {
 const narrow = () => camera.aspect < 1.05;
 function preset(name) {
   if (name === 'plan') {
-    if (floor === '1') return fit(new THREE.Box3(new V3(-15.8, 0, -10.8), new V3(15.8, 0.5, 10.8)), new V3(0, 1, 0.015), narrow() ? 0.96 : 0.9);
-    const y = f2y(floor === 'all' ? '2' : floor);
-    return fit(new THREE.Box3(new V3(-17.4, y, -18.0), new V3(31.4, y + 0.5, 12.0)), new V3(0, 1, 0.015), narrow() ? 0.96 : 0.92);
+    const pb = floorBox(floor); pb.min.y = 0; pb.max.y = 0.5;
+    return fit(pb, new V3(0, 1, 0.015), narrow() ? 0.96 : 0.94);
   }
   const b = floorBox(floor);
-  if (floor === '1') return fit(b, narrow() ? new V3(0.18, 0.95, 0.75) : new V3(0.3, 0.68, 0.7), narrow() ? 1.0 : 0.96, new V3(0, 0, 0.4));
-  if (floor === '2') return fit(b, narrow() ? new V3(0.22, 0.95, 0.75) : new V3(0.34, 0.6, 0.74), narrow() ? 1.0 : 0.98, new V3(7.5, f2y('2'), -3.0));
-  return fit(b, narrow() ? new V3(0.2, 0.75, 0.85) : new V3(0.36, 0.42, 0.82), narrow() ? 1.0 : 0.97, new V3(narrow() ? 6 : 7.0, 3.6, -1.8));
+  if (floor === '1') return fit(b, narrow() ? new V3(0.18, 0.95, 0.75) : new V3(0.3, 0.68, 0.7), narrow() ? 1.0 : 0.97, new V3(X1, 0, 0.4));
+  if (floor === '2') return fit(b, narrow() ? new V3(0.22, 0.95, 0.75) : new V3(0.34, 0.6, 0.74), narrow() ? 1.0 : 0.98, new V3(X2 + 3.0, 0, -3.0));
+  return fit(b, narrow() ? new V3(-0.66, 0.66, 0.36) : new V3(0.06, 0.8, 0.6), narrow() ? 1.0 : 1.0, new V3(0, 0, narrow() ? -3 : -2.6));
 }
 let fly = null, lastInput = performance.now();
 function flyTo(pos, target, dur) {
@@ -2965,7 +3114,7 @@ renderer.domElement.addEventListener('pointerleave', () => { hoverId = null; ren
 DH.on('select', ({ id, fly: f }) => { selected = id; lastInput = performance.now(); if (id && f) flyRoom(id); updateLabels(); });
 DH.on('view', (v) => { view = v; selected = null; lastInput = performance.now(); flyView(v); updateLabels(); });
 DH.on('focus', ({ rooms }) => { lastInput = performance.now(); flyRooms(rooms); });
-DH.on('floor', ({ f, quiet }) => { floor = f; lastInput = performance.now(); if (REDUCED) liftCur = LIFT[f]; applyFloorShadows(); updateLabels(); if (!quiet) flyView(view); });
+DH.on('floor', ({ f, quiet }) => { floor = f; lastInput = performance.now(); updateLabels(); if (!quiet) flyView(view); });
 DH.on('refresh', updateLabels);
 DH.on('theme', () => { readTokens(); applyTheme(); updateLight(); });
 DH.on('time', updateLight);
@@ -3010,6 +3159,7 @@ buildDhPavilion();
 buildParticles();
 buildLabels();
 ROOT = F1; buildStudio();
+ROOT = scene; buildOfficeSigns();
 ROOT = scene;
 flush();
 F2.traverse((o) => { if (o.isMesh) o.userData.cs = o.castShadow; });
@@ -3103,7 +3253,7 @@ function updPrinters(dt, t) {
       prog = REDUCED ? 0.6 : k1Cycle / 45;
     }
     const h = p.bedY + 0.012 + prog * p.objH;
-    p.plane.constant = h + F2.position.y;
+    p.plane.constant = h;
     const hx = REDUCED ? 0 : Math.sin(t * 3.1 + p.t0) * 0.16 * p.S, hz = REDUCED ? 0 : Math.sin(t * 2.3 + p.t0 * 2) * 0.12 * p.S;
     p.head.position.set(p.x + hx, h + 0.075 * p.S, p.z + hz); p.rail.position.set(p.x, h + 0.12 * p.S, p.z + hz);
   }
@@ -3149,7 +3299,7 @@ function updParticles(dt, t) {
       dhCurve.getPointAt(p.u, tv); sc = 1.1; c = C.champ;
     } else {
       if (!REDUCED) p.u = (p.u + dt * 0.35) % 1;
-      tv.set(PAV.x - 0.9, PAV.y + 9 - p.u * 7.6, PAV.z + 0.6);
+      tv.set(PAV.x - 0.9, PAV.y + 5.2 - p.u * 3.8, PAV.z + 0.6);
       sc = 0.8;
     }
     dummy.position.copy(tv); dummy.scale.setScalar(vis ? sc : 0.0001); dummy.updateMatrix();
@@ -3184,7 +3334,6 @@ function startPTrip() {
   o.a.trip = { P: poly(pts), s: 0, stage: 'go', h: o.h, wait: 0 };
 }
 function updStudio(dt, t) {
-  if (floor === '2') return;
   const ps = view === 'problems' && !selected ? problemSet() : null;
   nextPTrip -= dt; if (nextPTrip <= 0) { nextPTrip = 7 + Math.random() * 6; if (!REDUCED) startPTrip(); }
   (STUDIO.students || []).forEach((st) => { poseHuman(st.h, 'sit', t * 0.7, st.ph, ''); if (selected === st.id || hoverId === st.id) st.h.root.position.y = 0.02; else st.h.root.position.y = 0; });
@@ -3231,14 +3380,11 @@ function frame() {
   if (hoverPending && lastHoverEvt) { hoverPending = false; const id = pick(lastHoverEvt.clientX, lastHoverEvt.clientY); if (id !== hoverId) { hoverId = id; updateLabels(); } renderer.domElement.style.cursor = id ? 'pointer' : ''; }
   nextTrip -= dt; if (nextTrip <= 0) { nextTrip = 5 + Math.random() * 5; if (!REDUCED) startTrip(); }
   {
-    const close = camera.position.distanceTo(controls.target) < 24 || view === 'plan' || floor === 'all' || (selected && selected !== 'cloud');
+    const close = camera.position.distanceTo(controls.target) < 24 || view === 'plan' || (selected && selected !== 'cloud');
     vitA += ((close ? 0 : 1) - vitA) * Math.min(1, (REDUCED ? 1 : rawDt * 3));
     M.frame.opacity = vitA; M.frame.visible = vitA > 0.02; glassBox.visible = vitA > 0.35;
   }
-  liftCur += (LIFT[floor] - liftCur) * Math.min(1, REDUCED ? 1 : rawDt * 2.6);
-  if (Math.abs(LIFT[floor] - liftCur) < 0.01) liftCur = LIFT[floor];
-  F2.position.y = FH + liftCur; F2.visible = !(floor === '1' && liftCur > 11);
-  updWalkers(dt, t); updRooms(t); updPrinters(dt, t); updMachines(t); updParticles(dt, t); updStudio(dt, t);
+  updWalkers(dt, t); updRooms(t); updPrinters(dt, t); updMachines(t); updParticles(dt, t); updStudio(dt, t); updTaskFlights(dt, t);
   lightT -= dt; if (lightT <= 0) { lightT = 2; updateLight(); }
   labelT -= dt; if (labelT <= 0) {
     labelT = 0.5;
