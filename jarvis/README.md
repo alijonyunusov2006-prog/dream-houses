@@ -15,7 +15,7 @@
 | `.claude/agents/` | роли: planner, developer, tester, archicad, 3d, crm, content, browser, secretary, sysadmin |
 | `core/scripts/` | служебные скрипты (аудит диска и др.) |
 | `.claude/settings.json` | хуки политики доступа и разрешения Claude Code |
-| `skills/` | библиотека навыков (SKILL.md + tests + CHANGELOG) |
+| `skills/` | библиотека навыков (SKILL.md + tests + CHANGELOG); `skills/CATALOG.md` — что Jarvis будет уметь и откуда это берётся |
 | `core/jarviscore/` | политика, планировщик, раннер `claude -p`, отчёты, хуки, `jv` CLI |
 | `core/gateway/` | контракт облачной очереди (Supabase) — этап 3 |
 | `config/` | `settings.toml`, `allowlist.toml`, `.env.example` |

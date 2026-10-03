@@ -42,6 +42,9 @@
   ведёт `data/logs/costs.jsonl`; порог дня — `config/settings.toml`. Порог исчерпан → пауза и сообщение, не обход.
 - **Память.** Перед задачей читай `brain/20-me/`, карточку проекта в `brain/30-projects/<имя>/` и `90-lessons/`.
   После задачи — обнови карточку и `daily/`. Повторное исследование того же проекта запрещено.
+- **Обучение.** «Джарвис, научись…», «запомни, как я делаю…» → навык `skills/learn-from-owner`: дослушать,
+  «вот что я понял», записать в `brain/80-howto/`, собрать `skills/<имя>/` с тестом, проверить на примере владельца,
+  включить после его «да». Что Jarvis умеет и откуда — `skills/CATALOG.md`.
 - **Методология.** Используй скиллы superpowers: `brainstorming` → `writing-plans` → `executing-plans`,
   `test-driven-development`, `subagent-driven-development`, `verification-before-completion`.
 - Проекты, которые ты разрабатываешь (CRM брата и т.п.), живут **вне** этой папки: `C:\Projects\<имя>`,
