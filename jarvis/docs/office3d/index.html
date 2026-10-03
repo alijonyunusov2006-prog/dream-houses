@@ -401,6 +401,9 @@
   .zl span { color: var(--faint); margin-right: 6px; letter-spacing: .06em; }
   .zl.is-sel, .zl:hover { border-color: var(--champ); color: var(--ink); }
   /* карточка сотрудника и форма */
+  .now-line { margin: -4px 0 12px; font-size: 13px; color: var(--ink); } .now-line span { font: 500 9.5px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--champ-ink); margin-right: 8px; }
+  .acl { pointer-events: none; font: 500 10px/1.3 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--ink); padding: 5px 9px; border-radius: 7px; background: var(--overlay-2); border: 1px solid color-mix(in oklab, var(--champ) 55%, var(--line)); white-space: nowrap; }
+  .acl b { color: var(--champ-ink); font-weight: 600; }
   .name-ph { margin: -2px 0 10px; font: italic 400 13px/1.4 var(--f-body); color: var(--muted); }
   .name-ph.is-name { font-style: normal; color: var(--ink); font-weight: 600; }
   ul.ptasks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
@@ -868,32 +871,34 @@ const MK_IDS = ['targetolog', 'marketolog', 'screenwriter', 'analyst', 'finance'
    Пока имён нет: name: null — на табличке роль и «имя придёт из DH OS». zone: open | reception | academy.
    outfit: style (suit | blazer | sweater | hoodie | workwear | shirt | cardigan | apron), top, bottom, hair (short | long | bun | curly), hairColor, skin, acc (tie | helmet | phone | laptop | glasses). ---------- */
 const STAFF = [
-  { id: 'owner', name: null, outfit: { style: 'suit', top: '#2e2a27', bottom: '#2e2a27', hair: 'short', hairColor: '#2a221d', skin: '#d4ab84', acc: 'tie' }, n: '01', role: 'Руководитель', gen: 'руководителя', short: 'Руководитель', enumR: 'OWNER', zone: 'open', st: 'work',
+  { id: 'owner', name: null, now: 'Утверждает карусель о макетах', outfit: { style: 'suit', top: '#2e2a27', bottom: '#2e2a27', hair: 'short', hairColor: '#2a221d', skin: '#d4ab84', acc: 'tie' }, n: '01', role: 'Руководитель', gen: 'руководителя', short: 'Руководитель', enumR: 'OWNER', zone: 'open', st: 'work',
     d: 'Владелец студии. Утверждает проекты, цены и решения JARVIS. Зарплаты в DH OS видит только он.',
     tasks: [{ t: 'Утвердить карусель о макетах', due: 'сегодня до ' + T(1.3) }, { t: 'Ответить Archicad: глубина ниши в коридоре', due: 'до ' + T(2.2) }] },
-  { id: 'manager', name: null, outfit: { style: 'blazer', top: '#a8865c', bottom: '#3a3430', hair: 'bun', hairColor: '#3b2b21', skin: '#dcb592', acc: 'phone' }, n: '02', role: 'Менеджер', gen: 'менеджера', short: 'Менеджер', enumR: 'MANAGER', zone: 'reception', st: 'late',
+  { id: 'manager', name: null, now: 'Звонки по трём новым заявкам', outfit: { style: 'blazer', top: '#a8865c', bottom: '#3a3430', hair: 'bun', hairColor: '#3b2b21', skin: '#dcb592', acc: 'phone' }, n: '02', role: 'Менеджер', gen: 'менеджера', short: 'Менеджер', enumR: 'MANAGER', zone: 'reception', st: 'late',
     d: 'Принимает заявки, записывает на замер, ведёт клиента до договора.',
     tasks: [{ t: 'Перезвонить по трём новым заявкам', due: 'просрочено на 1 день', late: true }, { t: 'Записать замер: коттедж, 2 этажа', due: 'завтра, 11:00' }] },
-  { id: 'designer', name: null, outfit: { style: 'sweater', top: '#9a634a', bottom: '#4a433d', hair: 'curly', hairColor: '#2e241e', skin: '#c99d74', acc: 'glasses' }, n: '03', role: 'Дизайнер-проектировщик', gen: 'дизайнера-проектировщика', short: 'Дизайнер', enumR: 'DESIGNER', zone: 'open', st: 'late',
+  { id: 'designer', name: null, now: 'Планировка, кв. 85 м²', outfit: { style: 'sweater', top: '#9a634a', bottom: '#4a433d', hair: 'curly', hairColor: '#2e241e', skin: '#c99d74', acc: 'glasses' }, n: '03', role: 'Дизайнер-проектировщик', gen: 'дизайнера-проектировщика', short: 'Дизайнер', enumR: 'DESIGNER', zone: 'open', st: 'late',
     d: 'Обмеры, планировки, концепции и рабочие чертежи — до альбома для бригады.',
     tasks: [{ t: 'Концепция гостиной, квартира 78 м²', due: 'завтра' }, { t: 'Рабочие чертежи санузла', due: 'просрочено на 2 дня', late: true }] },
-  { id: 'viz', name: null, outfit: { style: 'hoodie', top: '#6f8c72', bottom: '#37322e', hair: 'short', hairColor: '#4a3a2c', skin: '#d8b18b' }, n: '04', role: '3D-визуализатор', gen: '3D-визуализатора', short: '3D-визуализатор', enumR: 'VISUALIZER', zone: 'open', st: 'free',
+  { id: 'viz', name: null, now: 'Свободен: рендер кухни сдан', outfit: { style: 'hoodie', top: '#6f8c72', bottom: '#37322e', hair: 'short', hairColor: '#4a3a2c', skin: '#d8b18b' }, n: '04', role: '3D-визуализатор', gen: '3D-визуализатора', short: '3D-визуализатор', enumR: 'VISUALIZER', zone: 'open', st: 'free',
     d: 'Фотореалистичные 3D-визуализации интерьеров и фасадов.',
     tasks: [{ t: 'Рендер кухни, 2 ракурса', due: 'сдано сегодня', done: true }] },
-  { id: 'supervisor', name: null, outfit: { style: 'workwear', top: '#b58a3c', bottom: '#4a433d', hair: 'short', hairColor: '#2b2420', skin: '#c2946b', acc: 'helmet' }, n: '05', role: 'Авторский надзор', gen: 'авторского надзора', short: 'Надзор', enumR: 'SUPERVISOR', zone: 'open', st: 'work',
+  { id: 'supervisor', name: null, now: 'Объект: проверка электрики', outfit: { style: 'workwear', top: '#b58a3c', bottom: '#4a433d', hair: 'short', hairColor: '#2b2420', skin: '#c2946b', acc: 'helmet' }, n: '05', role: 'Авторский надзор', gen: 'авторского надзора', short: 'Надзор', enumR: 'SUPERVISOR', zone: 'open', st: 'work',
     d: 'Следит на объекте, чтобы бригада строила по чертежам, а не «как привыкла». Надзор идёт весь срок ремонта — 8 месяцев.',
     tasks: [{ t: 'Выезд на объект: проверка электрики', due: 'пятница' }] },
-  { id: 'smm', name: null, outfit: { style: 'shirt', top: '#d4794e', bottom: '#3d3a36', hair: 'long', hairColor: '#2a1f1a', skin: '#e0bc98', acc: 'phone' }, n: '06', role: 'SMM (контент и реклама)', gen: 'SMM', short: 'SMM', enumR: 'SMM', zone: 'open', st: 'work',
+  { id: 'smm', name: null, now: 'Съёмка печати макета для Reels', outfit: { style: 'shirt', top: '#d4794e', bottom: '#3d3a36', hair: 'long', hairColor: '#2a1f1a', skin: '#e0bc98', acc: 'phone' }, n: '06', role: 'SMM (контент и реклама)', gen: 'SMM', short: 'SMM', enumR: 'SMM', zone: 'open', st: 'work',
     d: 'Контент и реклама @dream_houses.tj: съёмки, посты, Reels. Работает вместе с агентами контента, сценариев и таргета.',
     tasks: [{ t: 'Снять процесс печати макета для Reels', due: 'завтра' }] },
-  { id: 'teacher', name: null, outfit: { style: 'cardigan', top: '#7d6549', bottom: '#2f2b28', hair: 'short', hairColor: '#6b6259', skin: '#d2a882', acc: 'laptop' }, n: '07', role: 'Преподаватель DH Academy', gen: 'преподавателя DH Academy', short: 'Преподаватель', enumR: 'TEACHER', zone: 'academy', st: 'work',
+  { id: 'teacher', name: null, now: 'Урок: развёртки стен', outfit: { style: 'cardigan', top: '#7d6549', bottom: '#2f2b28', hair: 'short', hairColor: '#6b6259', skin: '#d2a882', acc: 'laptop' }, n: '07', role: 'Преподаватель DH Academy', gen: 'преподавателя DH Academy', short: 'Преподаватель', enumR: 'TEACHER', zone: 'academy', st: 'work',
     d: 'Ведёт курсы чертёжника и 3D-визуализатора. Набор ежемесячно.',
     tasks: [{ t: 'Урок курса чертёжника: развёртки стен', due: 'по расписанию' }] },
-  { id: 'maker', name: null, outfit: { style: 'apron', top: '#e6dccb', apron: '#5f4f40', bottom: '#3b3530', hair: 'curly', hairColor: '#3a2b20', skin: '#c79b70' }, n: '08', role: 'Инженер-макетчик', gen: 'инженера-макетчика', short: 'Макетчик', enumR: 'MOCKUP_ENGINEER', zone: 'open', st: 'work',
+  { id: 'maker', name: null, now: 'Макет коттеджа М 1:100', outfit: { style: 'apron', top: '#e6dccb', apron: '#5f4f40', bottom: '#3b3530', hair: 'curly', hairColor: '#3a2b20', skin: '#c79b70' }, n: '08', role: 'Инженер-макетчик', gen: 'инженера-макетчика', short: 'Макетчик', enumR: 'MOCKUP_ENGINEER', zone: 'open', st: 'work',
     d: 'Собирает архитектурные макеты с умной подсветкой: печать деталей, сборка, ESP32 и адресные светодиоды.',
     tasks: [{ t: 'Макет коттеджа М 1:100: сборка и подсветка', due: 'через 3 дня' }] },
 ];
 const PEOPLE = STAFF; /* одно и то же: места строятся из STAFF */
+/* DH Academy: учебный класс рядом со студией. Демо; придёт из DH OS (курсы академии). Число студентов = число столов. */
+const ACADEMY = { course: 'чертёжник', lesson: 'Развёртки стен', students: 6 };
 const PST = { work: 'На задаче', free: 'Свободен', late: 'Просрочка' };
 STAFF.forEach((p, i) => { p.n = pad(i + 1); if (!p.zone) p.zone = 'open'; if (!p.tasks) p.tasks = []; if (!p.st) p.st = 'free'; if (!p.gen) p.gen = p.role; if (!p.short) p.short = p.role; });
 const byPid = Object.fromEntries(PEOPLE.map((p) => [p.id, p]));
@@ -908,6 +913,7 @@ function entity(id) {
   if (!id) return null;
   if (byId[id]) { const r = byId[id]; return { kind: 'room', floor: '2', code: r.code, short: r.short }; }
   if (id.startsWith('p:') && byPid[id.slice(2)]) { const p = byPid[id.slice(2)]; return { kind: 'person', floor: '1', code: '1 · место ' + p.n, short: p.short, p }; }
+  if (id.startsWith('s:')) { const n = +id.slice(2); if (n >= 1 && n <= ACADEMY.students) return { kind: 'student', floor: '1', code: '1.04 · стол ' + pad(n), short: 'Студент ' + n, n }; }
   if (id.startsWith('d:')) { const d = DEPTS.find((x) => x.id === id.slice(2)); if (d) return { kind: 'dept', floor: '2', code: 'отдел', short: d.name, d }; }
   if (id.startsWith('z:') && byZid[id.slice(2)]) { const z = byZid[id.slice(2)]; return { kind: 'zone', floor: '1', code: z.code, short: z.name, z }; }
   return null;
@@ -1027,7 +1033,7 @@ const QPOOL = ['Сделай планировку по фото, 64 м²', 'На
 const state = { selected: null, view: 'overview', floor: 'all', pc: 'online', queue: [], k1Done: 18, p1sLayer: 212, gpu: 78, timeOverride: null, uptime0: NOW0 - (6 * H + 12 * 60e3) };
 const bus = {};
 const DH = window.DH = {
-  ROOMS, byId, ORDER, DEPTS, deptOf, DHOS_SYS, TASKS, RES, HANDOFFS, STAFF, PEOPLE, byPid, ZONES, PTRIPS, MK_IDS, entity, state, REDUCED,
+  ROOMS, byId, ORDER, DEPTS, deptOf, DHOS_SYS, ACADEMY, TASKS, RES, HANDOFFS, STAFF, PEOPLE, byPid, ZONES, PTRIPS, MK_IDS, entity, state, REDUCED,
   on(e, f) { (bus[e] || (bus[e] = [])).push(f); },
   emit(e, d) { (bus[e] || []).forEach((f) => { try { f(d); } catch (err) { console.error(err); } }); },
   statusOf, select, clearSelection, setView, setFloor, pushEvent: (r, t) => pushEvent(r, t),
@@ -1221,6 +1227,7 @@ function personCard(p) {
     '<div class="pills"><span class="pill ' + stc + '"><span class="dot ' + (p.st === 'late' ? 'bad' : p.st) + '"></span>' + PST[p.st] + '</span><span class="pill">Человек · DH OS</span></div>' +
     (p.name ? '<p class="name-ph is-name">' + esc(p.name) + '</p>' : '<p class="name-ph">Имя придёт из DH OS</p>') +
     '<p class="lead">' + esc(p.d) + '</p>' +
+    (p.now ? '<p class="now-line"><span>Сейчас</span>' + esc(p.now) + '</p>' : '') +
     '<div class="sec-l"><span>Задачи сейчас</span><span>демо</span></div>' +
     '<ul class="ptasks">' + p.tasks.map((t) => '<li class="' + (t.late ? 'late' : t.done ? 'done' : t.fresh ? 'fresh' : '') + '"><b>' + esc(t.t) + '</b><span>' + esc(t.due) + '</span></li>').join('') + '</ul>' +
     '<dl class="facts">' +
@@ -1249,9 +1256,21 @@ function zoneCard(z) {
     (z.id === 'open' ? '<div class="pills"><span class="pill work"><span class="dot work"></span>На задаче ' + pc.work + '</span><span class="pill free"><span class="dot free"></span>Свободен ' + pc.free + '</span><span class="pill bad"><span class="dot bad"></span>Просрочка ' + pc.late + '</span></div>' : '') +
     '<p class="lead">' + esc(z.d) + '</p>' +
     (list.length ? '<div class="sec-l"><span>' + (z.id === 'open' ? 'Команда · ' + PEOPLE.length + ' мест' : 'Кто здесь') + '</span><span>демо</span></div><ul class="brief">' + list.map((p) => '<li data-room="p:' + p.id + '" tabindex="0"><span class="dot ' + (p.st === 'late' ? 'bad' : p.st) + '"></span><div><b>' + esc(p.role) + '</b>' + PST[p.st] + ' · ' + esc((p.tasks.find((t) => t.late) || p.tasks[0]).t) + '</div></li>').join('') + '</ul>' : '') +
+    (z.id === 'academy' ? '<div class="sec-l"><span>Курс сейчас</span><span>демо</span></div><p class="now-line"><span>«' + esc(ACADEMY.course) + '»</span>урок «' + esc(ACADEMY.lesson) + '», ' + ACADEMY.students + ' ' + plural(ACADEMY.students, 'студент', 'студента', 'студентов') + '</p>' : '') +
     (z.book ? '<div class="sec-l"><span>Брони на сегодня</span><span>демо</span></div><ul class="rel">' + z.book.map((b) => '<li><span class="dot free"></span><div><b>' + b[0] + '</b> ' + esc(b[1]) + '</div></li>').join('') + '</ul>' : '') +
     '<p class="note">Имена не выдумываем: на табличках роли из DH OS. Имена придут после подключения ключа.</p>' +
     '<div class="card-actions"><button class="link-btn" type="button" data-act="back">← Ко всему макету</button></div>';
+}
+function studentCard(n) {
+  $('#side-room').innerHTML =
+    '<div class="eyebrow">Этаж 1 · Класс DH Academy · Стол ' + pad(n) + ' из ' + ACADEMY.students + '</div>' +
+    '<h2>Студент курса «' + esc(ACADEMY.course) + '»</h2>' +
+    '<div class="pills"><span class="pill work"><span class="dot work"></span>На уроке</span><span class="pill">DH Academy · демо</span></div>' +
+    '<p class="name-ph">Имя придёт из DH OS</p>' +
+    '<p class="lead">Сейчас урок: «' + esc(ACADEMY.lesson) + '». Курсы чертёжника и 3D-визуализатора, набор ежемесячно.</p>' +
+    '<dl class="facts"><div><dt>Курс</dt><dd>' + esc(ACADEMY.course) + '</dd></div><div><dt>В группе</dt><dd>' + ACADEMY.students + ' <small>' + plural(ACADEMY.students, 'студент', 'студента', 'студентов') + '</small></dd></div></dl>' +
+    '<div class="fact"><div class="eyebrow">По факту на 3 октября · не демо</div><dl><dt>Сейчас</dt><dd>Курсы академии есть в DH OS по коду. Список студентов и посещаемость JARVIS ещё не видел.</dd><dt>Нужно</dt><dd>Ключ DH OS на ПК (DHOS_AGENT_KEY).</dd></dl></div>' +
+    '<div class="card-actions"><button class="link-btn" type="button" data-act="back">← Ко всей студии</button></div>';
 }
 function deptCard(d) {
   const c = { work: 0, wait: 0, bad: 0, off: 0 }; d.rooms.forEach((id) => { c[statusOf(id)]++; });
@@ -1269,7 +1288,7 @@ function renderSide() {
   if (state.selected) {
     $('#side-home').hidden = true; $('#side-room').hidden = false;
     const id = state.selected;
-    if (id.startsWith('p:')) personCard(byPid[id.slice(2)]); else if (id.startsWith('z:')) zoneCard(byZid[id.slice(2)]); else if (id.startsWith('d:')) deptCard(DEPTS.find((x) => x.id === id.slice(2))); else renderRoom(id);
+    if (id.startsWith('s:')) studentCard(+id.slice(2)); else if (id.startsWith('p:')) personCard(byPid[id.slice(2)]); else if (id.startsWith('z:')) zoneCard(byZid[id.slice(2)]); else if (id.startsWith('d:')) deptCard(DEPTS.find((x) => x.id === id.slice(2))); else renderRoom(id);
   }
   else { $('#side-room').hidden = true; $('#side-home').hidden = false; renderHome(); }
 }
@@ -2400,7 +2419,7 @@ function buildStudio() {
   screenPanel('meet', TEX.plan, 10, 1.35, -9.9, 0, 2.6, 1.2);
   // класс DH Academy: кафедра, экран, 6 учебных мест
   screenPanel('academy', TEX.max, 10, 1.4, -0.52, 0, 2.6, 1.1);
-  for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) { const x = 7.6 + c * 2.4, z = 3.9 + r * 2.5; add(M.model, boxG(1.2, 0.04, 0.6, x, 0.66, z)); add(M.model, boxG(1.1, 0.62, 0.05, x, 0.31, z - 0.25)); chairG(x, z + 0.6, Math.PI); add(M.dark, boxG(0.34, 0.01, 0.24, x, 0.685, z)); }
+  buildAcademy();
   // места команды — из массива STAFF
   STUDIO.slots = layoutStaff();
   const RT = ROLE_TEX();
@@ -2442,7 +2461,7 @@ function buildStudio() {
     const c = pos.clone().setY(0.85);
     hb.position.copy(c); hb.rotation.y = face; hb.visible = false; hb.userData.room = id; hb.userData.floor = '1'; ROOT.add(hb); STUDIO.hits.push(hb);
     const el = document.createElement('div'); el.className = 'rl pl'; el.dataset.room = id; el.setAttribute('role', 'button'); el.tabIndex = 0;
-    el.innerHTML = '<div class="rl-top"><span class="dot"></span><span class="rl-code">' + p.n + '</span><span>' + esc3(p.short || p.role) + '</span></div><div class="rl-sub">' + (p.name ? esc3(p.name) : 'имя придёт из DH OS') + '</div>';
+    el.innerHTML = '<div class="rl-top"><span class="dot"></span><span class="rl-code">' + p.n + '</span><span>' + esc3(p.name || p.short || p.role) + '</span></div><div class="rl-sub">' + esc3(p.now || (p.name ? p.role : 'имя придёт из DH OS')) + '</div>';
     el.addEventListener('click', (e) => { e.stopPropagation(); DH.select(id); });
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); DH.select(id); } });
     el.addEventListener('pointerenter', () => { hoverId = id; }); el.addEventListener('pointerleave', () => { if (hoverId === id) hoverId = null; });
@@ -2459,6 +2478,26 @@ function buildStudio() {
     const lo = new CSS2DObject(el); lo.center.set(0, 1); lo.position.set(g.x0 + 0.5, 0.05, g.z1 - 0.35); ROOT.add(lo);
     STUDIO.zlabels[z.id] = { o: lo, el };
   });
+}
+const STU = ['#8f8a80', '#a99a83', '#7f8a86', '#9b8a7a', '#8a8278', '#a39787', '#7d8379', '#b0a28d'];
+function buildAcademy() {
+  const A = DH.ACADEMY || { course: '', students: 0, lesson: '' };
+  const n = Math.max(0, Math.min(12, A.students | 0)), cols = n > 9 ? 4 : 3, rows = Math.ceil(n / cols);
+  const dx = cols === 4 ? 2.05 : 2.5, x0 = 10 - dx * (cols - 1) / 2, dz = rows > 2 ? 1.95 : 2.4;
+  STUDIO.students = [];
+  for (let i = 0; i < n; i++) {
+    const c = i % cols, r = Math.floor(i / cols), x = x0 + c * dx, z = 3.4 + r * dz;
+    const d = desk('academy-st', x, z, 0, { sc: 1.1, tex: [i % 2 ? TEX.plan : TEX.max], inbox: false, sitOff: 0.5 });
+    chairG(d.seat.x, d.seat.z, d.face);
+    const h = makeHuman({ style: 'shirt', top: STU[i % STU.length], bottom: '#4a433d', hair: i % 3 === 1 ? 'long' : 'short', hairColor: i % 2 ? '#3a2d24' : '#2a221d', skin: ['#d4ab84', '#c99d74', '#e0bc98'][i % 3], simple: true });
+    h.root.position.copy(d.seat); h.root.rotation.y = d.face; h.root.scale.setScalar(0.84); ROOT.add(h.root);
+    const id = 's:' + (i + 1);
+    const hb = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.5, 1.0), new THREE.MeshBasicMaterial()); hb.position.copy(d.seat).setY(0.75); hb.visible = false; hb.userData.room = id; hb.userData.floor = '1'; ROOT.add(hb); STUDIO.hits.push(hb);
+    STUDIO.students.push({ h, id, ph: Math.random() * 6 });
+  }
+  const el = document.createElement('div'); el.className = 'acl';
+  el.innerHTML = 'DH Academy · курс <b>«' + esc3(A.course) + '»</b><br>урок: ' + esc3(A.lesson) + ' · ' + n + ' студ.';
+  const lo = new CSS2DObject(el); lo.center.set(0.5, 1); lo.position.set(10, 2.45, -0.45); ROOT.add(lo); STUDIO.acl = lo;
 }
 function esc3(t) { return String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 function plantG(x, z, k) { k = k || 1; add(M.model, cylG(0.17 * k, 0.13 * k, 0.32 * k, x, 0.16 * k, z, 16)); const sp = new THREE.SphereGeometry(0.3 * k, 16, 12); sp.translate(x, 0.32 * k + 0.26 * k, z); add(M.figure, sp); }
@@ -2484,7 +2523,7 @@ function makeHuman(o) {
   if (o.hair === 'long') { const lg = hmesh(new THREE.BoxGeometry(0.2, 0.26, 0.06), hair, 0, -0.12, -0.08, head); lg.rotation.x = 0.12; }
   if (o.hair === 'bun') hmesh(new THREE.SphereGeometry(0.05, 12, 10), hair, 0, 0.07, -0.1, head);
   if (o.hair === 'curly') for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; hmesh(new THREE.SphereGeometry(0.042, 10, 8), hair, Math.cos(a) * 0.07, 0.07, Math.sin(a) * 0.07 - 0.01, head); }
-  if (o.acc === 'glasses') hmesh(new THREE.BoxGeometry(0.15, 0.025, 0.012), hm('#1f1b18', 0.4), 0, 0.015, 0.097, head);
+  if (!o.simple && o.acc === 'glasses') hmesh(new THREE.BoxGeometry(0.15, 0.025, 0.012), hm('#1f1b18', 0.4), 0, 0.015, 0.097, head);
   const front = (w, h, y, c, z) => hmesh(new THREE.BoxGeometry(w, h, 0.012), hm(c, 0.7), 0, y, z || 0.113, hips);
   if (st === 'suit') { front(0.09, 0.13, 0.56, '#efe9de'); if (o.acc === 'tie') front(0.035, 0.22, 0.46, '#6e3b2c', 0.12); }
   if (st === 'blazer') front(0.11, 0.2, 0.5, '#efe7da');
@@ -2764,6 +2803,7 @@ function updateLabels() {
     lb.el.className = 'rl pl st-' + (st === 'late' ? 'bad' : st) + (selected === id ? ' is-sel' : '') + (hoverId === id ? ' is-hover' : '') + (ps && !ps.has(id) ? ' is-muted' : '');
     lb.dot.className = 'dot ' + (st === 'late' ? 'bad' : st);
   }
+  if (STUDIO.acl) STUDIO.acl.visible = floor !== '2';
   for (const id in STUDIO.zlabels) { const z = STUDIO.zlabels[id]; z.o.visible = showF1 && floor === '1'; z.el.classList.toggle('is-sel', selected === 'z:' + id); }
 }
 
@@ -2832,6 +2872,7 @@ const box3 = new THREE.Box3();
 function roomBox(id, out) {
   const y = f2y();
   if (id === 'cloud') return out.set(new V3(PAV.x - 3.4, y + PAV.y - 0.3, PAV.z - 3.4), new V3(PAV.x + 3.4, y + PAV.y + 2.4, PAV.z + 3.4));
+  if (id.startsWith('s:')) { const st = (STUDIO.students || []).find((q) => q.id === id); const c = st ? st.h.root.position : new V3(); return out.set(new V3(c.x - 1.7, 0, c.z - 1.7), new V3(c.x + 1.7, 1.9, c.z + 1.7)); }
   if (id.startsWith('p:')) { const sl = STUDIO.slots.find((q) => 'p:' + q.p.id === id); const c = sl ? sl.pos : new V3(); return out.set(new V3(c.x - 1.7, 0, c.z - 1.7), new V3(c.x + 1.7, 1.9, c.z + 1.7)); }
   if (id.startsWith('z:')) { const g = ZG[id.slice(2)]; return out.set(new V3(g.x0, 0, g.z0), new V3(g.x1, H1, g.z1)); }
   if (id.startsWith('d:')) { const d = (DH.DEPTS || []).find((x) => x.id === id.slice(2)); const rs = d ? d.rooms.filter((x) => L[x] || x === 'cloud' || x === 'dhos') : []; out.makeEmpty(); rs.forEach((x) => out.union(roomBox(x, new THREE.Box3()))); return out; }
@@ -2882,7 +2923,7 @@ function flyTo(pos, target, dur) {
 }
 function fitRoom(id) {
   const b = roomBox(id, new THREE.Box3()).expandByScalar(0.4);
-  const person = id.startsWith('p:');
+  const person = id.startsWith('p:') || id.startsWith('s:');
   const dir = id === 'cloud' || id === 'dhos' ? new V3(-0.4, 0.55, 0.85) : person ? new V3(0.35, 0.62, 0.75) : narrow() ? new V3(0.12, 0.95, 0.5) : new V3(0.3, 0.8, 0.62);
   return fit(b, dir, person ? (narrow() ? 0.75 : 0.62) : id.startsWith('d:') ? (narrow() ? 0.92 : 0.82) : narrow() ? 0.82 : 0.66);
 }
@@ -3145,6 +3186,7 @@ function updStudio(dt, t) {
   if (floor === '2') return;
   const ps = view === 'problems' && !selected ? problemSet() : null;
   nextPTrip -= dt; if (nextPTrip <= 0) { nextPTrip = 7 + Math.random() * 6; if (!REDUCED) startPTrip(); }
+  (STUDIO.students || []).forEach((st) => { poseHuman(st.h, 'sit', t * 0.7, st.ph, ''); if (selected === st.id || hoverId === st.id) st.h.root.position.y = 0.02; else st.h.root.position.y = 0; });
   for (const sl of STUDIO.slots) {
     const id = 'p:' + sl.p.id, st = sl.p.st;
     const c = st === 'work' ? C.ok : st === 'late' ? C.bad : C.champ;
