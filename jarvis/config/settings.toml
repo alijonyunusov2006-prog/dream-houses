@@ -60,6 +60,7 @@ stt_language = "ru"
 tts_engine = "qwen3-tts"               # qwen3-tts (основной, GPU) | chatterbox (запасной, GPU) | piper (CPU, когда GPU занят)
 tts_fallback = "piper"                 # только бесплатные локальные движки — решение владельца
 wake_word = "джарвис"
+voice = ""                             # выбранный голос: имя образца из data/voices/samples (выбирает владелец)
 
 [energy]
 # Свет — отдельная строка в отчётах (core/jarviscore/energy.py). Тарифы с 01.02.2026, постановление № 709.
