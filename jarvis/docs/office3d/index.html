@@ -419,6 +419,21 @@
   .tform-row > div { display: grid; gap: 6px; min-width: 0; }
   .tform-err { margin: 0; font-size: 12.5px; color: var(--bad); }
   .modal-card h3.q { font-size: 24px; line-height: 1.2; }
+  /* системы DH OS */
+  .sys-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+  .sys { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; padding: 12px 13px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); }
+  .sys-n { font: 600 12px/1.6 var(--f-num); color: var(--champ-ink); border-right: 1px solid var(--line); }
+  .sys b { display: block; font-weight: 600; font-size: 13.5px; }
+  .sys span:not(.sys-n) { display: block; font-size: 12.5px; color: var(--muted); margin: 2px 0 6px; }
+  .sys .link-btn { font-size: 12px; }
+  ul.sysl { list-style: none; margin: 0 0 4px; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-size: 12.5px; color: var(--earth); }
+  ul.sysl li { display: flex; gap: 7px; align-items: center; }
+  .dl { pointer-events: auto; cursor: pointer; font: 600 10.5px/1 var(--f-mono); letter-spacing: .22em; text-transform: uppercase; color: var(--champ-ink); padding: 6px 10px; border-radius: 7px; background: var(--overlay-2); border: 1px solid color-mix(in oklab, var(--champ) 60%, var(--line)); white-space: nowrap; box-shadow: var(--shadow); }
+  .dl:hover, .dl.is-sel { background: var(--brand-soft); color: var(--ink); }
+  .dl small { font: 500 9px var(--f-mono); color: var(--muted); letter-spacing: .1em; margin-left: 6px; }
+  .labels:not(.far) .dl { display: none; }
+  .labels.far .rl.st-work:not(.is-sel):not(.pl), .labels.far .rl.st-off:not(.is-sel):not(.pl) { padding: 5px; border-radius: 50%; }
+  .labels.far .rl.st-work:not(.is-sel):not(.pl) .rl-top > :not(.dot), .labels.far .rl.st-off:not(.is-sel):not(.pl) .rl-top > :not(.dot) { display: none; }
   /* план месяца */
   .month-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 0.9fr); gap: 10px; }
   @media (max-width: 1180px) { .month-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -579,6 +594,14 @@
     </article>
   </section>
 
+  <section class="block" id="dhos-sys" aria-labelledby="ds-h">
+    <div class="sec-h">
+      <div><div class="eyebrow">DH OS · системы · пом. 2.61</div><h2 id="ds-h">DH OS — что уже автоматизировано</h2></div>
+      <p class="sec-note"><span class="src">По коду</span> Есть в DH OS по коду, работу JARVIS ещё не проверял. На макете — светящиеся модули павильона DH OS, кабель идёт в комнату CRM.</p>
+    </div>
+    <ol class="sys-grid" id="sys-grid"></ol>
+  </section>
+
   <footer class="foot">
     <span>JARVIS обновляет этот офис после каждого этапа. Плоский план: <a href="https://claude.ai/artifact/MMn9bqtRDoMrC3W1DUfhEN" target="_blank" rel="noopener">чертёж офиса</a>.</span>
     <span>Dream House · Душанбе, ул. Ахрори, 140 · Пн–Сб 09:00–20:00 · исходник <code>jarvis/docs/office3d/index.html</code></span>
@@ -649,28 +672,28 @@ const ROOMS = [
     queue: ['План: каталог архитектурных макетов на сайте', 'Оценка заказа: 12 тракторов на K1'],
     report: { at: T(-1.1), t: 'ТЗ «Список дел с тегами» передано разработчику: 6 критериев готовности, оценка 5 часов.' },
     fact: { now: 'Определён. Модель Opus.', need: 'Первое задание.', where: '.claude/agents/planner.md' } },
-  { id: 'developer', code: '2.02', name: 'Разработка', short: 'Разработка', role: 'Разработчик', agent: 'developer', model: 'Sonnet', st: 'work', share: 3.30,
+  { id: 'developer', code: '2.10', name: 'Разработка', short: 'Разработка', role: 'Разработчик', agent: 'developer', model: 'Sonnet', st: 'work', share: 3.30,
     d: 'Пишет код в отдельной папке проекта: тест → код → коммит. Вашу CRM не трогает.',
     task: { t: 'Список дел с тегами: код и тесты', p: 72, eta: T(2.0), due: T(3.0) },
     queue: ['Исправить шлюз: бот отвечает дважды — вернула проверка', 'Экспорт отчёта в PDF'],
     report: { at: T(-0.3), t: 'Коммит 3 из 5: фильтр по тегам. 14 тестов зелёные.' },
     fact: { now: 'Определён. Модель Sonnet.', need: 'Папка C:\\Projects.', where: '.claude/agents/developer.md' },
     rel: [{ s: 'wait', b: 'Репозиторий сайта публичный', t: 'Память JARVIS туда класть нельзя. Решение: отдельный приватный репозиторий.', w: 'brain/00-inbox/questions.md' }] },
-  { id: 'tester', code: '2.03', name: 'Проверка', short: 'Проверка', role: 'Тестировщик', agent: 'tester', model: 'Sonnet', st: 'bad', share: 1.20,
+  { id: 'tester', code: '2.11', name: 'Проверка', short: 'Проверка', role: 'Тестировщик', agent: 'tester', model: 'Sonnet', st: 'bad', share: 1.20,
     d: 'Не верит разработчику: запускает тесты, пробует сценарии, делает скриншоты и пишет протокол «критерий → прошёл или нет → доказательство».',
     task: { t: 'Протокол: шлюз Telegram → очередь', p: 100, label: 'Проверено 9 из 9 критериев', eta: T(-0.15) },
     blocker: { k: 'bad', t: 'Критерии 4 и 7 не прошли: бот отвечает дважды, в отчёте нет скриншота. Задача вернулась разработчику.' },
     queue: ['Проверка: список дел с тегами — после разработчика', 'Повторная проверка шлюза'],
     report: { at: T(-0.15), t: 'Протокол готов: 7 из 9 критериев прошли. Доказательства — 9 скриншотов.' },
     fact: { now: 'Определён.', need: '—', where: '.claude/agents/tester.md' } },
-  { id: 'archicad', code: '2.05', name: 'Мастерская Archicad', short: 'Archicad', role: 'Планировки в Archicad', agent: 'archicad', model: 'Sonnet', st: 'wait', share: 0.85,
+  { id: 'archicad', code: '2.12', name: 'Мастерская Archicad', short: 'Archicad', role: 'Планировки в Archicad', agent: 'archicad', model: 'Sonnet', st: 'wait', share: 0.85,
     d: 'Строит планировки в Archicad по фото и размерам через Tapir и MCP. Отчитывается скриншотами и данными модели.',
     task: { t: 'Планировка: квартира 78 м², 3 комнаты, по фото плана', p: 45, eta: T(3.6), due: T(2.2), risk: true },
     blocker: { k: 'wait', t: 'Ждёт от вас глубину ниши в коридоре. Без ответа срок ' + T(2.2) + ' не успеть.' },
     queue: ['Вариант расстановки №2 для гостиной', 'Экспорт PDF и IFC для бригады'],
     report: { at: T(-0.6), t: 'Стены и проёмы построены, зоны размечены: 3 комнаты, кухня-гостиная, 2 санузла. Остановлено: нет размера ниши.' },
     fact: { now: 'Навык написан, на ПК не проверен. Лицензия Archicad куплена.', need: 'Версия Archicad; установка Tapir.', where: 'skills/archicad/' } },
-  { id: 'print', code: '2.07', name: '3D и печать', short: '3D и печать', role: 'Модели и печать', agent: '3d', model: 'Sonnet', st: 'work', share: 0.40,
+  { id: 'print', code: '2.13', name: '3D и печать', short: '3D и печать', role: 'Модели и печать', agent: '3d', model: 'Sonnet', st: 'work', share: 0.40,
     d: 'Заказы на печать: фото → ТЗ → 3ds Max или Blender → проверка сетки → нарезка в OrcaSlicer. Физический старт печати — только с вашего подтверждения.',
     task: { t: 'Партия: трактор на два цвета, 30 шт.', p: 60, kind: 'k1', eta: T(7.5), due: T(6.5), risk: true },
     queue: ['Нарезка: макет ЖК, крыша', 'Проверка сетки: подарочная табличка'],
@@ -681,13 +704,13 @@ const ROOMS = [
       { s: 'work', b: 'Bambu Lab P1S', t: 'Многоцветная печать с AMS (уточнить, есть ли). Управление: LAN-only и Developer Mode.', w: 'printer:bambu-p1s' },
       { s: 'wait', b: 'Creality K1', t: 'Одноцветный. Управление: root и Moonraker. Нить на исходе.', w: 'printer:creality-k1' },
     ] },
-  { id: 'content', code: '2.08', name: 'Контент-студия', short: 'Контент', role: 'Контент', agent: 'content', model: 'Sonnet', st: 'work', share: 0.75,
+  { id: 'content', code: '2.23', name: 'Контент-студия', short: 'Контент', role: 'Контент', agent: 'content', model: 'Sonnet', st: 'work', share: 0.75,
     d: 'Контент-планы, карусели, сторис и Reels для @dream_houses.tj. Публикует через Metricool только то, что вы утвердили.',
     task: { t: 'Карусель «Как печатаем архитектурный макет», 7 слайдов', p: 80, eta: T(0.6), due: T(1.3) },
     queue: ['Reels: процесс печати, 20 секунд', 'Сторис: до и после гостиной'],
     report: { at: T(-0.25), t: 'Тексты слайдов 1–7 готовы в голосе бренда. Ждут вашего утверждения к ' + T(1.3) + '.' },
     fact: { now: 'Определён. Metricool подключён.', need: 'Голос бренда записан (brand-voice.md).', where: '.claude/agents/content.md' } },
-  { id: 'crm', code: '2.09', name: 'CRM · DH OS', short: 'CRM', role: 'CRM · DH OS', agent: 'crm', model: 'Haiku', st: 'wait', share: 0.18,
+  { id: 'crm', code: '2.31', name: 'CRM · DH OS', short: 'CRM', role: 'CRM · DH OS', agent: 'crm', model: 'Haiku', st: 'wait', share: 0.18,
     d: 'Читает DH OS: задачи сотрудникам, статусы заявок, просрочки. Записывает только с вашего подтверждения.',
     task: { t: 'Сводка заявок за неделю', p: 35, eta: T(1.5) },
     blocker: { k: 'wait', t: 'Факт: вход для JARVIS в DH OS готов — MCP-сервер с ключом. Ждём ключ: вы выдадите его на ПК при установке.' },
@@ -695,63 +718,100 @@ const ROOMS = [
     report: { at: T(-0.8), t: 'Новых заявок за сутки: 3. Просрочено задач: 2 — у дизайнера-проектировщика и менеджера.' },
     fact: { now: 'MCP-сервер DH OS готов: 11 инструментов чтения и 3 действия — только после вашего «да». Деньги, сообщения клиентам и удаление закрыты.', need: 'Ключ помощника на ПК (DHOS_AGENT_KEY).', where: '.mcp.json · .claude/agents/crm.md · brain/30-projects/crm-vladelca/' },
     rel: [{ s: 'off', b: 'Столы сотрудников', t: 'Здесь будут настоящие люди из DH OS: кто над чем работает, у кого просрочка. Имена JARVIS не выдумывает — до подключения только роли.', w: 'brain/75-crm/' }] },
-  { id: 'browser', code: '2.10', name: 'Браузер', short: 'Браузер', role: 'Браузер', agent: 'browser', model: 'Sonnet', st: 'off', share: 0,
+  { id: 'browser', code: '2.52', name: 'Браузер', short: 'Браузер', role: 'Браузер', agent: 'browser', model: 'Sonnet', st: 'off', share: 0,
     d: 'Собирает данные с разрешённых сайтов, проверяет страницы, делает скриншоты. Правила площадок не обходит.',
     task: null,
     queue: ['Цены на PETG у трёх поставщиков'],
     report: { at: T(-3.2), t: 'Скриншоты сайта студии на трёх ширинах сохранены.' },
     fact: { now: 'Определён.', need: 'Playwright, этап 5.', where: '.claude/agents/browser.md' } },
-  { id: 'secretary', code: '2.11', name: 'Секретарь', short: 'Секретарь', role: 'Секретарь', agent: 'secretary', model: 'Haiku', st: 'work', share: 0.07,
+  { id: 'secretary', code: '2.50', name: 'Секретарь', short: 'Секретарь', role: 'Секретарь', agent: 'secretary', model: 'Haiku', st: 'work', share: 0.07,
     d: 'Дайджест в 08:00: календарь, письма, заявки, сроки и что ждёт вашего решения. Напоминания и отчёты — в Telegram.',
     task: { t: 'Напоминания на завтра: замер и встреча с клиентом', p: 50, eta: T(0.5) },
     queue: ['Вечерняя сводка в Telegram'],
     report: { at: '08:00', t: 'Дайджест отправлен: 3 встречи, 5 писем, 1 решение за вами.' },
     fact: { now: 'Определён. Модель Haiku.', need: 'Telegram-бот.', where: '.claude/agents/secretary.md' } },
-  { id: 'sysadmin', code: '2.06', name: 'Сисадмин', short: 'Сисадмин', role: 'Сисадмин', agent: 'sysadmin', model: 'Sonnet + скрипты', st: 'wait', share: 0.15,
+  { id: 'sysadmin', code: '2.51', name: 'Сисадмин', short: 'Сисадмин', role: 'Сисадмин', agent: 'sysadmin', model: 'Sonnet + скрипты', st: 'wait', share: 0.15,
     d: 'Аудит диска без удаления, четыре корзины, порядок в файлах, поиск за секунду (Everything), бэкапы и режимы питания.',
     task: { t: 'План переноса архива: 312 ГБ с C: на D:', p: 100, label: 'План готов, перенос заблокирован' },
     blocker: { k: 'wait', t: 'Заблокировано: диск D: ещё не установлен. Удаление файлов — только с вашего подтверждения.' },
     queue: ['Еженедельный бэкап brain/', 'Проверка здоровья SSD'],
     report: { at: T(-1.4), t: 'Аудит C: — 4 корзины: архив 312 ГБ, дубликаты 41 ГБ, кэш 18 ГБ, временное 9 ГБ. Ничего не удалено.' },
     fact: { now: 'Скрипт аудита проверен на тестовой папке.', need: 'Запуск на ПК; HDD.', where: 'skills/disk-audit/' } },
-  { id: 'targetolog', code: '2.12', name: 'Таргет', short: 'Таргет', role: 'Таргетолог', agent: 'targetolog', model: 'Sonnet', st: 'work', share: 0.55, dept: 'mk',
+  { id: 'targetolog', code: '2.20', name: 'Таргет', short: 'Таргет', role: 'Таргетолог', agent: 'targetolog', model: 'Sonnet', st: 'work', share: 0.55, dept: 'mk',
     d: 'Реклама в Instagram и Facebook: что работает, что сливает бюджет, что выключить и что усилить. Любое изменение рекламы — только после вашего «да».',
     task: { t: 'Разбор рекламы за неделю: что сливает бюджет', p: 55, eta: T(1.4) },
     queue: ['Три креатива для теста: макет с подсветкой', 'Отчёт: цена заявки по кампаниям'],
     report: { at: T(-0.7), t: 'Одна кампания из четырёх даёт 70 % заявок. Предложение: перенести в неё бюджет двух слабых — ждёт вашего решения.' },
     fact: { now: 'Агент создан 3 октября.', need: 'Данные — после подключения Windsor.ai, Metricool и DH OS.', where: '.claude/agents/targetolog.md' } },
-  { id: 'marketolog', code: '2.13', name: 'Маркетинг', short: 'Маркетинг', role: 'Маркетолог', agent: 'marketolog', model: 'Sonnet', st: 'work', share: 0.48, dept: 'mk',
+  { id: 'marketolog', code: '2.21', name: 'Маркетинг', short: 'Маркетинг', role: 'Маркетолог', agent: 'marketolog', model: 'Sonnet', st: 'work', share: 0.48, dept: 'mk',
     d: 'План продвижения на месяц и квартал: офферы, каналы, бюджет, связка с продажами. Ставит задачи сценаристу и контенту.',
     task: { t: 'План продвижения на октябрь: архитектурные макеты', p: 65, eta: T(2.1) },
     queue: ['Оффер для DH Academy: набор ноября', 'Календарь акций на квартал'],
     report: { at: T(-1.0), t: 'Три канала на октябрь: Instagram, рекомендации клиентов, витрина макетов для застройщиков.' },
     fact: { now: 'Агент создан 3 октября.', need: 'Данные — после подключения Windsor.ai, Metricool и DH OS.', where: '.claude/agents/marketolog.md' } },
-  { id: 'screenwriter', code: '2.14', name: 'Сценарии', short: 'Сценарии', role: 'Сценарист', agent: 'screenwriter', model: 'Sonnet', st: 'work', share: 0.36, dept: 'mk',
+  { id: 'screenwriter', code: '2.22', name: 'Сценарии', short: 'Сценарии', role: 'Сценарист', agent: 'screenwriter', model: 'Sonnet', st: 'work', share: 0.36, dept: 'mk',
     d: 'Сценарии Reels, сторис и коротких видео для @dream_houses.tj: хук в первую секунду, раскадровка, текст за кадром, подпись.',
     task: { t: 'Сценарий Reels: макет загорается квартира за квартирой', p: 40, eta: T(1.2) },
     queue: ['Сторис-серия: день в студии', 'Reels: до и после гостиной'],
     report: { at: T(-0.5), t: 'Раскадровка на 8 кадров готова, 18 секунд. Хук: свет гаснет — и загорается одна квартира.' },
     fact: { now: 'Агент создан 3 октября.', need: 'Данные — после подключения Windsor.ai, Metricool и DH OS.', where: '.claude/agents/screenwriter.md' } },
-  { id: 'analyst', code: '2.15', name: 'Аналитика', short: 'Аналитика', role: 'Аналитик', agent: 'analyst', model: 'Sonnet', st: 'wait', share: 0.42, dept: 'mk',
+  { id: 'analyst', code: '2.24', name: 'Аналитика', short: 'Аналитика', role: 'Аналитик', agent: 'analyst', model: 'Sonnet', st: 'wait', share: 0.42, dept: 'mk',
     d: 'Разбирает рекламу, Instagram, работу студии и конкурентов в Душанбе: что приносит заявки и договоры, где теряются клиенты.',
     task: { t: 'Где теряются клиенты: от заявки до договора', p: 30, eta: T(3.0) },
     blocker: { k: 'wait', t: 'Ждёт данные: без DH OS и Windsor.ai выводы будут на примерных цифрах.' },
     queue: ['Обзор пяти конкурентов в Instagram', 'Какие посты приводят заявки'],
     report: { at: T(-1.3), t: 'По демо-воронке больше всего клиентов теряется между заявкой и встречей: 64 → 27.' },
     fact: { now: 'Агент создан 3 октября.', need: 'Данные — после подключения Windsor.ai, Metricool и DH OS.', where: '.claude/agents/analyst.md' } },
-  { id: 'finance', code: '2.16', name: 'Финансы и план', short: 'Финансы', role: 'Финансы и план', agent: 'finance', model: 'Sonnet', st: 'work', share: 0.3, dept: 'mk',
+  { id: 'finance', code: '2.40', name: 'Финансы и план', short: 'Финансы', role: 'Финансы и план', agent: 'finance', model: 'Sonnet', st: 'work', share: 0.3, dept: 'mk',
     d: 'План месяца: сколько нужно заявок, встреч и договоров для целевой прибыли; план против факта. Анализ оплаты сотрудников — только по вашему запросу и только вам.',
     task: { t: 'План октября: 12 договоров, 85 000 сомони прибыли', p: 80, eta: T(0.9) },
     queue: ['План против факта: неделя 1', 'Средний чек по типам объектов'],
     report: { at: T(-0.9), t: 'Чтобы получить 12 договоров, нужно около 70 заявок и 29 встреч при текущей конверсии.' },
     fact: { now: 'Агент создан 3 октября.', need: 'Данные — после подключения Windsor.ai, Metricool и DH OS.', where: '.claude/agents/finance.md' } },
-  { id: 'strategist', code: '2.17', name: 'Стратег', short: 'Стратег', role: 'Стратег', agent: 'strategist', model: 'Opus', st: 'work', share: 0.75, dept: 'mk',
+  { id: 'strategist', code: '2.02', name: 'Стратег', short: 'Стратег', role: 'Стратег', agent: 'strategist', model: 'Opus', st: 'work', share: 0.75, dept: 'mk',
     d: 'Советник руководителя: раз в месяц собирает выводы всех отделов и даёт 3–5 рекомендаций, как вырасти в топовую студию Душанбе. Сам ничего не меняет.',
     task: { t: 'Советы руководителю на октябрь', p: 25, eta: T(4.0) },
     queue: ['Что автоматизировать следующим', 'Цена макета для застройщиков'],
     report: { at: T(-2.0), t: 'Черновик: макеты с подсветкой продавать застройщикам отдельной услугой — ждёт цифр аналитика и финансов.' },
     fact: { now: 'Агент создан 3 октября.', need: 'Данные — после подключения Windsor.ai, Metricool и DH OS.', where: '.claude/agents/strategist.md' } },
-  { id: 'server', code: '2.04', name: 'Серверная', short: 'Серверная', role: 'ПК «Alijon»', agent: 'локальный агент на ПК', model: 'Локальная · qwen3.5 27B', st: 'bad', share: 0, local: true,
+  { id: 'sales', code: '2.30', name: 'Продажи', short: 'Продажи', role: 'Продажи', agent: 'sales', model: 'Sonnet', st: 'work', share: 0.4,
+    d: 'Следит, чтобы заявки не терялись: скорость ответа, встречи, коммерческие предложения, дожим и причины отказов.',
+    task: { t: 'Три заявки без ответа больше 2 часов — напомнить менеджеру', p: 50, eta: T(0.6) },
+    queue: ['КП: коттедж, 2 этажа', 'Разбор отказов за неделю'],
+    report: { at: T(-0.7), t: 'Среднее время ответа на заявку — 3 ч 40 мин (демо). Цель — до 30 минут.' },
+    fact: { now: 'Агент создан 3 октября.', need: 'Данные — после подключения DH OS.', where: '.claude/agents/sales.md' } },
+  { id: 'quality', code: '2.32', name: 'Качество и отзывы', short: 'Качество', role: 'Качество и отзывы', agent: 'quality', model: 'Sonnet', st: 'work', share: 0.22,
+    d: 'Проверка проекта перед сдачей, отзывы клиентов, гарантия и повторные заказы.',
+    task: { t: 'Проверка альбома чертежей перед сдачей: квартира 64 м²', p: 70, eta: T(1.1) },
+    queue: ['Попросить отзыв: два сданных проекта', 'Напомнить о гарантийном осмотре'],
+    report: { at: T(-1.5), t: 'В альбоме найдено 2 несоответствия размеров — возвращено дизайнеру (демо).' },
+    fact: { now: 'Агент создан 3 октября.', need: 'Данные — после подключения DH OS.', where: '.claude/agents/quality.md' } },
+  { id: 'academy', code: '2.33', name: 'DH Academy', short: 'Академия', role: 'DH Academy', agent: 'academy', model: 'Haiku', st: 'work', share: 0.08,
+    d: 'Курсы DH Academy: набор, расписание, посещаемость и лучшие студенты. Набор ежемесячно.',
+    task: { t: 'Набор ноября: напомнить записавшимся', p: 35, eta: T(1.8) },
+    queue: ['Посещаемость курса чертёжника', 'Лучшие работы студентов для Instagram'],
+    report: { at: T(-2.2), t: 'Записалось 7 человек на курс 3D-визуализатора (демо).' },
+    fact: { now: 'Агент создан 3 октября.', need: 'Данные — после подключения DH OS.', where: '.claude/agents/academy.md' } },
+  { id: 'hr', code: '2.41', name: 'Кадры', short: 'Кадры', role: 'Кадры', agent: 'hr', model: 'Sonnet', st: 'wait', share: 0.15,
+    d: 'Подбор и вакансии, адаптация новичков, нагрузка и рабочее время команды.',
+    task: { t: 'Нагрузка команды за неделю: кто перегружен', p: 45, eta: T(2.4) },
+    blocker: { k: 'wait', t: 'Ждёт данные учёта рабочего времени из DH OS.' },
+    queue: ['Вакансия: второй 3D-визуализатор', 'План адаптации новичка на 2 недели'],
+    report: { at: T(-1.8), t: 'По демо-данным больше всего задач у дизайнера-проектировщика — 9 открытых.' },
+    fact: { now: 'Агент создан 3 октября.', need: 'Данные — после подключения DH OS.', where: '.claude/agents/hr.md' } },
+  { id: 'procurement', code: '2.42', name: 'Снабжение и сметы', short: 'Снабжение', role: 'Снабжение и сметы', agent: 'procurement', model: 'Sonnet', st: 'work', share: 0.2,
+    d: 'Сметы на материалы, поставщики Душанбе, пластик для принтеров. Заказы и оплата — только с вашего подтверждения.',
+    task: { t: 'Смета материалов: санузел, квартира 78 м²', p: 60, eta: T(1.3) },
+    queue: ['Нить PLA: три поставщика, цены', 'Плитка: сравнить два салона'],
+    report: { at: T(-1.1), t: 'Нить для K1 дешевле у второго поставщика на 12 % — ждёт вашего решения (демо).' },
+    fact: { now: 'Агент создан 3 октября.', need: 'Данные — после подключения DH OS.', where: '.claude/agents/procurement.md' } },
+  { id: 'dhos', code: '2.61', name: 'Павильон DH OS', short: 'DH OS', role: 'Системы DH OS', agent: 'DH OS (Vercel)', model: 'Своя логика DH OS', st: 'work', share: 0, always: true,
+    d: 'Что в DH OS уже автоматизировано по коду: чат-бот клиентов, распределение заявок, напоминания, отчёты, тревоги, расчёт цен и другое. JARVIS подключится к ним через ключ.',
+    task: { t: '14 систем DH OS по коду', p: 0, kind: 'dhos' },
+    queue: [],
+    report: { at: '—', t: 'Есть в DH OS по коду, работу JARVIS ещё не проверял.' },
+    fact: { now: 'Системы найдены в коде DH OS. Их работу JARVIS ещё не проверял.', need: 'Ключ DH OS на ПК (DHOS_AGENT_KEY).', where: 'brain/30-projects/crm-vladelca/статус.md' } },
+  { id: 'server', code: '2.53', name: 'Серверная', short: 'Серверная', role: 'ПК «Alijon»', agent: 'локальный агент на ПК', model: 'Локальная · qwen3.5 27B', st: 'bad', share: 0, local: true,
     d: 'Windows 11 Pro · i9-13900K · 64 ГБ ОЗУ · RTX 3090 24 ГБ. Тянет локальные модели до ~30B, расшифровку речи и голос без облака.',
     task: { t: 'Рендер фасада коттеджа, 3ds Max на видеокарте', p: 55, eta: T(1.6) },
     blocker: { k: 'bad', t: 'Факт: диск C: занят на 96 % — свободно ≈ 80 ГБ из 1,86 ТБ. Диск D: ещё не установлен.' },
@@ -763,7 +823,7 @@ const ROOMS = [
       { s: 'work', b: 'Ядро jarviscore · 43 теста', t: 'Разрешения (можно, спросить, нельзя), правило удаления «три раза», счётчик света, планировщик с ресурсами, запуск Claude Code с учётом расходов, формат отчёта, хуки. Проверено тестами, на Windows не запускалось.', w: 'core/jarviscore/' },
       { s: 'work', b: 'Железо с запасом', t: 'i9 · 64 ГБ · RTX 3090: локальные модели, речь и голос без облака.', w: 'brain/20-me/profile.md' },
     ] },
-  { id: 'cloud', code: '2.20', name: 'Облачный павильон', short: 'Облако', role: 'Telegram-бот и очередь', agent: 'шлюз JARVIS', model: 'Без модели · Vercel + Supabase', st: 'work', share: 0, cloud: true,
+  { id: 'cloud', code: '2.60', name: 'Облачный павильон', short: 'Облако', role: 'Telegram-бот и очередь', agent: 'шлюз JARVIS', model: 'Без модели · Vercel + Supabase', st: 'work', share: 0, cloud: true,
     d: 'Принимает задания с телефона голосом и текстом, фото планов и пересланные сообщения клиентов. Пока ПК выключен, держит их в очереди, потом ПК забирает всё сразу. Отвечает только вам.',
     task: { t: 'Очередь задач', p: 0, kind: 'queue' },
     queue: [],
@@ -771,7 +831,35 @@ const ROOMS = [
     fact: { now: 'Контракт очереди готов. Схема готова, развёртывание — этап 3. Vercel и Supabase подключены, бесплатно.', need: 'Токен бота, ваш chat_id и ваше «да».', where: 'core/gateway/ · core/gateway/schema.sql' } },
 ];
 const byId = Object.fromEntries(ROOMS.map((r) => [r.id, r]));
-const ORDER = ['jarvis', 'planner', 'developer', 'tester', 'archicad', 'print', 'content', 'crm', 'browser', 'secretary', 'sysadmin', 'targetolog', 'marketolog', 'screenwriter', 'analyst', 'finance', 'strategist', 'server', 'cloud'];
+/* ---------- отделы этажа агентов: этаж читается как компания ---------- */
+const DEPTS = [
+  { id: 'mgmt', name: 'Управление', rooms: ['jarvis', 'planner', 'strategist'] },
+  { id: 'prod', name: 'Производство', rooms: ['archicad', 'print', 'developer', 'tester'] },
+  { id: 'mk', name: 'Маркетинг', rooms: ['targetolog', 'marketolog', 'screenwriter', 'content', 'analyst'] },
+  { id: 'sales', name: 'Продажи и клиенты', rooms: ['sales', 'crm', 'quality', 'academy'] },
+  { id: 'money', name: 'Деньги и люди', rooms: ['finance', 'hr', 'procurement'] },
+  { id: 'svc', name: 'Служебные', rooms: ['secretary', 'sysadmin', 'browser', 'server', 'cloud', 'dhos'] },
+];
+const deptOf = (id) => DEPTS.find((d) => d.rooms.includes(id));
+/* ---------- что уже автоматизировано в DH OS (по коду DH OS; работу JARVIS ещё не проверял) ---------- */
+const DHOS_SYS = [
+  ['Чат-бот клиентов', 'Instagram, WhatsApp и сайт: отвечает клиентам и собирает заявки', 'crm'],
+  ['Распределение заявок', 'новая заявка сразу попадает к ответственному', 'sales'],
+  ['Напоминания клиентам', 'о замере, встрече и оплате этапа', 'sales'],
+  ['Отчёт дня', 'что сделано и что сорвалось за день', 'secretary'],
+  ['Дайджест', 'короткая сводка руководителю', 'secretary'],
+  ['Месячный отчёт', 'итоги месяца по заявкам, проектам и деньгам', 'finance'],
+  ['Аналитика', 'заявки, конверсия, источники клиентов', 'analyst'],
+  ['Учёт рабочего времени', 'кто сколько работал и над чем', 'hr'],
+  ['Тест стиля для клиентов', 'клиент выбирает картинки — студия видит его стиль', 'marketolog'],
+  ['Распознавание голоса', 'голосовые сообщения превращаются в текст и задачи', 'crm'],
+  ['Тревоги', 'просрочки и зависшие заявки поднимаются наверх', 'crm'],
+  ['Расчёт цен', 'стоимость по площади и типу объекта', 'sales'],
+  ['Шаблоны этапов проекта', 'от замера до надзора — одинаковые шаги для всех проектов', 'planner'],
+  ['Курсы академии', 'группы, уроки и посещаемость DH Academy', 'academy'],
+];
+
+const ORDER = ['jarvis', 'planner', 'strategist', 'developer', 'tester', 'archicad', 'print', 'targetolog', 'marketolog', 'screenwriter', 'content', 'analyst', 'sales', 'crm', 'quality', 'academy', 'finance', 'hr', 'procurement', 'secretary', 'sysadmin', 'browser', 'server', 'cloud', 'dhos'];
 const MK_IDS = ['targetolog', 'marketolog', 'screenwriter', 'analyst', 'finance', 'strategist'];
 
 
@@ -820,6 +908,7 @@ function entity(id) {
   if (!id) return null;
   if (byId[id]) { const r = byId[id]; return { kind: 'room', floor: '2', code: r.code, short: r.short }; }
   if (id.startsWith('p:') && byPid[id.slice(2)]) { const p = byPid[id.slice(2)]; return { kind: 'person', floor: '1', code: '1 · место ' + p.n, short: p.short, p }; }
+  if (id.startsWith('d:')) { const d = DEPTS.find((x) => x.id === id.slice(2)); if (d) return { kind: 'dept', floor: '2', code: 'отдел', short: d.name, d }; }
   if (id.startsWith('z:') && byZid[id.slice(2)]) { const z = byZid[id.slice(2)]; return { kind: 'zone', floor: '1', code: z.code, short: z.name, z }; }
   return null;
 }
@@ -840,6 +929,8 @@ const TASKS = [
   { id: 'g1', room: 'targetolog', t: 'Разбор рекламы за неделю', s: -1.2, e: 1.4, p: 55, st: 'work' },
   { id: 'g2', room: 'screenwriter', t: 'Сценарий Reels: макет загорается', s: -0.6, e: 1.2, p: 40, st: 'work', due: 2.5 },
   { id: 'g3', room: 'strategist', t: 'Советы руководителю на октябрь', s: -1.0, e: 4.0, p: 25, st: 'work' },
+  { id: 'g4', room: 'sales', t: 'Заявки без ответа: напомнить', s: -0.4, e: 0.6, p: 50, st: 'work', due: 0.8 },
+  { id: 'g5', room: 'procurement', t: 'Смета материалов: санузел', s: -1.5, e: 1.3, p: 60, st: 'work' },
 ];
 const RES = [
   { id: 'gpu', name: 'Видеокарта (GPU)', sub: 'RTX 3090 · одна задача', items: [
@@ -918,6 +1009,11 @@ const HANDOFFS = [
   { from: 'analyst', to: 'strategist', kind: 'wait', text: 'Аналитик передал стратегу: клиенты теряются между заявкой и встречей' },
   { from: 'strategist', to: 'jarvis', kind: 'task', text: 'Стратег подготовил совет руководителю — JARVIS проверит и отправит вам' },
   { from: 'screenwriter', to: 'content', kind: 'task', text: 'Сценарист передал контент-студии раскадровку Reels' },
+  { from: 'sales', to: 'crm', kind: 'wait', text: 'Продажи: три заявки без ответа — CRM напомнит менеджеру через DH OS' },
+  { from: 'quality', to: 'tester', kind: 'task', text: 'Качество передало проверке замечания по альбому чертежей' },
+  { from: 'procurement', to: 'finance', kind: 'task', text: 'Снабжение отдало финансам смету материалов на санузел' },
+  { from: 'hr', to: 'strategist', kind: 'wait', text: 'Кадры: дизайнер-проектировщик перегружен — вопрос стратегу' },
+  { from: 'academy', to: 'content', kind: 'task', text: 'DH Academy передала контенту лучшие работы студентов' },
 ];
 const PTRIPS = [
   { from: 'manager', to: 'designer', text: 'Менеджер передал дизайнеру-проектировщику бриф клиента (демо)' },
@@ -931,7 +1027,7 @@ const QPOOL = ['Сделай планировку по фото, 64 м²', 'На
 const state = { selected: null, view: 'overview', floor: 'all', pc: 'online', queue: [], k1Done: 18, p1sLayer: 212, gpu: 78, timeOverride: null, uptime0: NOW0 - (6 * H + 12 * 60e3) };
 const bus = {};
 const DH = window.DH = {
-  ROOMS, byId, ORDER, TASKS, RES, HANDOFFS, STAFF, PEOPLE, byPid, ZONES, PTRIPS, MK_IDS, entity, state, REDUCED,
+  ROOMS, byId, ORDER, DEPTS, deptOf, DHOS_SYS, TASKS, RES, HANDOFFS, STAFF, PEOPLE, byPid, ZONES, PTRIPS, MK_IDS, entity, state, REDUCED,
   on(e, f) { (bus[e] || (bus[e] = [])).push(f); },
   emit(e, d) { (bus[e] || []).forEach((f) => { try { f(d); } catch (err) { console.error(err); } }); },
   statusOf, select, clearSelection, setView, setFloor, pushEvent: (r, t) => pushEvent(r, t),
@@ -948,7 +1044,7 @@ const DH = window.DH = {
 function pcOn() { return state.pc === 'online' || state.pc === 'stopping'; }
 function statusOf(id) {
   const r = byId[id]; if (!r) return 'off';
-  if (!pcOn() && !r.cloud) return 'off';
+  if (!pcOn() && !r.cloud && !r.always) return 'off';
   return r.st;
 }
 function sceneTime() {
@@ -1045,6 +1141,7 @@ function renderHome() {
 }
 function taskBlock(r, st) {
   const t = r.task;
+  if (t && t.kind === 'dhos') return '<div class="task"><b>Системы DH OS · ' + DHOS_SYS.length + '</b><ul class="sysl">' + DHOS_SYS.map((x) => '<li><span class="dot free"></span>' + esc(x[0]) + '</li>').join('') + '</ul><div class="blocker">Есть в DH OS по коду, работу JARVIS ещё не проверял.</div></div>';
   if (r.cloud) {
     const n = state.queue.length;
     return '<div class="task"><b>' + (n ? 'В очереди ' + n + ' ' + plural(n, 'задача ждёт', 'задачи ждут', 'задач ждут') + ' ПК' : 'Очередь пуста — ПК забирает задания сразу') + '</b>' +
@@ -1089,7 +1186,7 @@ function renderRoom(id) {
   const spend = r.local ? '0 $ <small>локально</small>' : r.cloud ? '0 $ <small>бесплатно</small>' : money(roomSpend(r));
   const due = r.task && r.task.due ? r.task.due : (r.task && r.task.eta ? r.task.eta : '—');
   let html =
-    '<div class="eyebrow">Пом. ' + r.code + ' · ' + esc(r.name) + '</div>' +
+    '<div class="eyebrow">Пом. ' + r.code + ' · ' + esc((deptOf(id) || {}).name || '') + ' · ' + esc(r.name) + '</div>' +
     '<h2>' + esc(r.role) + '</h2>' +
     '<div class="pills"><span class="pill ' + st + '"><span class="dot ' + st + '"></span>' + ST[st] + '</span><span class="pill model">' + esc(r.model) + '</span></div>' +
     '<p class="lead">' + esc(r.d) + '</p>' +
@@ -1156,11 +1253,23 @@ function zoneCard(z) {
     '<p class="note">Имена не выдумываем: на табличках роли из DH OS. Имена придут после подключения ключа.</p>' +
     '<div class="card-actions"><button class="link-btn" type="button" data-act="back">← Ко всему макету</button></div>';
 }
+function deptCard(d) {
+  const c = { work: 0, wait: 0, bad: 0, off: 0 }; d.rooms.forEach((id) => { c[statusOf(id)]++; });
+  $('#side-room').innerHTML =
+    '<div class="eyebrow">Этаж 2 · Отдел · ' + d.rooms.length + ' ' + plural(d.rooms.length, 'комната', 'комнаты', 'комнат') + '</div>' +
+    '<h2>' + esc(d.name) + '</h2>' +
+    '<div class="pills">' + ['work', 'wait', 'bad', 'off'].filter((k) => c[k]).map((k) => '<span class="pill ' + k + '"><span class="dot ' + k + '"></span>' + ST[k] + ' ' + c[k] + '</span>').join('') + '</div>' +
+    '<ul class="brief">' + d.rooms.map((id) => { const r = byId[id], st = statusOf(id); return '<li data-room="' + id + '" tabindex="0"><span class="dot ' + st + '"></span><div><b>' + r.code + ' · ' + esc(r.role) + '</b>' + esc(r.model) + ' · ' + (r.task && r.task.t ? esc(r.task.t) : 'задач нет') + '</div></li>'; }).join('') + '</ul>' +
+    '<div class="card-actions"><button class="link-btn" type="button" data-act="back">← Ко всему макету</button></div>';
+}
+function renderSysGrid() {
+  $('#sys-grid').innerHTML = DHOS_SYS.map((x, i) => '<li class="sys"><span class="sys-n">' + pad(i + 1) + '</span><div><b>' + esc(x[0]) + '</b><span>' + esc(x[1]) + '</span><button class="link-btn" type="button" data-room="' + x[2] + '">Агент: ' + esc(byId[x[2]].role) + ' →</button></div></li>').join('');
+}
 function renderSide() {
   if (state.selected) {
     $('#side-home').hidden = true; $('#side-room').hidden = false;
     const id = state.selected;
-    if (id.startsWith('p:')) personCard(byPid[id.slice(2)]); else if (id.startsWith('z:')) zoneCard(byZid[id.slice(2)]); else renderRoom(id);
+    if (id.startsWith('p:')) personCard(byPid[id.slice(2)]); else if (id.startsWith('z:')) zoneCard(byZid[id.slice(2)]); else if (id.startsWith('d:')) deptCard(DEPTS.find((x) => x.id === id.slice(2))); else renderRoom(id);
   }
   else { $('#side-room').hidden = true; $('#side-home').hidden = false; renderHome(); }
 }
@@ -1439,6 +1548,7 @@ function renderPower() {
     '<div class="p-actions"><button class="btn primary" type="button" id="pw-wake"' + (s === 'off' ? '' : ' disabled') + '>Включить по сети</button><button class="btn" type="button" id="pw-off"' + (on ? '' : ' disabled') + '>Выключить после задач</button></div>' +
     '<p class="note">Обе кнопки спрашивают подтверждение. В демо команда на ПК не уходит — макет только показывает, как это будет. Диски — факт на 27 сентября.</p>';
 }
+$('#sys-grid').addEventListener('click', (e) => { const b = e.target.closest('[data-room]'); if (!b) return; tourStop(); $('#stage').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }); select(b.dataset.room, { silent: true }); });
 $('#dhos').addEventListener('click', (e) => { const li = e.target.closest('li[data-pid]'); if (!li) return; tourStop(); const st = $('#stage'), r = st.getBoundingClientRect(); if (r.bottom < 0 || r.top > window.innerHeight) st.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }); select('p:' + li.dataset.pid, { silent: true }); });
 $('#power').addEventListener('click', (e) => { if (e.target.closest('#pw-wake')) openModal('wake'); if (e.target.closest('#pw-off')) openModal('shutdown'); });
 let modalCfg = null, modalReturn = null;
@@ -1569,6 +1679,12 @@ const POOL = [
   ['analyst', () => 'Аналитик: ждёт данные DH OS и Windsor.ai, считает на примерных цифрах'],
   ['finance', () => 'Финансы: план октября — 12 договоров, 85 000 сомони прибыли (демо)'],
   ['strategist', () => 'Стратег: черновик совета — макеты для застройщиков отдельной услугой'],
+  ['sales', () => 'Продажи: новая заявка — ответ через 12 минут (демо)'],
+  ['hr', () => 'Кадры: ждут учёт рабочего времени из DH OS'],
+  ['procurement', () => 'Снабжение: цены на нить PLA у трёх поставщиков собраны (демо)'],
+  ['quality', () => 'Качество: клиент оставил отзыв 5 из 5 (демо)'],
+  ['academy', () => 'DH Academy: напоминание группе курса чертёжника отправлено (демо)'],
+  ['dhos', () => 'DH OS: тревога — заявка ждёт ответа больше 2 часов (демо)'],
 ];
 let lastPool = -1;
 function feedTick() {
@@ -1584,16 +1700,18 @@ DH.on('ptrip', (h) => { if (!feedPaused) pushEvent('p:' + h.from, h.text); });
 
 /* ---------- экскурсия: ярлык → заголовок → факты → действие ---------- */
 const TOUR = [
-  { view: 'overview', floor: 'all', eb: 'Общий вид · два этажа', title: 'Офис Dream House — макет под стеклом', text: () => 'Снизу студия: 8 мест команды. Сверху JARVIS: 16 агентов, компьютер «Alijon» и облако. Подсветка комнаты — её состояние: зелёная работает, янтарная ждёт, красная — проблема.', act: 'Показать проблемы →', go: () => setView('problems') },
+  { view: 'overview', floor: 'all', eb: 'Общий вид · два этажа', title: 'Офис Dream House — макет под стеклом', text: () => 'Снизу студия: места команды из DH OS. Сверху JARVIS и 21 агент в шести отделах, компьютер «Alijon», облако и павильон DH OS. Подсветка комнаты — её состояние: зелёная работает, янтарная ждёт, красная — проблема.', act: 'Показать проблемы →', go: () => setView('problems') },
   { view: 'overview', floor: '1', eb: 'Этаж 1 · Студия — люди', title: 'Команда в одном зале', text: () => '8 мест — по одному на роль из DH OS. Кольцо у фигурки: зелёное — на задаче, шампань — свободен, красное — просрочка. Имена придут из DH OS.', act: 'Открыть место менеджера →', open: 'p:manager' },
   { room: 'jarvis', eb: 'Пом. 2.00 · Кабинет JARVIS', title: 'Управляющий раздаёт задачи', text: () => 'Модель Opus. Сейчас — разбор голосового задания, 60 %. В очереди 3 задачи: протокол проверки, заказ на печать, вечерний отчёт.', act: 'Открыть карточку →' },
-  { rooms: ['planner', 'developer', 'tester'], eb: 'Пом. 2.01–2.03 · конвейер', title: 'План → код → проверка', text: () => 'Белая коробочка — задача. Планировщик передаёт ТЗ разработчику, тот сдаёт сборку на проверку. Сейчас проверка вернула шлюз: 2 из 9 критериев не прошли.', act: 'Открыть проверку →', open: 'tester' },
-  { room: 'archicad', eb: 'Пом. 2.05 · Мастерская Archicad', title: 'Планировка 78 м² ждёт вас', text: () => 'Стены и проёмы построены, готово 45 %. Нужна глубина ниши в коридоре — без ответа срок ' + T(2.2) + ' не успеть.', act: 'Открыть карточку →' },
-  { room: 'print', eb: 'Пом. 2.07 · 3D и печать', title: 'Два принтера, два заказа', text: () => 'P1S печатает макет коттеджа М 1:100, слой ' + state.p1sLayer + ' из 640. K1 — тракторы, ' + state.k1Done + ' из 30; нить на исходе.', act: 'Открыть карточку →' },
-  { rooms: ['content', 'crm', 'browser', 'secretary'], eb: 'Пом. 2.08–2.11', title: 'Контент, CRM, браузер, секретарь', text: () => 'Карусель о макетах готова на 80 %. CRM ждёт ключ DH OS — это факт. Браузер свободен. Секретарь готовит напоминания на завтра.', act: 'Открыть CRM →', open: 'crm' },
-  { rooms: ['targetolog', 'marketolog', 'screenwriter', 'analyst', 'finance', 'strategist'], floor: '2', eb: 'Пом. 2.12–2.17 · Маркетинг и аналитика', title: 'Отдел, который ищет рост', text: () => 'Таргетолог, маркетолог, сценарист, аналитик, финансы и стратег. Цепочка месяца: цель → план → контент и реклама → разбор → советы руководителю.', act: 'Открыть стратега →', open: 'strategist' },
-  { room: 'server', eb: 'Пом. 2.04 · Серверная', title: 'ПК «Alijon» тянет всё локально', text: () => 'i9-13900K · 64 ГБ · RTX 3090. Видеокарта занята на ' + state.gpu + ' % — рендер фасада. Диск C: занят на 96 %, диск D: ещё не установлен.', act: 'Открыть карточку →' },
-  { room: 'cloud', eb: 'Пом. 2.20 · Облачный павильон', title: 'Связь, когда ПК выключен', text: () => 'Telegram-бот и очередь на Vercel и Supabase. Выключите ПК в карточке «Питание ПК» — задачи начнут копиться здесь.', act: 'К питанию ПК ↓', go: () => $('#power').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'center' }) },
+  { rooms: ['planner', 'developer', 'tester'], eb: 'Пом. 2.01 · 2.10–2.11 · план → код → проверка', title: 'План → код → проверка', text: () => 'Белая коробочка — задача. Планировщик передаёт ТЗ разработчику, тот сдаёт сборку на проверку. Сейчас проверка вернула шлюз: 2 из 9 критериев не прошли.', act: 'Открыть проверку →', open: 'tester' },
+  { room: 'archicad', eb: 'Пом. 2.12 · Производство · Archicad', title: 'Планировка 78 м² ждёт вас', text: () => 'Стены и проёмы построены, готово 45 %. Нужна глубина ниши в коридоре — без ответа срок ' + T(2.2) + ' не успеть.', act: 'Открыть карточку →' },
+  { room: 'print', eb: 'Пом. 2.13 · Производство · 3D и печать', title: 'Два принтера, два заказа', text: () => 'P1S печатает макет коттеджа М 1:100, слой ' + state.p1sLayer + ' из 640. K1 — тракторы, ' + state.k1Done + ' из 30; нить на исходе.', act: 'Открыть карточку →' },
+  { rooms: ['strategist', 'crm', 'browser', 'secretary'], eb: 'Продажи, контент, служебные', title: 'Контент, CRM, браузер, секретарь', text: () => 'Стратег готовит советы руководителю. CRM ждёт ключ DH OS — это факт. Браузер свободен. Секретарь готовит напоминания на завтра.', act: 'Открыть CRM →', open: 'crm' },
+  { rooms: ['targetolog', 'marketolog', 'screenwriter', 'analyst', 'finance', 'strategist'], floor: '2', eb: 'Пом. 2.20–2.24 · Маркетинг', title: 'Отдел, который ищет рост', text: () => 'Таргетолог, маркетолог, сценарист, контент и аналитик. Цепочка месяца: цель финансов → план → контент и реклама → разбор → советы стратега руководителю.', act: 'Открыть аналитика →', open: 'analyst' },
+  { rooms: ['sales', 'crm', 'quality', 'academy', 'finance', 'hr', 'procurement'], floor: '2', eb: 'Пом. 2.30–2.42 · Продажи, деньги и люди', title: 'Восточное крыло', text: () => 'Продажи следят, чтобы заявки не терялись. Качество проверяет проект перед сдачей. Финансы, кадры и снабжение считают план, нагрузку и сметы. Все — демо, созданы 3 октября.', act: 'Открыть продажи →', open: 'sales' },
+  { room: 'dhos', floor: '2', eb: 'Пом. 2.61 · Павильон DH OS', title: 'Что уже автоматизировано', text: () => '14 систем DH OS по коду: чат-бот клиентов, распределение заявок, напоминания, отчёты, тревоги, расчёт цен и другие. Работу JARVIS ещё не проверял.', act: 'Открыть карточку →' },
+  { room: 'server', eb: 'Пом. 2.53 · Служебные · Серверная', title: 'ПК «Alijon» тянет всё локально', text: () => 'i9-13900K · 64 ГБ · RTX 3090. Видеокарта занята на ' + state.gpu + ' % — рендер фасада. Диск C: занят на 96 %, диск D: ещё не установлен.', act: 'Открыть карточку →' },
+  { room: 'cloud', eb: 'Пом. 2.60 · Облачный павильон', title: 'Связь, когда ПК выключен', text: () => 'Telegram-бот и очередь на Vercel и Supabase. Выключите ПК в карточке «Питание ПК» — задачи начнут копиться здесь.', act: 'К питанию ПК ↓', go: () => $('#power').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'center' }) },
   { view: 'problems', eb: 'Итог', title: 'Где проблемы', text: () => { const l = problems(); return l.length + ' пунктов, критичных ' + l.filter((p) => p.sev === 'bad').length + '. У каждого — кнопка «Показать»: камера подлетит к комнате.'; }, act: 'К списку проблем ↓', go: () => $('#problems').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }) },
 ];
 const tour = { on: false, i: 0, play: false, t: 0, last: 0, dur: 7600 };
@@ -1660,7 +1778,7 @@ DH.refresh = refresh;
   $$('.fl-b').forEach((b) => b.classList.toggle('is-on', b.dataset.floor === state.floor));
   const saved = store.get('dh-office-sel');
   if (saved && entity(saved)) { state.selected = saved; const e = entity(saved); if (state.floor !== 'all' && state.floor !== e.floor) state.floor = e.floor; $$('.fl-b').forEach((b) => b.classList.toggle('is-on', b.dataset.floor === state.floor)); }
-  renderMonth();
+  renderMonth(); renderSysGrid();
   refresh(); renderGantt();
   const seed = [['cloud', 'Telegram: голосовое от владельца, 0:42 — передано на ПК'], ['developer', 'Коммит 3 из 5: фильтр по тегам, 14 тестов зелёные'], ['tester', 'Протокол готов: 7 из 9 критериев прошли'],
     ['archicad', 'Остановлено: нет размера ниши в коридоре'], ['print', 'K1: трактор 18 из 30 готов'], ['content', 'Тексты слайдов 1–7 готовы, ждут утверждения'], ['jarvis', 'Раздал 4 задачи: планировщику, Archicad, контенту, печати']];
@@ -1827,27 +1945,33 @@ const TEX = {
 /* ---------- комнаты: план этажа ---------- */
 const INS = 0.12, WT = 0.16;
 const L = {
-  planner: { x0: -15, x1: -7.5, z0: -10, z1: -4.4, door: 'S' },
-  developer: { x0: -7.5, x1: 0, z0: -10, z1: -4.4, door: 'S' },
-  tester: { x0: 0, x1: 7.5, z0: -10, z1: -4.4, door: 'S' },
+  developer: { x0: -15, x1: -7.5, z0: -10, z1: -4.4, door: 'S' },
+  tester: { x0: -7.5, x1: 0, z0: -10, z1: -4.4, door: 'S' },
+  planner: { x0: 0, x1: 7.5, z0: -10, z1: -4.4, door: 'S' },
   server: { x0: 8.7, x1: 15, z0: -10, z1: -4.4, door: 'S' },
   archicad: { x0: -15, x1: -9, z0: -3.2, z1: 3.2, door: 'E' },
   jarvis: { x0: -7.8, x1: 7.8, z0: -3.2, z1: 3.2, door: 'NSEW' },
   sysadmin: { x0: 9, x1: 15, z0: -3.2, z1: 3.2, door: 'W' },
   print: { x0: -15, x1: -6, z0: 4.4, z1: 10, door: 'N' },
-  content: { x0: -6, x1: 0, z0: 4.4, z1: 10, door: 'N' },
-  crm: { x0: 0, x1: 6, z0: 4.4, z1: 10, door: 'N' },
+  strategist: { x0: -6, x1: 0, z0: 4.4, z1: 10, door: 'N' },
+  secretary: { x0: 0, x1: 6, z0: 4.4, z1: 10, door: 'N' },
   browser: { x0: 6, x1: 10.5, z0: 4.4, z1: 10, door: 'N' },
-  secretary: { x0: 10.5, x1: 15, z0: 4.4, z1: 10, door: 'N' },
+  crm: { x0: 10.5, x1: 15, z0: 4.4, z1: 10, door: 'N' },
   targetolog: { x0: -15, x1: -10, z0: -17, z1: -11.4, door: 'S' },
   marketolog: { x0: -10, x1: -5, z0: -17, z1: -11.4, door: 'S' },
   screenwriter: { x0: -5, x1: 0, z0: -17, z1: -11.4, door: 'S' },
-  analyst: { x0: 0, x1: 5, z0: -17, z1: -11.4, door: 'S' },
-  finance: { x0: 5, x1: 10, z0: -17, z1: -11.4, door: 'S' },
-  strategist: { x0: 10, x1: 15, z0: -17, z1: -11.4, door: 'S' },
+  content: { x0: 0, x1: 5, z0: -17, z1: -11.4, door: 'S' },
+  analyst: { x0: 5, x1: 10, z0: -17, z1: -11.4, door: 'S' },
+  finance: { x0: 10, x1: 15, z0: -17, z1: -11.4, door: 'S' },
+  hr: { x0: 16.4, x1: 21.4, z0: -17, z1: -11.6, door: 'W' },
+  procurement: { x0: 16.4, x1: 21.4, z0: -11.6, z1: -6.2, door: 'W' },
+  sales: { x0: 16.4, x1: 21.4, z0: -6.2, z1: -0.8, door: 'W' },
+  quality: { x0: 16.4, x1: 21.4, z0: -0.8, z1: 4.6, door: 'W' },
+  academy: { x0: 16.4, x1: 21.4, z0: 4.6, z1: 10, door: 'W' },
 };
+const OL = { planner: { cx: -11.25, cz: -7.2 }, developer: { cx: -3.75, cz: -7.2 }, tester: { cx: 3.75, cz: -7.2 }, secretary: { cx: 12.75, cz: 7.2, xb: 14.88 } };
 for (const id in L) { const r = L[id]; r.xa = r.x0 + INS; r.xb = r.x1 - INS; r.za = r.z0 + INS; r.zb = r.z1 - INS; r.cx = (r.x0 + r.x1) / 2; r.cz = (r.z0 + r.z1) / 2; r.w = r.xb - r.xa; r.d = r.zb - r.za; }
-const PAV = new V3(23.7, 4.3, -5.8);
+const PAV = new V3(27.8, 4.3, -5.8), DPV = new V3(27.6, 3.4, 7.0);
 
 const RM = {};
 const POOL = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const gr = g.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.55, '#8a8a8a'); gr.addColorStop(1, '#141414'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
@@ -1863,7 +1987,7 @@ function screenMat(id, t) {
 function doorsOf(id) {
   const r = L[id];
   if (id === 'jarvis') return [{ s: 'N', at: 0, w: 2.6 }, { s: 'S', at: 0, w: 2.6 }, { s: 'W', at: 0, w: 1.6 }, { s: 'E', at: 0, w: 1.6 }];
-  return [{ s: r.door, at: r.door === 'N' || r.door === 'S' ? r.cx : 0, w: 1.3 }];
+  return [{ s: r.door, at: r.door === 'N' || r.door === 'S' ? r.cx : r.cz, w: 1.3 }];
 }
 function buildWalls(id) {
   const r = L[id], rm = roomMats(id), isJ = id === 'jarvis';
@@ -1908,25 +2032,27 @@ function ge(a, b, via) {
   let len = 0; for (let i = 1; i < pts.length; i++) len += pts[i].distanceTo(pts[i - 1]);
   A.e.push({ to: b, pts, len }); B.e.push({ to: a, pts: pts.slice().reverse(), len });
 }
-const CA = -3.8, CB = 3.8, CL = -8.4, CR = 8.4, CG = -10.7;
-const corr = { A: [], B: [], L: [], R: [], G: [] };
+const CA = -3.8, CB = 3.8, CL = -8.4, CR = 8.4, CG = -10.7, CE = 15.7;
+const corr = { A: [], B: [], L: [], R: [], G: [], E: [] };
 corr.A.push(gn('A_L', CL, CA), gn('A_R', CR, CA)); corr.B.push(gn('B_L', CL, CB), gn('B_R', CR, CB));
-corr.L.push('A_L', 'B_L', gn('L_0', CL, 0)); corr.R.push('A_R', 'B_R', gn('R_0', CR, 0), gn('G_R', CR, CG)); corr.G.push('G_R');
+corr.L.push('A_L', 'B_L', gn('L_0', CL, 0)); corr.R.push('A_R', 'B_R', gn('R_0', CR, 0), gn('G_R', CR, CG)); corr.G.push('G_R', gn('G_E', CE, CG)); corr.E.push('G_E', gn('A_E', CE, CA), gn('B_E', CE, CB)); corr.A.push('A_E'); corr.B.push('B_E');
 const SEATS = {};
+let SHIFT = new V3();
 function seatNode(id, seat, face, via) {
   const r = L[id];
+  seat = seat.clone().add(SHIFT); if (via) via = via.map((v) => [v[0] + SHIFT.x, v[1] + SHIFT.z]);
   gn('s_' + id, seat.x, seat.z);
   SEATS[id] = { seat, face };
   if (r.door.length > 1) return;
   if (r.door === 'S') { const wing = r.z1 < -10.5; gn('d_' + id, r.cx, r.zb); (wing ? corr.G : corr.A).push(gn('c_' + id, r.cx, wing ? CG : CA)); ge('d_' + id, 'c_' + id); }
   else if (r.door === 'N') { gn('d_' + id, r.cx, r.za); corr.B.push(gn('c_' + id, r.cx, CB)); ge('d_' + id, 'c_' + id); }
   else if (r.door === 'E') { gn('d_' + id, r.xb, 0); ge('d_' + id, 'L_0'); }
-  else if (r.door === 'W') { gn('d_' + id, r.xa, 0); ge('d_' + id, 'R_0'); }
+  else if (r.door === 'W') { gn('d_' + id, r.xa, r.cz); if (r.x0 > 15) { corr.E.push(gn('c_' + id, CE, r.cz)); ge('d_' + id, 'c_' + id); } else ge('d_' + id, 'R_0'); }
   ge('s_' + id, 'd_' + id, via);
 }
 function finishGraph() {
   const link = (list, key) => { const u = [...new Set(list)].sort((a, b) => G.get(a).p[key] - G.get(b).p[key]); for (let i = 1; i < u.length; i++) ge(u[i - 1], u[i]); };
-  link(corr.A, 'x'); link(corr.B, 'x'); link(corr.L, 'y'); link(corr.R, 'y'); link(corr.G, 'x');
+  link(corr.A, 'x'); link(corr.B, 'x'); link(corr.L, 'y'); link(corr.R, 'y'); link(corr.G, 'x'); link(corr.E, 'y');
 }
 function route(a, b) {
   const dist = new Map([[a, 0]]), prev = new Map(), done = new Set();
@@ -1994,26 +2120,33 @@ function screenPanel(id, t, x, y, z, ry, w, h) {
 const anim = { rings: [], printers: [], rack: null, gpu: null, cGauge: null, beacons: {}, plane: null };
 
 function prop(m, mat, geo, o) { geo.applyMatrix4(m); add(mat, geo, o); }
+function shifted(id, fn) { const o = OL[id], r = L[id]; const g = new THREE.Group(); g.position.set(r.cx - o.cx, 0, r.cz - o.cz); ROOT.add(g); const prev = ROOT; ROOT = g; SHIFT = g.position.clone(); try { fn(); } finally { ROOT = prev; SHIFT = new V3(); } }
 function buildProps() {
   const R = rng(11);
   let s, m;
-  // 1.01 Планирование: стол переговоров с листами, доска задач
+  // Управление · Планирование: стол переговоров с листами, доска задач
+  shifted('planner', () => {
   s = desk('planner', -12.95, -8.45, 0, { tex: [TEX.board] }); seatNode('planner', s.seat, s.face);
   m = TM(-9.7, -7.4, 0);
   prop(m, M.model, boxG(1.9, 0.04, 1.0, 0, 0.42, 0)); prop(m, M.model, boxG(0.07, 0.4, 0.8, -0.8, 0.2, 0)); prop(m, M.model, boxG(0.07, 0.4, 0.8, 0.8, 0.2, 0));
   for (let i = 0; i < 4; i++) prop(m, M.slab, boxG(0.36, 0.006, 0.26, -0.6 + i * 0.4, 0.443, (R() - 0.5) * 0.3, (R() - 0.5) * 0.5));
   for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; prop(m, M.model, cylG(0.1, 0.1, 0.3, Math.cos(a) * 1.15, 0.15, Math.sin(a) * 0.72, 12)); }
   screenPanel('planner', TEX.board, -10.2, 1.3, L.planner.za + 0.11, 0, 2.6, 1.05);
-  // 1.02 Разработка: два стола, второй с двумя мониторами, доска
+  });
+  // Производство · Разработка: два стола, второй с двумя мониторами, доска
+  shifted('developer', () => {
   s = desk('developer', -5.45, -8.45, 0, { tex: [TEX.code] }); seatNode('developer', s.seat, s.face);
   desk('developer', -2.15, -8.45, 0, { mons: 2, tex: [TEX.code, TEX.term], inbox: false });
   screenPanel('developer', TEX.term, -1.6, 1.4, L.developer.za + 0.11, 0, 2.0, 0.9);
-  // 1.03 Проверка: стол, доска критериев 7 из 9, стенд с лупой
+  });
+  // Производство · Проверка: стол, доска критериев 7 из 9, стенд с лупой
+  shifted('tester', () => {
   s = desk('tester', 2.05, -8.45, 0, { tex: [TEX.term] }); seatNode('tester', s.seat, s.face);
   screenPanel('tester', TEX.crit, 5.4, 1.35, L.tester.za + 0.11, 0, 1.15, 1.15);
   m = TM(5.6, -6.9, 0);
   prop(m, M.model, boxG(1.3, 0.04, 0.7, 0, 0.42, 0)); prop(m, M.model, boxG(1.2, 0.4, 0.06, 0, 0.2, 0));
   prop(m, M.dark, boxG(0.16, 0.012, 0.3, -0.3, 0.446, 0)); prop(m, M.brass, cylG(0.08, 0.08, 0.015, 0.25, 0.448, 0.1, 24)); prop(m, M.brass, boxG(0.02, 0.012, 0.18, 0.34, 0.446, 0.22, 0.7));
+  });
   // 1.04 Серверная: пульт, ПК «Alijon» со стеклянной стенкой, стойка, датчики дисков
   s = desk('server', 10.3, -8.45, 0, { mons: 2, tex: [TEX.render, TEX.disk] }); seatNode('server', s.seat, s.face);
   add(M.dark, boxG(1.1, 1.25, 0.56, 12.6, 0.625, -8.7));
@@ -2062,33 +2195,37 @@ function buildProps() {
   buildTractorTray(-12.2, 6.0);
   [[0x6f9e7a, 6.0], [0x2f2b27, 6.65], [0xf3efe6, 7.3], [0xc4a675, 7.95]].forEach(([c, z]) => { const sp = new THREE.Mesh(new THREE.TorusGeometry(0.21, 0.09, 10, 24), new THREE.MeshStandardMaterial({ color: c, roughness: 0.45 })); sp.rotation.y = Math.PI / 2; sp.position.set(-14.6, 1.12, z); sp.castShadow = true; ROOT.add(sp); });
   add(M.model, boxG(0.3, 0.05, 2.7, -14.66, 0.86, 7.0));
-  // 1.08 Контент: стол, фон-циклорама, софтбокс, камера на штативе
-  s = desk('content', -4.2, 7.55, 0, { tex: [TEX.max] }); seatNode('content', s.seat, s.face, [[-3.05, s.seat.z], [-3.05, 5.3]]);
-  m = TM(-1.5, 8.6, 0, 1.25);
-  const sweep = new THREE.CylinderGeometry(0.6, 0.6, 1.6, 16, 1, true, Math.PI, Math.PI / 2); sweep.rotateZ(Math.PI / 2); sweep.translate(0, 0.6, 0.15); prop(m, M.model, sweep);
-  prop(m, M.model, boxG(1.6, 1.0, 0.03, 0, 1.1, 0.74)); prop(m, M.model, boxG(1.6, 0.01, 0.7, 0, 0.005, -0.5));
-  const sb = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.6), M.warmLight); sb.position.set(-0.45, 1.4, 7.2); sb.rotation.y = -2.3; ROOT.add(sb);
-  add(M.dark, boxG(0.66, 0.66, 0.12, -0.4, 1.4, 7.15, -2.3)); add(M.dark, cylG(0.018, 0.018, 1.4, -0.35, 0.7, 7.1, 6));
-  m = TM(-1.7, 6.5, 0, 1.3);
-  prop(m, M.dark, boxG(0.24, 0.16, 0.14, 0, 1.0, 0));
-  { const lens = new THREE.CylinderGeometry(0.05, 0.05, 0.14, 12); lens.rotateX(Math.PI / 2); lens.translate(0, 1.0, 0.13); prop(m, M.dark, lens); }
-  [[0.13, 0.08], [-0.13, 0.08], [0, -0.15]].forEach(([dx, dz]) => { const leg = cylG(0.01, 0.01, 1.0, 0, 0.5, 0, 5); leg.rotateX(dz * 0.9); leg.rotateZ(-dx * 0.9); leg.translate(dx * 0.9, 0, dz * 0.9); prop(m, M.dark, leg); });
+  // Маркетинг · Контент: стол, циклорама, софтбокс, камера на штативе
+  { const r = L.content, cx = r.cx;
+    s = desk('content', cx - 1.0, -15.45, 0, { tex: [TEX.max] }); seatNode('content', s.seat, s.face);
+    m = TM(cx + 1.15, -16.05, 0, 1.0);
+    const sweep = new THREE.CylinderGeometry(0.6, 0.6, 1.6, 16, 1, true, Math.PI, Math.PI / 2); sweep.rotateZ(Math.PI / 2); sweep.translate(0, 0.6, 0.15); sweep.rotateY(Math.PI); prop(m, M.model, sweep);
+    prop(m, M.model, boxG(1.6, 1.0, 0.03, 0, 1.1, -0.44)); prop(m, M.model, boxG(1.6, 0.01, 0.9, 0, 0.005, 0.5));
+    const sb = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.55), M.warmLight); sb.position.set(cx + 2.0, 1.35, -14.1); sb.rotation.y = 2.45; ROOT.add(sb);
+    add(M.dark, boxG(0.6, 0.6, 0.1, cx + 2.04, 1.35, -14.05, 2.45)); add(M.dark, cylG(0.018, 0.018, 1.35, cx + 2.06, 0.67, -14.0, 6));
+    m = TM(cx + 1.0, -13.2, Math.PI, 1.3);
+    prop(m, M.dark, boxG(0.24, 0.16, 0.14, 0, 1.0, 0));
+    { const lens = new THREE.CylinderGeometry(0.05, 0.05, 0.14, 12); lens.rotateX(Math.PI / 2); lens.translate(0, 1.0, 0.13); prop(m, M.dark, lens); }
+    [[0.13, 0.08], [-0.13, 0.08], [0, -0.15]].forEach(([dx, dz]) => { const leg = cylG(0.01, 0.01, 1.0, 0, 0.5, 0, 5); leg.rotateX(dz * 0.9); leg.rotateZ(-dx * 0.9); leg.translate(dx * 0.9, 0, dz * 0.9); prop(m, M.dark, leg); });
+  }
   // 1.09 CRM: стол, экран-воронка на стойке
-  s = desk('crm', 1.8, 7.55, 0, { tex: [TEX.funnel] }); seatNode('crm', s.seat, s.face, [[2.95, s.seat.z], [2.95, 5.3]]);
-  screenPanel('crm', TEX.funnel, 4.55, 1.25, 6.5, -0.5, 1.5, 0.9); add(M.dark, cylG(0.035, 0.06, 0.8, 4.55, 0.4, 6.5, 8));
+  { const cx = L.crm.cx; s = desk('crm', cx - 0.8, 7.55, 0, { tex: [TEX.funnel] }); seatNode('crm', s.seat, s.face, [[cx + 0.37, s.seat.z], [cx + 0.37, 5.3]]);
+    screenPanel('crm', TEX.funnel, cx + 1.4, 1.25, 6.1, -0.6, 1.1, 0.7); add(M.dark, cylG(0.035, 0.06, 0.8, cx + 1.4, 0.4, 6.1, 8)); }
   // 1.10 Браузер: стол с тремя экранами, глобус
   s = desk('browser', 7.45, 7.55, 0, { mons: 3, tex: [TEX.web, TEX.web, TEX.web] }); seatNode('browser', s.seat, s.face, [[8.62, s.seat.z], [8.62, 5.3]]);
   const globe = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(0.36, 1)), new THREE.LineBasicMaterial({ color: 0xc4a675 }));
   globe.position.set(9.6, 1.06, 5.95); ROOT.add(globe); anim.globe = globe; add(M.model, cylG(0.14, 0.2, 0.68, 9.6, 0.34, 5.95, 16));
   // 1.11 Секретарь: стол, календарь на стене, лоток писем
-  s = desk('secretary', 11.95, 7.55, 0, { tex: [TEX.mail] }); seatNode('secretary', s.seat, s.face, [[13.12, s.seat.z], [13.12, 5.3]]);
-  screenPanel('secretary', TEX.cal, L.secretary.xb - 0.11, 0.72, 6.3, -Math.PI / 2, 1.5, 0.66);
-  for (let i = 0; i < 4; i++) add(M.model, boxG(0.4, 0.025, 0.3, 11.4, 0.7 + i * 0.035, 7.48, i * 0.08));
+  shifted('secretary', () => {
+    s = desk('secretary', 11.95, 7.55, 0, { tex: [TEX.mail] }); seatNode('secretary', s.seat, s.face, [[13.12, s.seat.z], [13.12, 5.3]]);
+    screenPanel('secretary', TEX.cal, 14.3, 0.95, 6.0, -Math.PI / 2, 1.5, 0.66); add(M.dark, cylG(0.03, 0.05, 0.62, 14.36, 0.31, 6.0, 8));
+    for (let i = 0; i < 4; i++) add(M.model, boxG(0.4, 0.025, 0.3, 11.4, 0.7 + i * 0.035, 7.48, i * 0.08));
+  });
   // растения и кресла: комнаты обжиты
   const plant = (x, z, k) => { k = k || 1; add(M.model, cylG(0.17 * k, 0.13 * k, 0.32 * k, x, 0.16 * k, z, 16)); const sp = new THREE.SphereGeometry(0.3 * k, 16, 12); sp.translate(x, 0.32 * k + 0.26 * k, z); add(M.figure, sp); };
   const chair = (x, z, ry) => { const cm = TM(x, z, ry, 1.35); prop(cm, M.model, boxG(0.46, 0.06, 0.46, 0, 0.3, 0)); prop(cm, M.model, boxG(0.46, 0.34, 0.06, 0, 0.5, -0.2)); prop(cm, M.model, boxG(0.06, 0.3, 0.06, -0.18, 0.15, 0.16)); prop(cm, M.model, boxG(0.06, 0.3, 0.06, 0.18, 0.15, 0.16)); prop(cm, M.model, boxG(0.06, 0.3, 0.06, -0.18, 0.15, -0.16)); prop(cm, M.model, boxG(0.06, 0.3, 0.06, 0.18, 0.15, -0.16)); };
-  [[-14.3, -5.2], [-0.75, -5.2], [0.75, -5.2], [-9.75, -2.55], [9.75, -2.55], [-5.35, 9.35], [6.7, 9.35], [14.3, 9.35], [-7.1, -2.6], [7.1, -2.6], [-7.1, 2.6], [7.1, 2.6]].forEach(([x, z]) => plant(x, z, 1.1));
-  chair(3.75, 9.15, Math.PI * 0.85); chair(5.3, 9.15, -Math.PI * 0.85); add(M.model, cylG(0.3, 0.3, 0.05, 4.5, 0.48, 9.2, 24)); add(M.model, cylG(0.05, 0.08, 0.46, 4.5, 0.23, 9.2, 10));
+  [[-14.3, -5.2], [-0.75, -5.2], [0.75, -5.2], [-9.75, -2.55], [9.75, -2.55], [-0.6, 9.35], [6.7, 9.35], [-7.1, -2.6], [7.1, -2.6], [-7.1, 2.6], [7.1, 2.6]].forEach(([x, z]) => plant(x, z, 1.1));
+  chair(4.2, 9.2, Math.PI * 0.85); chair(5.35, 8.4, -Math.PI * 0.6); add(M.model, cylG(0.3, 0.3, 0.05, 5.0, 0.48, 9.3, 24)); add(M.model, cylG(0.05, 0.08, 0.46, 5.0, 0.23, 9.3, 10));
   chair(-0.9, -6.4, -Math.PI / 2); chair(9.6, -6.1, 0.4);
   buildWing(plant, chair);
 
@@ -2133,10 +2270,26 @@ function buildWing(plant, chair) {
   r = L.finance; s = desk('finance', r.cx - 1.0, -15.45, 0, { tex: [TEX.fin] }); seatNode('finance', s.seat, s.face);
   screenPanel('finance', TEX.fin, r.cx + 0.9, 1.35, r.za + 0.11, 0, 1.7, 0.95);
   add(M.dark, boxG(0.7, 0.75, 0.6, r.cx + 1.55, 0.375, -12.6)); add(M.brass, cylG(0.07, 0.07, 0.02, r.cx + 1.55, 0.45, -12.29, 16).rotateX(0));
-  r = L.strategist; s = desk('strategist', r.cx - 0.9, -15.45, 0, { tex: [TEX.core], sc: 1.5 }); seatNode('strategist', s.seat, s.face);
-  shelf(r.cx + 1.15, r.za + 0.3, 0, 1.5, R);
-  chair(r.cx + 0.9, -12.4, Math.PI * 0.8); chair(r.cx + 1.9, -12.9, -Math.PI * 0.7); add(M.model, cylG(0.3, 0.3, 0.04, r.cx + 1.45, 0.48, -13.0, 20));
-  for (let i = 0; i < 4; i++) add(i % 2 ? M.dark : M.model, cylG(0.03, 0.04, 0.09, r.cx + 1.33 + i * 0.08, 0.545, -13.0 + (i % 2) * 0.08, 8));
+  r = L.strategist; s = desk('strategist', r.cx - 1.25, 7.55, 0, { tex: [TEX.core], sc: 1.4 }); seatNode('strategist', s.seat, s.face, [[r.cx + 0.05, s.seat.z], [r.cx + 0.05, 5.3]]);
+  shelf(r.cx + 1.6, r.zb - 0.35, Math.PI, 1.6, R);
+  chair(r.cx + 1.2, 6.0, Math.PI * 0.2); chair(r.cx + 2.2, 6.6, -Math.PI * 0.35); add(M.model, cylG(0.3, 0.3, 0.04, r.cx + 1.75, 0.48, 6.6, 20));
+  for (let i = 0; i < 4; i++) add(i % 2 ? M.dark : M.model, cylG(0.03, 0.04, 0.09, r.cx + 1.63 + i * 0.08, 0.545, 6.6 + (i % 2) * 0.08, 8));
+  buildEast(plant, chair, R);
+}
+
+/* ---------- восточное крыло: продажи и клиенты, деньги и люди ---------- */
+function buildEast(plant, chair, R) {
+  const one = (id, tx, extra) => {
+    const r = L[id];
+    const s = desk(id, r.xb - 1.45, r.cz - 1.0, -Math.PI / 2, { tex: [tx] }); seatNode(id, s.seat, s.face);
+    screenPanel(id, tx, r.xb - 0.11, 1.25, r.cz + 1.15, -Math.PI / 2, 1.5, 0.85);
+    extra(r);
+  };
+  one('hr', TEX.cal, (r) => { chair(r.cx - 0.6, r.cz + 1.4, Math.PI / 2); chair(r.cx + 0.5, r.cz + 1.4, -Math.PI / 2); plant(r.xa + 0.5, r.za + 0.5, 1.0); });
+  one('procurement', TEX.disk, (r) => { const m = TM(r.cx, r.za + 0.3, 0, 1.15); prop(m, M.model, boxG(1.8, 1.2, 0.34, 0, 0.6, 0)); const cs = [0xc4a675, 0x7d6549, 0x6f9e7a, 0xe6dccb, 0x9a634a, 0x4a433d]; for (let i = 0; i < 12; i++) prop(m, new THREE.MeshStandardMaterial({ color: cs[i % 6], roughness: 0.7 }), boxG(0.24, 0.26, 0.03, -0.66 + (i % 6) * 0.26, 0.3 + Math.floor(i / 6) * 0.45, 0.17)); });
+  one('sales', TEX.funnel, (r) => { add(M.model, cylG(0.38, 0.38, 0.04, r.cx - 0.5, 0.62, r.cz + 1.3, 24)); add(M.model, cylG(0.05, 0.1, 0.6, r.cx - 0.5, 0.3, r.cz + 1.3, 10)); chair(r.cx - 0.5, r.cz + 2.05, Math.PI); plant(r.xa + 0.5, r.za + 0.5, 1.0); });
+  one('quality', TEX.crit, (r) => { add(M.model, boxG(1.2, 0.04, 0.6, r.cx - 0.5, 0.42, r.cz + 1.4)); add(M.model, boxG(1.1, 0.4, 0.05, r.cx - 0.5, 0.2, r.cz + 1.4)); add(M.brass, cylG(0.08, 0.08, 0.015, r.cx - 0.3, 0.448, r.cz + 1.4, 24)); add(M.slab, boxG(0.42, 0.006, 0.3, r.cx - 0.75, 0.445, r.cz + 1.4, 0.2)); });
+  one('academy', TEX.max, (r) => { for (let i = 0; i < 3; i++) { add(M.model, boxG(0.9, 0.04, 0.45, r.cx - 1.0 + i * 1.0, 0.5, r.cz + 1.7)); chairG(r.cx - 1.0 + i * 1.0, r.cz + 2.15, Math.PI); } });
 }
 
 /* ---------- принтеры: печать слоями (плоскость отсечения поднимается) ---------- */
@@ -2409,57 +2562,61 @@ function buildCables() {
   }
   add(M.cable, mergeGeometries(geos), { cast: false, receive: false });
 }
-const mainCurve = new THREE.CatmullRomCurve3([new V3(12.6, 1.25, -8.7), new V3(12.6, 3.4, -8.7), new V3(12.9, 7.0, -8.7), new V3(15.8, 9.1, -8.3), new V3(19.4, 8.1, -7.2), new V3(20.9, 4.3, -6.4)], false, 'centripetal');
-const N_IN = 80, N_MAIN = 22, N_BEAM = 10;
+const mainCurve = new THREE.CatmullRomCurve3([new V3(12.6, 1.25, -8.7), new V3(12.6, 3.4, -8.7), new V3(12.9, 7.0, -8.7), new V3(17.0, 9.6, -8.3), new V3(23.0, 8.6, -7.2), new V3(25.0, 4.3, -6.4)], false, 'centripetal');
+const dhCurve = new THREE.CatmullRomCurve3([new V3(12.3, 0.9, 7.2), new V3(12.6, 3.4, 7.6), new V3(13.6, 6.95, 8.2), new V3(17.5, 8.4, 8.4), new V3(23.2, 7.0, 7.6), new V3(25.0, 3.5, 7.1)], false, 'centripetal');
+const N_IN = 110, N_MAIN = 22, N_BEAM = 10, N_DH = 16;
 const parts = { mesh: null, list: [] };
 function buildParticles() {
-  const total = N_IN + N_MAIN + N_BEAM;
+  const total = N_IN + N_MAIN + N_BEAM + N_DH;
   const im = new THREE.InstancedMesh(new THREE.SphereGeometry(0.05, 8, 6), new THREE.MeshBasicMaterial({ toneMapped: false }), total);
   im.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   for (let i = 0; i < total; i++) im.setColorAt(i, C.champ);
   for (let i = 0; i < N_IN; i++) { const c = i % cables.length; parts.list.push({ k: 'in', c, s: Math.random() * cables[c].P.len, v: (0.9 + Math.random() * 0.8) * (i % 3 === 0 ? -1 : 1) }); }
   for (let i = 0; i < N_MAIN; i++) parts.list.push({ k: 'main', u: i / N_MAIN, v: (i % 2 ? 1 : -1) * 0.07 });
   for (let i = 0; i < N_BEAM; i++) parts.list.push({ k: 'beam', u: i / N_BEAM });
+  for (let i = 0; i < N_DH; i++) parts.list.push({ k: 'dh', u: i / N_DH, v: (i % 2 ? 1 : -1) * 0.06 });
   im.frustumCulled = false; ROOT.add(im); parts.mesh = im;
 }
 const flyBoxes = [];
 
 /* ---------- подиум, витрина, павильон ---------- */
-const PW = 35.4, PD = 32.1, PH = 1.6, PTOP = -0.25, ZC = -3.35, VH = 9.85, VD = 31.1;
+const PW = 41.3, PD = 32.1, PH = 1.6, PTOP = -0.25, ZC = -3.35, XC = 2.95, VH = 9.85, VD = 31.1, VW = 40.3;
 let glassBox, plaqueMat, northMat, floorMesh, contact;
 function buildBase() {
-  add(M.podium, boxG(PW, PH, PD, 0, PTOP - PH / 2, ZC));
-  add(M.plinth, boxG(PW - 0.9, 0.15, PD - 0.9, 0, -1.925, ZC));
-  [[PW + 0.01, 0.03, 0.02, 0, PTOP - 0.16, ZC + PD / 2 + 0.003], [PW + 0.01, 0.03, 0.02, 0, PTOP - 0.16, ZC - PD / 2 - 0.003], [0.02, 0.03, PD + 0.01, PW / 2 + 0.003, PTOP - 0.16, ZC], [0.02, 0.03, PD + 0.01, -PW / 2 - 0.003, PTOP - 0.16, ZC]].forEach((b) => add(M.glow, boxG(...b), { cast: false, receive: false }));
-  [[PW - 0.92, 0.02, 0.03, 0, -1.86, ZC + PD / 2 - 0.45], [PW - 0.92, 0.02, 0.03, 0, -1.86, ZC - PD / 2 + 0.45], [0.03, 0.02, PD - 0.92, PW / 2 - 0.45, -1.86, ZC], [0.03, 0.02, PD - 0.92, -PW / 2 + 0.45, -1.86, ZC]].forEach((b) => add(M.glowSoft, boxG(...b), { cast: false, receive: false }));
+  add(M.podium, boxG(PW, PH, PD, XC, PTOP - PH / 2, ZC));
+  add(M.plinth, boxG(PW - 0.9, 0.15, PD - 0.9, XC, -1.925, ZC));
+  [[PW + 0.01, 0.03, 0.02, XC, PTOP - 0.16, ZC + PD / 2 + 0.003], [PW + 0.01, 0.03, 0.02, XC, PTOP - 0.16, ZC - PD / 2 - 0.003], [0.02, 0.03, PD + 0.01, XC + PW / 2 + 0.003, PTOP - 0.16, ZC], [0.02, 0.03, PD + 0.01, XC - PW / 2 - 0.003, PTOP - 0.16, ZC]].forEach((b) => add(M.glow, boxG(...b), { cast: false, receive: false }));
+  [[PW - 0.92, 0.02, 0.03, XC, -1.86, ZC + PD / 2 - 0.45], [PW - 0.92, 0.02, 0.03, XC, -1.86, ZC - PD / 2 + 0.45], [0.03, 0.02, PD - 0.92, XC + PW / 2 - 0.45, -1.86, ZC], [0.03, 0.02, PD - 0.92, XC - PW / 2 + 0.45, -1.86, ZC]].forEach((b) => add(M.glowSoft, boxG(...b), { cast: false, receive: false }));
   const gridT = tex(128, 128, (g) => { g.fillStyle = '#ffffff'; g.fillRect(0, 0, 128, 128); g.fillStyle = 'rgba(120,108,92,.16)'; g.fillRect(0, 0, 128, 2); g.fillRect(0, 0, 2, 128); });
   gridT.wrapS = gridT.wrapT = THREE.RepeatWrapping; gridT.repeat.set(31.2, 21.2); M.slab.map = gridT;
-  const g2 = gridT.clone(); g2.repeat.set(31.2, 27.9); g2.needsUpdate = true; M.slab2.map = g2;
+  const g2 = gridT.clone(); g2.repeat.set(37.3, 27.9); g2.needsUpdate = true; M.slab2.map = g2;
   add(M.slab, boxG(31.2, 0.25, 21.2, 0, -0.125, 0));
   floorMesh = new THREE.Mesh(new THREE.CircleGeometry(160, 64), M.floor); floorMesh.rotation.x = -Math.PI / 2; floorMesh.position.y = -2.0; floorMesh.receiveShadow = true; ROOT.add(floorMesh);
   const ct = tex(256, 256, (g) => { g.clearRect(0, 0, 256, 256); const gr = g.createRadialGradient(128, 128, 30, 128, 128, 128); gr.addColorStop(0, 'rgba(0,0,0,.55)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256); });
-  contact = new THREE.Mesh(new THREE.PlaneGeometry(52, 47), new THREE.MeshBasicMaterial({ map: ct, transparent: true, depthWrite: false })); contact.rotation.x = -Math.PI / 2; contact.position.set(0, -1.995, ZC); ROOT.add(contact);
+  contact = new THREE.Mesh(new THREE.PlaneGeometry(58, 47), new THREE.MeshBasicMaterial({ map: ct, transparent: true, depthWrite: false })); contact.rotation.x = -Math.PI / 2; contact.position.set(XC, -1.995, ZC); ROOT.add(contact);
   const pc = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshBasicMaterial({ map: ct, transparent: true, depthWrite: false, opacity: 0.6 })); pc.rotation.x = -Math.PI / 2; pc.position.set(PAV.x, -1.993, PAV.z); ROOT.add(pc);
-  glassBox = new THREE.Mesh(new THREE.BoxGeometry(34.4, VH, VD), Q === 'high' ? glassHigh : glassLow); glassBox.position.set(0, PTOP + VH / 2, ZC); glassBox.renderOrder = 5; ROOT.add(glassBox);
-  const ex = 17.2, ez1 = ZC + VD / 2, ez0 = ZC - VD / 2, yb = PTOP, t = 0.05;
-  [[34.4 + t, 0.08, t, 0, yb + 0.04, ez1], [34.4 + t, 0.08, t, 0, yb + 0.04, ez0], [t, 0.08, VD + t, ex, yb + 0.04, ZC], [t, 0.08, VD + t, -ex, yb + 0.04, ZC],
-   [t, VH, t, ex, PTOP + VH / 2, ez1], [t, VH, t, -ex, PTOP + VH / 2, ez1], [t, VH, t, ex, PTOP + VH / 2, ez0], [t, VH, t, -ex, PTOP + VH / 2, ez0]].forEach((b) => add(M.frame, boxG(...b), { cast: false }));
+  glassBox = new THREE.Mesh(new THREE.BoxGeometry(VW, VH, VD), Q === 'high' ? glassHigh : glassLow); glassBox.position.set(XC, PTOP + VH / 2, ZC); glassBox.renderOrder = 5; ROOT.add(glassBox);
+  const exR = XC + VW / 2, exL = XC - VW / 2, ez1 = ZC + VD / 2, ez0 = ZC - VD / 2, yb = PTOP, t = 0.05;
+  [[VW + t, 0.08, t, XC, yb + 0.04, ez1], [VW + t, 0.08, t, XC, yb + 0.04, ez0], [t, 0.08, VD + t, exR, yb + 0.04, ZC], [t, 0.08, VD + t, exL, yb + 0.04, ZC],
+   [t, VH, t, exR, PTOP + VH / 2, ez1], [t, VH, t, exL, PTOP + VH / 2, ez1], [t, VH, t, exR, PTOP + VH / 2, ez0], [t, VH, t, exL, PTOP + VH / 2, ez0]].forEach((b) => add(M.frame, boxG(...b), { cast: false }));
   plaqueMat = new THREE.MeshStandardMaterial({ transparent: true, roughness: 0.4, metalness: 0.4, emissive: 0xffffff, emissiveIntensity: 0.25 });
-  const plaque = new THREE.Mesh(new THREE.PlaneGeometry(13, 1.2), plaqueMat); plaque.position.set(0, PTOP - PH / 2 + 0.05, ZC + PD / 2 + 0.008); ROOT.add(plaque);
+  const plaque = new THREE.Mesh(new THREE.PlaneGeometry(13, 1.2), plaqueMat); plaque.position.set(XC, PTOP - PH / 2 + 0.05, ZC + PD / 2 + 0.008); ROOT.add(plaque);
   northMat = new THREE.MeshStandardMaterial({ transparent: true, roughness: 0.4, metalness: 0.6 });
   const north = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.1), northMat); north.rotation.x = -Math.PI / 2; north.position.set(-16.2, PTOP + 0.003, 11.35); ROOT.add(north);
-  for (let i = 0; i < 5; i++) add(i % 2 ? M.model : M.dark, boxG(0.8, 0.02, 0.12, 12.2 + i * 0.8, PTOP + 0.01, 11.5));
+  for (let i = 0; i < 5; i++) add(i % 2 ? M.model : M.dark, boxG(0.8, 0.02, 0.12, 17.4 + i * 0.8, PTOP + 0.01, 11.6));
   // деревья макета на подиуме
   const R = rng(17);
-  const trees = [[-16.4, -18.2], [-16.4, -12.5], [-16.4, -6], [-16.4, 0.5], [-16.4, 6.5], [-16.4, 11.5], [-11, 11.6], [-4, 11.6], [5, 11.6], [11.5, 11.6], [16.4, 11.5], [16.4, 5], [16.4, -2], [16.4, -8], [16.4, -14], [-10, -18.6], [-2, -18.6], [6, -18.6], [13, -18.6]];
+  const trees = [[-16.4, -18.2], [-16.4, -12.5], [-16.4, -6], [-16.4, 0.5], [-16.4, 6.5], [-16.4, 11.5], [-11, 11.6], [-4, 11.6], [5, 11.6], [11.5, 11.6], [22.1, 11.5], [22.1, 5], [22.1, -2], [22.1, -8], [22.1, -14], [-10, -18.6], [-2, -18.6], [6, -18.6], [13, -18.6], [20, -18.6], [16.4, 11.6]];
   trees.forEach(([x, z]) => { const r0 = 0.32 + R() * 0.16; add(M.brass, cylG(0.025, 0.03, 0.75, x, -0.25 + 0.375, z, 6), { cast: false }); const sp = new THREE.SphereGeometry(r0, 18, 12); sp.translate(x, -0.25 + 0.75 + r0 * 0.8, z); add(M.figure, sp); });
   drawPlaques();
 }
 function buildF2Base() {
-  add(M.slab2, boxG(31.2, 0.25, 27.9, 0, -0.125, -3.35));
+  add(M.slab2, boxG(37.3, 0.25, 27.9, 3.05, -0.125, -3.35));
   const port = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.04, 8, 24), M.frame); port.rotation.x = Math.PI / 2; port.position.set(12.9, PTOP + VH - FH, -8.7); ROOT.add(port);
   // колонны под консолью отдела маркетинга
-  for (const z of [-16.9, -13.9]) for (let x = -15; x <= 15.01; x += 6) add(M.brass, cylG(0.07, 0.07, FH, x, -0.25 - FH / 2, z, 12));
+  for (const z of [-16.9, -13.9]) for (let x = -15; x <= 21.01; x += 6) add(M.brass, cylG(0.07, 0.07, FH, x, -0.25 - FH / 2, z, 12));
+  for (const z of [-8.5, -3, 2.5, 8, 10.4]) for (const x of [16.5, 21.4]) add(M.brass, cylG(0.07, 0.07, FH, x, -0.25 - FH / 2, z, 12));
+  const port2 = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.04, 8, 24), M.frame); port2.rotation.x = Math.PI / 2; port2.position.set(13.6, PTOP + VH - FH, 8.2); ROOT.add(port2);
 }
 function drawPlaques() {
   const ink = C.champHex;
@@ -2502,16 +2659,33 @@ function buildPavilion() {
   qm.castShadow = true; qm.frustumCulled = false; qm.count = 0; ROOT.add(qm); pav.queue = qm;
   const hit = new THREE.Mesh(new THREE.CylinderGeometry(3.3, 3.3, 2.4, 24), new THREE.MeshBasicMaterial()); hit.position.set(P.x, P.y + 1.0, P.z); hit.visible = false; hit.userData.room = 'cloud'; hit.userData.floor = '2'; ROOT.add(hit); hits.push(hit);
 }
+const dhMods = [];
+function buildDhPavilion() {
+  const P = DPV;
+  add(M.model, cylG(3.1, 3.0, 0.24, P.x, P.y - 0.12, P.z, 64));
+  const ring = new THREE.TorusGeometry(3.02, 0.022, 8, 96); ring.rotateX(Math.PI / 2); ring.translate(P.x, P.y - 0.25, P.z); add(M.glow, ring, { cast: false, receive: false });
+  add(M.dark, boxG(4.6, 0.06, 2.3, P.x, P.y + 0.03, P.z));
+  const n = (DH.DHOS_SYS || []).length || 14;
+  for (let i = 0; i < n; i++) {
+    const c = i % 7, r = Math.floor(i / 7), x = P.x - 1.95 + c * 0.65, z = P.z - 0.5 + r * 1.0;
+    add(M.model, boxG(0.5, 0.42, 0.5, x, P.y + 0.27, z));
+    const top = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.02, 0.4), new THREE.MeshBasicMaterial({ toneMapped: false })); top.position.set(x, P.y + 0.49, z); ROOT.add(top); dhMods.push(top);
+  }
+  add(M.dark, boxG(0.5, 1.3, 0.3, P.x + 2.25, P.y + 0.65, P.z - 0.9)); add(M.glow, boxG(0.04, 1.1, 0.012, P.x + 2.25, P.y + 0.65, P.z - 0.74), { cast: false });
+  const hit = new THREE.Mesh(new THREE.CylinderGeometry(3.1, 3.1, 1.8, 24), new THREE.MeshBasicMaterial()); hit.position.set(P.x, P.y + 0.7, P.z); hit.visible = false; hit.userData.room = 'dhos'; hit.userData.floor = '2'; ROOT.add(hit); hits.push(hit);
+}
 const qPos = (i) => new V3(PAV.x + 0.15 + (i % 4) * 0.52, PAV.y + 0.18, PAV.z - 0.15 + Math.floor(i / 4) * 0.45);
 
 /* ---------- маяки над проблемными комнатами, подписи ---------- */
 const hits = [];
 const labels = {};
-const minis = {}; const MINI_ROOM = { p1s: 'print', k1: 'print', c: 'server', d: 'server', gpu: 'server' };
+const minis = {}; const deptLabels = {}; const MINI_ROOM = { p1s: 'print', k1: 'print', c: 'server', d: 'server', gpu: 'server' };
 function labelPos(id) {
   if (id === 'cloud') return new V3(PAV.x + 0.3, PAV.y + 2.25, PAV.z + 2.6);
   if (id === 'jarvis') return new V3(0, 2.35, 0.2);
+  if (id === 'dhos') return new V3(DPV.x, DPV.y + 1.6, DPV.z + 2.2);
   const r = L[id];
+  if (r.x0 > 15) return new V3(r.cx, 1.35, r.cz + 1.9);
   if (r.z0 >= 4) return new V3(r.cx, 1.0, r.z1 - 0.4);
   if (r.z1 <= -4) return new V3(r.cx, 1.35, r.zb - 0.3);
   return new V3(r.cx, 1.45, 2.35);
@@ -2535,6 +2709,18 @@ function buildLabels() {
       anim.beacons[r.id] = { g: bc, m: oct.material };
     }
   }
+  (DH.DEPTS || []).forEach((d) => {
+    const rs = d.rooms.filter((id) => L[id]); if (!rs.length) return;
+    const b = new THREE.Box3(); rs.forEach((id, i) => { const r = L[id]; const bb = new THREE.Box3(new V3(r.x0, 0, r.z0), new V3(r.x1, 0, r.z1)); if (i) b.union(bb); else b.copy(bb); });
+    const c = b.getCenter(new V3());
+    const el = document.createElement('div'); el.className = 'dl'; el.dataset.room = 'd:' + d.id; el.setAttribute('role', 'button'); el.tabIndex = 0;
+    el.innerHTML = esc3(d.name) + '<small>' + d.rooms.length + '</small>';
+    el.addEventListener('click', (e) => { e.stopPropagation(); DH.select('d:' + d.id); });
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); DH.select('d:' + d.id); } });
+    const DP = { mgmt: [0, 2.6, -1.0], prod: [-16.0, 2.2, -1.5], mk: [-5.0, 2.8, -17.6], money: [17.5, 2.8, -17.8], sales: [22.4, 2.2, 1.5], svc: [8.5, 1.4, 10.8] }; const pp = DP[d.id] || [c.x, 2.6, c.z];
+    const o = new CSS2DObject(el); o.center.set(0.5, 1); o.position.set(pp[0], pp[1], pp[2]); ROOT.add(o);
+    deptLabels[d.id] = { o, el };
+  });
   const mk = (key, txt, pos, cls) => { const el = document.createElement('div'); el.className = 'mini ' + (cls || ''); el.textContent = txt; const o = new CSS2DObject(el); o.center.set(0.5, 1); o.position.copy(pos); ROOT.add(o); minis[key] = el; };
   mk('p1s', 'P1S', new V3(-13.45, 1.95, 8.95)); mk('k1', 'K1', new V3(-11.3, 1.85, 8.95));
   mk('c', 'C: 96 %', new V3(13.0, 1.45, -6.4), 'bad'); mk('d', 'D: нет диска', new V3(14.05, 1.0, -6.4), 'warn');
@@ -2569,6 +2755,7 @@ function updateLabels() {
   for (const id in anim.beacons) { const st = DH.statusOf(id); anim.beacons[id].g.visible = st === 'bad' || st === 'wait'; }
   const showF2 = floor !== '1', showF1 = floor !== '2';
   for (const id in labels) labels[id].o.visible = showF2;
+  for (const id in deptLabels) { deptLabels[id].o.visible = showF2; deptLabels[id].el.classList.toggle('is-sel', selected === 'd:' + id); }
   for (const k in minis) minis[k].style.display = showF2 ? '' : 'none';
   labelsEl.classList.toggle('f1', floor === '1'); labelsEl.classList.toggle('fall', floor === 'all');
   for (const id in STUDIO.labels) {
@@ -2647,11 +2834,13 @@ function roomBox(id, out) {
   if (id === 'cloud') return out.set(new V3(PAV.x - 3.4, y + PAV.y - 0.3, PAV.z - 3.4), new V3(PAV.x + 3.4, y + PAV.y + 2.4, PAV.z + 3.4));
   if (id.startsWith('p:')) { const sl = STUDIO.slots.find((q) => 'p:' + q.p.id === id); const c = sl ? sl.pos : new V3(); return out.set(new V3(c.x - 1.7, 0, c.z - 1.7), new V3(c.x + 1.7, 1.9, c.z + 1.7)); }
   if (id.startsWith('z:')) { const g = ZG[id.slice(2)]; return out.set(new V3(g.x0, 0, g.z0), new V3(g.x1, H1, g.z1)); }
+  if (id.startsWith('d:')) { const d = (DH.DEPTS || []).find((x) => x.id === id.slice(2)); const rs = d ? d.rooms.filter((x) => L[x] || x === 'cloud' || x === 'dhos') : []; out.makeEmpty(); rs.forEach((x) => out.union(roomBox(x, new THREE.Box3()))); return out; }
+  if (id === 'dhos') return out.set(new V3(DPV.x - 3.2, y + DPV.y - 0.3, DPV.z - 3.2), new V3(DPV.x + 3.2, y + DPV.y + 1.6, DPV.z + 3.2));
   const r = L[id]; return out.set(new V3(r.x0, y, r.z0), new V3(r.x1, y + 2.0, r.z1));
 }
 function floorBox(f) {
   const y2 = f2y(f);
-  const b2 = new THREE.Box3(new V3(-16.2, y2 - 0.3, -17.6), new V3(27.0, y2 + 2.4, 11.4));
+  const b2 = new THREE.Box3(new V3(-16.2, y2 - 0.3, -17.6), new V3(31.2, y2 + 2.4, 11.0));
   const b1 = new THREE.Box3(new V3(-16.2, -0.3, -11.0), new V3(16.2, 2.4, 11.0));
   return f === '1' ? b1 : f === '2' ? b2 : b1.union(b2);
 }
@@ -2676,12 +2865,12 @@ function preset(name) {
   if (name === 'plan') {
     if (floor === '1') return fit(new THREE.Box3(new V3(-15.8, 0, -10.8), new V3(15.8, 0.5, 10.8)), new V3(0, 1, 0.015), narrow() ? 0.96 : 0.9);
     const y = f2y(floor === 'all' ? '2' : floor);
-    return fit(new THREE.Box3(new V3(-17.4, y, -18.0), new V3(27.4, y + 0.5, 12.0)), new V3(0, 1, 0.015), narrow() ? 0.96 : 0.92);
+    return fit(new THREE.Box3(new V3(-17.4, y, -18.0), new V3(31.4, y + 0.5, 12.0)), new V3(0, 1, 0.015), narrow() ? 0.96 : 0.92);
   }
   const b = floorBox(floor);
   if (floor === '1') return fit(b, narrow() ? new V3(0.18, 0.95, 0.75) : new V3(0.3, 0.68, 0.7), narrow() ? 1.0 : 0.96, new V3(0, 0, 0.4));
-  if (floor === '2') return fit(b, narrow() ? new V3(0.22, 0.95, 0.75) : new V3(0.34, 0.6, 0.74), narrow() ? 1.0 : 0.98, new V3(5.0, f2y('2'), -2.8));
-  return fit(b, narrow() ? new V3(0.2, 0.75, 0.85) : new V3(0.36, 0.42, 0.82), narrow() ? 1.0 : 0.97, new V3(narrow() ? 4 : 5.0, 3.6, -1.8));
+  if (floor === '2') return fit(b, narrow() ? new V3(0.22, 0.95, 0.75) : new V3(0.34, 0.6, 0.74), narrow() ? 1.0 : 0.98, new V3(7.5, f2y('2'), -3.0));
+  return fit(b, narrow() ? new V3(0.2, 0.75, 0.85) : new V3(0.36, 0.42, 0.82), narrow() ? 1.0 : 0.97, new V3(narrow() ? 6 : 7.0, 3.6, -1.8));
 }
 let fly = null, lastInput = performance.now();
 function flyTo(pos, target, dur) {
@@ -2694,8 +2883,8 @@ function flyTo(pos, target, dur) {
 function fitRoom(id) {
   const b = roomBox(id, new THREE.Box3()).expandByScalar(0.4);
   const person = id.startsWith('p:');
-  const dir = id === 'cloud' ? new V3(-0.4, 0.55, 0.85) : person ? new V3(0.35, 0.62, 0.75) : narrow() ? new V3(0.12, 0.95, 0.5) : new V3(0.3, 0.8, 0.62);
-  return fit(b, dir, person ? (narrow() ? 0.75 : 0.62) : narrow() ? 0.82 : 0.66);
+  const dir = id === 'cloud' || id === 'dhos' ? new V3(-0.4, 0.55, 0.85) : person ? new V3(0.35, 0.62, 0.75) : narrow() ? new V3(0.12, 0.95, 0.5) : new V3(0.3, 0.8, 0.62);
+  return fit(b, dir, person ? (narrow() ? 0.75 : 0.62) : id.startsWith('d:') ? (narrow() ? 0.92 : 0.82) : narrow() ? 0.82 : 0.66);
 }
 function flyRoom(id) { const f = fitRoom(id); flyTo(f.pos, f.target); }
 function flyRooms(ids) {
@@ -2774,6 +2963,8 @@ for (const id of Object.keys(SEATS)) if (id !== 'server') makeWalker(id, id === 
 buildCables();
 buildPavilion();
 const mainTube = new THREE.Mesh(new THREE.TubeGeometry(mainCurve, 160, 0.05, 8, false), M.mainCable); ROOT.add(mainTube);
+const dhTube = new THREE.Mesh(new THREE.TubeGeometry(dhCurve, 140, 0.045, 8, false), M.mainCable); ROOT.add(dhTube);
+buildDhPavilion();
 buildParticles();
 buildLabels();
 ROOT = F1; buildStudio();
@@ -2888,6 +3079,7 @@ function updMachines(t) {
   if (anim.cGauge) anim.cGauge.material.color.copy(C.bad).multiplyScalar(1.6 + (REDUCED ? 0 : Math.sin(t * 3.5) * 0.5));
   anim.rings.forEach((r, i) => { if (!REDUCED) { r.rotation.x += 0.004 * (i + 1); r.rotation.y += 0.006 * (3 - i); } });
   if (anim.globe && !REDUCED) anim.globe.rotation.y = t * 0.3;
+  dhMods.forEach((m, i) => { const ph = REDUCED ? 1 : 0.55 + 0.45 * Math.max(0, Math.sin(t * 1.6 - i * 0.45)); m.material.color.copy(C.glow).multiplyScalar((C.isDark ? 2.4 : 1.7) * ph); });
   if (anim.plane) { anim.plane.position.y = PAV.y + 1.15 + (REDUCED ? 0 : Math.sin(t * 1.3) * 0.08); anim.plane.rotation.y = REDUCED ? 0.5 : 0.5 + Math.sin(t * 0.5) * 0.3; }
   M.mainCable.color.copy(C.glow).multiplyScalar((C.isDark ? 1.8 : 1.3) * (on ? 1 : 0.25));
   M.cable.color.copy(C.glow).multiplyScalar((C.isDark ? 0.9 : 0.75) * (on ? 1 : 0.2));
@@ -2910,6 +3102,9 @@ function updParticles(dt, t) {
       if (!REDUCED) p.u = (p.u + p.v * dt + 1) % 1;
       mainCurve.getPointAt(p.u, tv);
       sc = 1.3;
+    } else if (p.k === 'dh') {
+      if (!REDUCED) p.u = (p.u + p.v * dt + 1) % 1;
+      dhCurve.getPointAt(p.u, tv); sc = 1.1; c = C.champ;
     } else {
       if (!REDUCED) p.u = (p.u + dt * 0.35) % 1;
       tv.set(PAV.x - 0.9, PAV.y + 9 - p.u * 7.6, PAV.z + 0.6);
