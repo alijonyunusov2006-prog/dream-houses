@@ -1,0 +1,382 @@
+<title>Офис Dreamhouses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap">
+<style>
+  /* Фирменный стиль Dreamhouses TJ: тёмно-синий, тёплый латте, Cormorant + Inter.
+     Макет: шапка · 3D-офис слева · карточка выбранного объекта справа · внизу «где проблемы». */
+  :root {
+    --navy: #1a1a2e; --navy-2: #22223a; --navy-3: #2b2b47;
+    --latte: #d4b08c; --latte-soft: rgba(212,176,140,.16); --latte-line: rgba(212,176,140,.35);
+    --beige: #f5f0e8; --text: #efe9df; --text-2: #b7b1a8; --text-3: #7a7a8c;
+    --ok: #6fcf97; --warn: #f2b35a; --bad: #ef6f6f; --off: #6b6b80;
+    --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--navy); color: var(--text); font-family: var(--font-body); font-size: 14px; line-height: 1.5; }
+  * { box-sizing: border-box; }
+  .app { min-height: 100%; display: grid; grid-template-rows: auto 1fr auto; }
+
+  /* шапка */
+  .top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; padding: 14px 20px 12px; border-bottom: 1px solid var(--latte-line); background: linear-gradient(180deg, rgba(212,176,140,.08), transparent); }
+  .brand { display: flex; align-items: baseline; gap: 12px; }
+  .brand .dh { font-family: var(--font-display); font-size: 30px; font-weight: 600; letter-spacing: 1px; color: #fff; line-height: 1; }
+  .brand .dh em { color: var(--latte); font-style: normal; }
+  .brand .sub { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--latte); }
+  .kpis { display: flex; flex-wrap: wrap; gap: 8px; }
+  .kpi { min-width: 118px; padding: 8px 12px; border: 1px solid var(--latte-line); background: rgba(255,255,255,.03); }
+  .kpi .l { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); }
+  .kpi .v { font-family: var(--font-display); font-size: 24px; font-weight: 600; line-height: 1.1; color: #fff; font-variant-numeric: tabular-nums; }
+  .kpi .v small { font-family: var(--font-body); font-size: 11px; color: var(--text-2); margin-left: 4px; font-weight: 400; }
+  .kpi.nodata .v { color: var(--text-3); }
+  .kpi.warn { border-color: var(--warn); } .kpi.warn .v { color: var(--warn); }
+
+  /* сцена + панель */
+  .main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; min-height: 0; }
+  @media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
+  .stage { position: relative; min-height: 420px; height: clamp(420px, 62vh, 760px); background: radial-gradient(ellipse at 50% 20%, #2a2a48 0%, var(--navy) 65%); overflow: hidden; }
+  .stage canvas { display: block; }
+  .labels { position: absolute; inset: 0; pointer-events: none; }
+  .tag { pointer-events: auto; cursor: pointer; transform: translate(-50%, -100%); white-space: nowrap; font-size: 11px; letter-spacing: .02em; padding: 3px 8px; border: 1px solid var(--latte-line); background: rgba(26,26,46,.82); color: var(--text); backdrop-filter: blur(4px); }
+  .tag.room { border: 0; background: transparent; color: var(--latte); letter-spacing: .18em; text-transform: uppercase; font-size: 10.5px; }
+  .tag.boss { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: #fff; border-color: var(--latte); }
+  .tag .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+  .dot.ok { background: var(--ok); box-shadow: 0 0 8px var(--ok); } .dot.now { background: var(--warn); box-shadow: 0 0 8px var(--warn); } .dot.todo { background: var(--off); } .dot.bad { background: var(--bad); box-shadow: 0 0 8px var(--bad); }
+  .hud { position: absolute; left: 14px; bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 11px; color: var(--text-2); pointer-events: none; }
+  .hud span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .hud .h-ok::before { background: var(--ok); } .hud .h-now::before { background: var(--warn); } .hud .h-todo::before { background: var(--off); } .hud .h-bad::before { background: var(--bad); }
+  .hint { position: absolute; right: 14px; top: 12px; font-size: 11px; color: var(--text-3); pointer-events: none; }
+  .nowebgl { position: absolute; inset: 0; display: none; place-items: center; padding: 24px; text-align: center; color: var(--text-2); }
+
+  .panel { border-left: 1px solid var(--latte-line); background: var(--navy-2); padding: 18px 18px 22px; min-width: 0; overflow: auto; }
+  @media (max-width: 900px) { .panel { border-left: 0; border-top: 1px solid var(--latte-line); } }
+  .panel h2 { font-family: var(--font-display); font-weight: 600; font-size: 26px; line-height: 1.1; margin: 0 0 4px; color: #fff; text-wrap: balance; }
+  .panel .eyebrow { font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--latte); margin-bottom: 6px; }
+  .pill { display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 999px; margin: 6px 0 12px; border: 1px solid; }
+  .pill.ok { color: var(--ok); border-color: var(--ok); } .pill.now { color: var(--warn); border-color: var(--warn); } .pill.todo { color: var(--text-2); border-color: var(--off); } .pill.bad { color: var(--bad); border-color: var(--bad); }
+  .panel p { margin: 0 0 10px; color: var(--text); }
+  .panel dl { margin: 12px 0 0; display: grid; grid-template-columns: 64px 1fr; gap: 6px 10px; font-size: 13px; }
+  .panel dt { color: var(--text-3); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; padding-top: 3px; }
+  .panel dd { margin: 0; }
+  .panel .path { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--text-2); word-break: break-all; }
+  .owner-list { margin: 0; padding: 0; list-style: none; }
+  .owner-list li { padding: 9px 0; border-top: 1px solid rgba(255,255,255,.07); display: grid; grid-template-columns: 10px 1fr; gap: 10px; align-items: start; }
+  .owner-list li .d { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; }
+  .owner-list b { display: block; font-weight: 600; color: #fff; }
+  .owner-list small { color: var(--text-2); }
+
+  /* проблемы */
+  .alerts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1px; background: var(--latte-line); border-top: 1px solid var(--latte-line); }
+  .alert { background: var(--navy); padding: 12px 16px 14px; min-width: 0; }
+  .alert .t { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 4px; }
+  .alert.bad .t { color: var(--bad); } .alert.warn .t { color: var(--warn); } .alert.ok .t { color: var(--ok); }
+  .alert b { display: block; color: #fff; font-weight: 600; margin-bottom: 2px; }
+  .alert span { color: var(--text-2); font-size: 12.5px; }
+  footer { padding: 10px 20px 14px; font-size: 11.5px; color: var(--text-3); border-top: 1px solid rgba(255,255,255,.06); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; }
+  footer a { color: var(--latte); }
+  @media (prefers-reduced-motion: reduce) { .stage * { transition: none !important; } }
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="dh">d<em>h</em></div>
+      <div>
+        <div class="sub">Dreamhouses · офис Jarvis</div>
+        <div style="font-size:12px;color:var(--text-2)">Один взгляд: что идёт, где стоит, где проблема. 3 октября 2026.</div>
+      </div>
+    </div>
+    <div class="kpis" aria-label="Показатели">
+      <div class="kpi"><div class="l">Этап</div><div class="v">2<small>из 7</small></div></div>
+      <div class="kpi"><div class="l">Готовность ядра</div><div class="v">29<small>/ 29 тестов</small></div></div>
+      <div class="kpi warn"><div class="l">Ждёт вас</div><div class="v">3<small>решения</small></div></div>
+      <div class="kpi nodata"><div class="l">Заявки сегодня</div><div class="v">—<small>CRM, этап 6</small></div></div>
+      <div class="kpi nodata"><div class="l">Просрочки команды</div><div class="v">—<small>CRM, этап 6</small></div></div>
+      <div class="kpi nodata"><div class="l">Печать</div><div class="v">—<small>принтеры позже</small></div></div>
+    </div>
+  </header>
+
+  <section class="main">
+    <div class="stage" id="stage">
+      <div class="labels" id="labels"></div>
+      <div class="hint">Крутите мышью · колесо — ближе · клик по столу</div>
+      <div class="hud"><span class="h-ok">работает / готово</span><span class="h-now">идёт или ждёт вас</span><span class="h-todo">ещё нет</span><span class="h-bad">проблема</span></div>
+      <div class="nowebgl" id="nowebgl">3D не поддерживается в этом окне. Откройте на компьютере или смотрите <a href="https://claude.ai/artifact/MMn9bqtRDoMrC3W1DUfhEN">плоский план офиса</a>.</div>
+    </div>
+
+    <aside class="panel" id="panel" aria-live="polite">
+      <div id="p-home">
+        <div class="eyebrow">Для владельца</div>
+        <h2>Что происходит</h2>
+        <ul class="owner-list">
+          <li><span class="d" style="background:var(--ok)"></span><div><b>Каркас Jarvis собран</b><small>Ядро с тестами, 10 агентов, второй мозг с вашими решениями, навыки Archicad и диска. Всё в репозитории.</small></div></li>
+          <li><span class="d" style="background:var(--warn)"></span><div><b>Работа стоит на одном месте</b><small>Ни один агент ещё не работал на вашем ПК. Нужен доступ: Claude Desktop или claude remote-control.</small></div></li>
+          <li><span class="d" style="background:var(--warn)"></span><div><b>Три решения за вами</b><small>Приватный репозиторий · подключить ПК · запустить установщик.</small></div></li>
+          <li><span class="d" style="background:var(--off)"></span><div><b>Команда и клиенты появятся здесь</b><small>Когда подключим вашу CRM (этап 6), столы в зоне «Команда» займут настоящие сотрудники: кто над чем, у кого просрочка.</small></div></li>
+        </ul>
+        <p style="margin-top:14px;color:var(--text-3);font-size:12.5px">Нажмите на любой стол в офисе, чтобы увидеть подробности.</p>
+      </div>
+      <div id="p-item" hidden>
+        <div class="eyebrow" id="p-room"></div>
+        <h2 id="p-title"></h2>
+        <span class="pill" id="p-pill"></span>
+        <p id="p-desc"></p>
+        <dl>
+          <dt>Сейчас</dt><dd id="p-now"></dd>
+          <dt>Нужно</dt><dd id="p-need"></dd>
+          <dt>Где</dt><dd class="path" id="p-where"></dd>
+        </dl>
+        <p style="margin-top:14px"><a href="#" id="p-back" style="color:var(--latte);font-size:12.5px">← ко всему офису</a></p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="alerts" aria-label="Где проблемы">
+    <div class="alert bad"><div class="t">Проблема</div><b>Диск C: почти полон</b><span>≈ 80 ГБ из 1,86 ТБ. Через неделю HDD: архив уедет на D:, ежедневное останется на C:.</span></div>
+    <div class="alert warn"><div class="t">Стоит</div><b>ПК не подключён</b><span>Этап 3 не начинается без доступа к компьютеру.</span></div>
+    <div class="alert warn"><div class="t">Риск</div><b>Репозиторий сайта публичный</b><span>Память Jarvis туда нельзя. Решение: отдельный приватный репозиторий.</span></div>
+    <div class="alert warn"><div class="t">Сломано</div><b>Telegram-бот вашей CRM</b><span>Чиним на этапе 6, нужна ссылка на репозиторий CRM.</span></div>
+    <div class="alert ok"><div class="t">Хорошо</div><b>Железо с запасом</b><span>i9 · 64 ГБ · RTX 3090: локальные модели, речь и голос без облака.</span></div>
+  </section>
+
+  <footer>
+    <span>Jarvis обновляет этот офис после каждого этапа. Плоский план: <a href="https://claude.ai/artifact/MMn9bqtRDoMrC3W1DUfhEN">чертёж</a>.</span>
+    <span>Исходник: jarvis/docs/office3d/index.html</span>
+  </footer>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+// ---------- данные (то же, что в brain/, честно: что определено, что нет) ----------
+const ROOMS = {
+  reception: { name: 'Приёмная · каналы', x: -11, z: -7, w: 7, d: 6 },
+  boss:      { name: 'Кабинет управляющего', x: -3.5, z: -7, w: 7, d: 6 },
+  server:    { name: 'Серверная', x: 4, z: -7, w: 8, d: 6 },
+  open:      { name: 'Агенты', x: -11, z: 0, w: 14, d: 7 },
+  team:      { name: 'Команда (из CRM)', x: 4, z: 0, w: 8, d: 7 },
+  shop:      { name: 'Мастерская', x: -11, z: 8, w: 9, d: 6 },
+  archive:   { name: 'Архив · второй мозг', x: -1, z: 8, w: 13, d: 6 },
+};
+const ITEMS = [
+  // id, room, label, status, x, z, kind
+  { id:'jarvis', room:'boss', label:'JARVIS', s:'ok', x:-3.5, z:-7, kind:'boss',
+    t:'JARVIS — управляющий', d:'Слушает длинное задание, отвечает «вот что я понял», пишет ТЗ и план, раздаёт работу агентам, проверяет и отчитывается. Сам не исполняет.', now:'Конституция написана (CLAUDE.md). Работает в Claude Code по подписке Max.', need:'Подключённый компьютер.', where:'jarvis/CLAUDE.md' },
+  { id:'telegram', room:'reception', label:'Telegram-бот', s:'todo', x:-12.5, z:-8,
+    t:'Telegram-бот', d:'Задания голосом и текстом с телефона, фото планов, пересланные сообщения клиентов, команды /статус и /режим. Отвечает только вам.', now:'Контракт очереди готов. Код — этап 3.', need:'Токен бота, ваш chat_id.', where:'core/gateway/' },
+  { id:'window', room:'reception', label:'Окно на ПК', s:'now', x:-9.5, z:-8,
+    t:'Окно Jarvis на ПК', d:'Приложение OpenJarvis: чат, память, трей, автозапуск — когда вы за компьютером.', now:'Установщик готов, на ПК не запускался.', need:'Запустить Установить-Jarvis.bat.', where:'jarvis/Установить-Jarvis.bat' },
+  { id:'voice', room:'reception', label:'Голос «Джарвис»', s:'todo', x:-11, z:-5.5,
+    t:'Голос и слово-активатор', d:'Говорите с ПК без кнопок, он отвечает голосом. Бесплатно и локально: Qwen3-TTS, Chatterbox, Piper; активатор openWakeWord.', now:'Выбор сделан, установка — этап 7.', need:'Микрофон, этап 7.', where:'PLAN.md §12' },
+  { id:'pc', room:'server', label:'ПК «Alijon»', s:'now', x:2, z:-8,
+    t:'ПК «Alijon»', d:'i9-13900K · 64 ГБ · RTX 3090 24 ГБ. Тянет локальные модели до 27B, речь и голос. Диск C: почти полон.', now:'Записан, настройки машины созданы. Доступ ещё не дан.', need:'Claude Desktop или claude remote-control.', where:'config/machines/Alijon.toml' },
+  { id:'cloud', room:'server', label:'Облако', s:'todo', x:6, z:-8,
+    t:'Облачный шлюз', d:'Принимает задания, когда ПК выключен; держит очередь. Vercel + Supabase, бесплатно, уже подключены.', now:'Схема готова, развёртывание — этап 3.', need:'Ваше «да».', where:'core/gateway/schema.sql' },
+  { id:'core', room:'server', label:'Ядро · 29 тестов', s:'ok', x:4, z:-5.5,
+    t:'Ядро jarviscore', d:'Разрешения (можно / спросить / нельзя), планировщик с ресурсами, запуск Claude Code с учётом расходов, формат отчёта, хуки-охранники.', now:'Проверено тестами. На Windows не запускалось.', need:'Python на ПК (ставит установщик).', where:'core/jarviscore/' },
+  { id:'planner', room:'open', label:'planner', s:'ok', x:-15, z:-1.5, t:'planner — планировщик', d:'Из вашего рассказа делает ТЗ, критерии готовности и план с оценкой времени.', now:'Определён. Модель Opus.', need:'Первое задание.', where:'.claude/agents/planner.md' },
+  { id:'developer', room:'open', label:'developer', s:'ok', x:-12, z:-1.5, t:'developer — разработчик', d:'Пишет код в отдельной папке проекта: тест → код → коммит. Вашу CRM не трогает.', now:'Определён. Модель Sonnet.', need:'Папка C:\\Projects.', where:'.claude/agents/developer.md' },
+  { id:'tester', room:'open', label:'tester', s:'ok', x:-9, z:-1.5, t:'tester — тестировщик', d:'Не верит разработчику: запускает тесты, пробует сценарии, делает скриншоты, пишет протокол.', now:'Определён.', need:'—', where:'.claude/agents/tester.md' },
+  { id:'crm', room:'open', label:'crm', s:'ok', x:-6, z:-1.5, t:'crm — ваша CRM', d:'Читает вашу CRM: проекты, задачи, просрочки, заявки. Записи — только с подтверждения.', now:'Определён. Ключа на чтение пока нет.', need:'Репозиторий CRM и ключ.', where:'.claude/agents/crm.md' },
+  { id:'content', room:'open', label:'content', s:'ok', x:-15, z:2, t:'content — контент', d:'Контент-планы, карусели, сторис, Reels для @dream_houses.tj. Публикует утверждённое через Metricool.', now:'Определён. Metricool подключён.', need:'Голос бренда.', where:'.claude/agents/content.md' },
+  { id:'browser', room:'open', label:'browser', s:'ok', x:-12, z:2, t:'browser — браузер', d:'Данные с разрешённых сайтов, проверка страниц, скриншоты. Правила площадок не обходит.', now:'Определён.', need:'Playwright, этап 5.', where:'.claude/agents/browser.md' },
+  { id:'secretary', room:'open', label:'secretary', s:'ok', x:-9, z:2, t:'secretary — секретарь', d:'Дайджест в 08:00: календарь, письма, заявки, сроки, что ждёт вашего решения.', now:'Определён. Модель Haiku.', need:'Telegram-бот.', where:'.claude/agents/secretary.md' },
+  { id:'sysadmin', room:'open', label:'sysadmin', s:'ok', x:-6, z:2, t:'sysadmin — сисадмин', d:'Аудит диска без удаления, четыре корзины, порядок в файлах, поиск за секунду (Everything), бэкапы.', now:'Скрипт аудита проверен на тестовой папке.', need:'Запуск на ПК; HDD.', where:'skills/disk-audit/' },
+  { id:'emp1', room:'team', label:'Сотрудник', s:'todo', x:2, z:-1.5, kind:'emp', t:'Стол сотрудника', d:'Здесь будет настоящий человек из вашей CRM: имя, над чем работает сегодня, что просрочено. Данных пока нет — и выдумывать их Jarvis не станет.', now:'Ждёт подключения CRM (этап 6).', need:'Доступ к CRM на чтение.', where:'brain/75-crm/' },
+  { id:'emp2', room:'team', label:'Сотрудник', s:'todo', x:6, z:-1.5, kind:'emp', t:'Стол сотрудника', d:'Здесь будет настоящий человек из вашей CRM: имя, над чем работает сегодня, что просрочено.', now:'Ждёт подключения CRM (этап 6).', need:'Доступ к CRM на чтение.', where:'brain/75-crm/' },
+  { id:'emp3', room:'team', label:'Сотрудник', s:'todo', x:2, z:2, kind:'emp', t:'Стол сотрудника', d:'Здесь будет настоящий человек из вашей CRM.', now:'Ждёт подключения CRM (этап 6).', need:'Доступ к CRM на чтение.', where:'brain/75-crm/' },
+  { id:'emp4', room:'team', label:'Сотрудник', s:'todo', x:6, z:2, kind:'emp', t:'Стол сотрудника', d:'Здесь будет настоящий человек из вашей CRM.', now:'Ждёт подключения CRM (этап 6).', need:'Доступ к CRM на чтение.', where:'brain/75-crm/' },
+  { id:'archicad', room:'shop', label:'archicad', s:'ok', x:-13.5, z:7, t:'archicad — планировки', d:'Планировки в Archicad по фото и размерам через Tapir + MCP. Отчёт скриншотами и данными модели.', now:'Навык написан, на ПК не проверен.', need:'Версия Archicad; установка Tapir.', where:'skills/archicad/' },
+  { id:'3d', room:'shop', label:'3d', s:'ok', x:-9.5, z:7, t:'3d — модели и печать', d:'Заказы на печать: фото → ТЗ → 3ds Max/Blender → проверка сетки → нарезка в OrcaSlicer. Печать с подтверждения.', now:'Определён. Принтеры записаны.', need:'Обсудим позже.', where:'.claude/agents/3d.md' },
+  { id:'p1s', room:'shop', label:'P1S', s:'todo', x:-13, z:10, kind:'printer', t:'Bambu Lab P1S', d:'Многоцветная печать с AMS. Управление через LAN-only + Developer Mode.', now:'Записан. Подключение позже.', need:'Включить режимы, одна Wi-Fi.', where:'brain/70-3d-print/принтеры.md' },
+  { id:'k1', room:'shop', label:'K1', s:'todo', x:-9.5, z:10, kind:'printer', t:'Creality K1', d:'Одноцветный. Управление через root + Moonraker.', now:'Записан. Подключение позже.', need:'Root и Moonraker.', where:'brain/70-3d-print/принтеры.md' },
+  { id:'rules', room:'archive', label:'Правила · 38', s:'ok', x:-5, z:8, kind:'shelf', t:'Правила, три полки', d:'always — делать так. decided — решено. always-ask — спрашивать каждый раз. Ваш ответ на вопрос становится правилом.', now:'Заполнено вашими решениями.', need:'Ответы на открытые вопросы.', where:'brain/10-rules/' },
+  { id:'profile', room:'archive', label:'Кто вы · файлы', s:'ok', x:-1.5, z:8, kind:'shelf', t:'Кто вы и где что лежит', d:'Профиль, компьютер, принтеры, сервисы, карта файлов: ежедневное на C:, архив на D:.', now:'Актуально на 3 октября.', need:'—', where:'brain/20-me/' },
+  { id:'questions', room:'archive', label:'Вопросы · 6', s:'now', x:2, z:8, kind:'shelf', t:'Вопросы к вам', d:'Приватный репозиторий, версия Archicad, объём HDD, версия 3ds Max, аудит диска сейчас?, кто работает в Archicad.', now:'Отвечать можно голосом.', need:'Ваши ответы.', where:'brain/00-inbox/questions.md' },
+  { id:'skills', room:'archive', label:'Навыки · уроки', s:'ok', x:5.5, z:8, kind:'shelf', t:'Навыки и уроки', d:'Чему Jarvis научился: инструкции, тесты, история. Уроки — ошибки, ставшие правилами.', now:'archicad, disk-audit, learn-from-owner. Уроков пока нет.', need:'Реальная работа на ПК.', where:'skills/, brain/90-lessons/' },
+];
+const COLORS = { ok: 0x6fcf97, now: 0xf2b35a, todo: 0x6b6b80, bad: 0xef6f6f };
+
+// ---------- сцена ----------
+const stage = document.getElementById('stage');
+const labelsEl = document.getElementById('labels');
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+} catch (e) {
+  document.getElementById('nowebgl').style.display = 'grid';
+  throw e;
+}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+stage.insertBefore(renderer.domElement, labelsEl);
+const labelRenderer = new CSS2DRenderer({ element: labelsEl });
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x1a1a2e, 40, 80);
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
+camera.position.set(14, 20, 24);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.maxPolarAngle = Math.PI / 2.25; controls.minDistance = 10; controls.maxDistance = 48;
+controls.target.set(-2, 0, 1);
+controls.autoRotate = true; controls.autoRotateSpeed = 0.35;
+controls.addEventListener('start', () => { controls.autoRotate = false; });
+
+scene.add(new THREE.HemisphereLight(0xcfd8ff, 0x1a1a2e, 0.9));
+const key = new THREE.DirectionalLight(0xfff1dc, 1.4);
+key.position.set(10, 22, 8); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048); key.shadow.camera.left = -22; key.shadow.camera.right = 22; key.shadow.camera.top = 22; key.shadow.camera.bottom = -22;
+scene.add(key);
+const fill = new THREE.PointLight(0xd4b08c, 40, 30); fill.position.set(-4, 6, -6); scene.add(fill);
+
+// пол
+const floorMat = new THREE.MeshStandardMaterial({ color: 0x24243c, roughness: 0.9, metalness: 0.05 });
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 28), floorMat);
+floor.rotation.x = -Math.PI / 2; floor.position.set(-2, 0, 1.5); floor.receiveShadow = true; scene.add(floor);
+const grid = new THREE.GridHelper(40, 40, 0x3a3a5c, 0x2c2c48); grid.position.set(-2, 0.01, 1.5); scene.add(grid);
+
+// комнаты: низкие стены цвета латте
+const wallMat = new THREE.MeshStandardMaterial({ color: 0xd4b08c, roughness: 0.6, metalness: 0.1, transparent: true, opacity: 0.55 });
+const edgeMat = new THREE.LineBasicMaterial({ color: 0xd4b08c, transparent: true, opacity: 0.9 });
+function room(r) {
+  const h = 0.9, t = 0.12;
+  const g = new THREE.Group();
+  const segs = [
+    [r.x, r.z - r.d / 2, r.w, t], [r.x, r.z + r.d / 2, r.w, t],
+    [r.x - r.w / 2, r.z, t, r.d], [r.x + r.w / 2, r.z, t, r.d],
+  ];
+  for (const [x, z, w, d] of segs) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
+    m.position.set(x, h / 2, z); m.castShadow = true; m.receiveShadow = true; g.add(m);
+    g.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), edgeMat).translateX(x).translateY(h / 2).translateZ(z));
+  }
+  const tag = document.createElement('div'); tag.className = 'tag room'; tag.textContent = r.name;
+  const lab = new CSS2DObject(tag); lab.position.set(r.x - r.w / 2 + 0.3, 1.6, r.z - r.d / 2 + 0.3); lab.center.set(0, 1);
+  g.add(lab);
+  scene.add(g);
+}
+Object.values(ROOMS).forEach(room);
+
+// стол
+const deskMat = new THREE.MeshStandardMaterial({ color: 0xf5f0e8, roughness: 0.55 });
+const legMat = new THREE.MeshStandardMaterial({ color: 0x3a3a5c, roughness: 0.8 });
+const screenMat = new THREE.MeshStandardMaterial({ color: 0x0f0f1c, emissive: 0x2a3a60, emissiveIntensity: 0.9, roughness: 0.3 });
+const shelfMat = new THREE.MeshStandardMaterial({ color: 0x8c6a4a, roughness: 0.7 });
+const printerMat = new THREE.MeshStandardMaterial({ color: 0x3b3b55, roughness: 0.5, metalness: 0.2 });
+const pickables = [];
+function lamp(status) {
+  const c = COLORS[status];
+  const m = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: status === 'todo' ? 0.2 : 1.2 }));
+  return m;
+}
+function desk(it) {
+  const g = new THREE.Group(); g.position.set(it.x, 0, it.z); g.userData = it;
+  const isBoss = it.kind === 'boss', isShelf = it.kind === 'shelf', isPr = it.kind === 'printer';
+  if (isShelf) {
+    const b = new THREE.Mesh(new THREE.BoxGeometry(2.6, 2.2, 0.6), shelfMat); b.position.y = 1.1; b.castShadow = true; g.add(b);
+    for (let i = 0; i < 3; i++) { const p = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.05, 0.55), deskMat); p.position.set(0, 0.5 + i * 0.6, 0.02); g.add(p); }
+    const l = lamp(it.s); l.position.set(1.1, 2.45, 0); g.add(l);
+  } else if (isPr) {
+    const b = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.5, 1.4), printerMat); b.position.y = 0.75; b.castShadow = true; g.add(b);
+    const win = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.7, 0.05), screenMat); win.position.set(0, 0.8, 0.72); g.add(win);
+    const l = lamp(it.s); l.position.set(0.5, 1.7, 0.5); g.add(l);
+  } else {
+    const w = isBoss ? 3.4 : 2.2, d = isBoss ? 1.6 : 1.1;
+    const top = new THREE.Mesh(new THREE.BoxGeometry(w, 0.08, d), deskMat); top.position.y = 0.76; top.castShadow = true; top.receiveShadow = true; g.add(top);
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.74, 0.08), legMat); leg.position.set(sx * (w / 2 - 0.15), 0.37, sz * (d / 2 - 0.15)); g.add(leg);
+    }
+    const scr = new THREE.Mesh(new THREE.BoxGeometry(isBoss ? 1.6 : 0.9, isBoss ? 0.9 : 0.55, 0.05), screenMat); scr.position.set(0, 0.76 + (isBoss ? 0.6 : 0.42), -d / 2 + 0.2); g.add(scr);
+    const chair = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.1, 20), legMat); chair.position.set(0, 0.45, d / 2 + 0.45); g.add(chair);
+    const l = lamp(it.s); l.position.set(w / 2 - 0.25, 0.98, d / 2 - 0.25); g.add(l);
+    if (it.kind === 'emp') { // пустое кресло — человека пока нет
+      const ghost = new THREE.Mesh(new THREE.CapsuleGeometry(0.22, 0.5, 4, 10), new THREE.MeshStandardMaterial({ color: 0x6b6b80, transparent: true, opacity: 0.25 }));
+      ghost.position.set(0, 0.95, d / 2 + 0.45); g.add(ghost);
+    }
+    if (isBoss) {
+      const glow = new THREE.PointLight(0xd4b08c, 8, 6); glow.position.set(0, 1.6, 0); g.add(glow);
+    }
+  }
+  // подпись
+  const tag = document.createElement('div');
+  tag.className = 'tag' + (isBoss ? ' boss' : '');
+  tag.innerHTML = `<span class="dot ${it.s}"></span>${it.label}`;
+  tag.addEventListener('click', () => select(it.id));
+  const lab = new CSS2DObject(tag); lab.position.set(0, isShelf ? 2.9 : (isBoss ? 2.2 : 1.7), 0); g.add(lab);
+  g.traverse((o) => { if (o.isMesh) { o.userData.item = it; pickables.push(o); } });
+  scene.add(g);
+}
+ITEMS.forEach(desk);
+
+// ПК в серверной — башня
+{
+  const tower = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.3, 1.2), printerMat); tower.position.set(0.9, 0.65, -8); tower.castShadow = true; scene.add(tower);
+}
+
+// ---------- выбор ----------
+const ray = new THREE.Raycaster(); const ptr = new THREE.Vector2();
+let selected = null;
+const byId = Object.fromEntries(ITEMS.map((i) => [i.id, i]));
+function select(id) {
+  const it = byId[id]; if (!it) return;
+  selected = id;
+  document.getElementById('p-home').hidden = true;
+  const box = document.getElementById('p-item'); box.hidden = false;
+  document.getElementById('p-room').textContent = ROOMS[it.room].name;
+  document.getElementById('p-title').textContent = it.t;
+  const pill = document.getElementById('p-pill');
+  pill.textContent = { ok: 'готово / определено', now: 'идёт · ждёт вас', todo: 'ещё нет', bad: 'проблема' }[it.s]; pill.className = 'pill ' + it.s;
+  document.getElementById('p-desc').textContent = it.d;
+  document.getElementById('p-now').textContent = it.now;
+  document.getElementById('p-need').textContent = it.need;
+  document.getElementById('p-where').textContent = it.where;
+  controls.autoRotate = false;
+  if (window.innerWidth < 900) document.getElementById('panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  try { localStorage.setItem('dh-office-sel', id); } catch (e) {}
+}
+document.getElementById('p-back').addEventListener('click', (e) => {
+  e.preventDefault(); selected = null;
+  document.getElementById('p-item').hidden = true; document.getElementById('p-home').hidden = false;
+  try { localStorage.removeItem('dh-office-sel'); } catch (e2) {}
+});
+let downAt = null;
+renderer.domElement.addEventListener('pointerdown', (e) => { downAt = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', (e) => {
+  if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 6) return;
+  const r = renderer.domElement.getBoundingClientRect();
+  ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ptr, camera);
+  const hit = ray.intersectObjects(pickables, false)[0];
+  if (hit && hit.object.userData.item) select(hit.object.userData.item.id);
+});
+
+// ---------- размер и цикл ----------
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setSize(w, h); labelRenderer.setSize(w, h);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(stage); resize();
+const clock = new THREE.Clock();
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (reduce) controls.autoRotate = false;
+function tick() {
+  const t = clock.getElapsedTime();
+  if (!reduce) scene.traverse((o) => { if (o.isMesh && o.geometry.type === 'SphereGeometry' && o.material.emissiveIntensity > 0.5) o.material.emissiveIntensity = 1 + 0.35 * Math.sin(t * 2 + o.position.x); });
+  controls.update(); renderer.render(scene, camera); labelRenderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+tick();
+try { const s = localStorage.getItem('dh-office-sel'); if (s && byId[s]) select(s); } catch (e) {}
+</script>
