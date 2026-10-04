@@ -155,7 +155,7 @@
 | Higgsfield `generate_image` | генерация вариантов логотипа (тратит кредиты Higgsfield) | подключение владельца | с согласия на расход |
 | Figma MCP | чистовой вектор логотипа, брендбук в Figma | подключение владельца | используем |
 | `canvas-design` | постеры, обложки, визуалы | навык владельца | используем |
-| logo-designer (luongnv89/skills) | 7 SVG-вариантов логотипа + страница-витрина | claudskills.com | кандидат, проверить код |
+| logo-designer (luongnv89/skills) | 7 SVG-вариантов логотипа + страница-витрина | `.claude/skills/logo-designer`, MIT | **добавлен 2026-10-04**, код проверен |
 | ckm:design (ui-ux-pro-max-skill) | логотипы 55+ стилей через Gemini, айдентика | claudemarketplaces.com | кандидат, проверить код |
 | brand-identity | система айдентики: лого, цвет, шрифт, образы | claudskills.com | кандидат, проверить код |
 
