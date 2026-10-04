@@ -228,11 +228,11 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-si
           <input id="hours" type="text" value="Пн–Сб 10:00–20:00"></label>
         <label class="f">Доставка по Душанбе, сомони (0 — нет доставки)
           <input id="deliv" type="number" min="0" step="1" value="15"></label>
-        <label class="f">Первая строка описания
+        <label class="f">Вариант описания
           <select id="hook">
-            <option value="0">3D-печать в Душанбе · слой за слоем</option>
-            <option value="1">Печатаем вещи, которых нет в магазинах</option>
-            <option value="2">Лампы и подарки на 3D-принтере · Душанбе</option>
+            <option value="0">1 — «Напечатаем то, чего нет в магазинах» (советую)</option>
+            <option value="1">2 — Спокойный, без значков</option>
+            <option value="2">3 — Про подарки</option>
           </select></label>
       </div>
       <p class="small muted" style="margin-top:10px">Свободен ли ник, проверьте в приложении: Instagram закрыт для моей облачной сессии. Если «qabat» занят, берите следующий по списку.</p>
@@ -467,21 +467,31 @@ async function copy(text, btn){
 }
 
 /* ---------- профиль ---------- */
-const HOOKS = ['3D-печать в Душанбе · слой за слоем', 'Печатаем вещи, которых нет в магазинах', 'Лампы и подарки на 3D-принтере · Душанбе'];
-const HOOKS_TJ = ['Чопи 3D дар Душанбе · қабат ба қабат', 'Чизҳое, ки дар мағоза нестанд', 'Чароғ ва тӯҳфа бо принтери 3D · Душанбе'];
+// Описание профиля: 4 строки ≤150 знаков. 1 — чем отличаемся, 2–3 — что заказать, 4 — где мы и что делать.
+// Длина проверена для всех вариантов, с доставкой и без (2026-10-04).
+const BIO = {
+  ru: [
+    [['Напечатаем то, чего нет в магазинах', '💡 Лампы · 🎁 подарки с именем · игрушки', '🔧 Сломалась деталь — сделаем новую'], '📍 Душанбе · заказ в Direct ↓', '📍 Душанбе, доставка · Direct ↓'],
+    [['3D-печать слой за слоем', 'Лампы, подарки, игрушки и детали на заказ', 'Печатаем то, чего нет в магазинах'], 'Душанбе · цена и срок — в Direct', 'Душанбе, доставка · цена и срок — в Direct'],
+    [['Подарок, которого нет ни у кого 🎁', 'Ночник с вашим фото · брелок с номером машины', 'Лампы, игрушки, декор'], '📍 Душанбе · заказ в Direct ↓', '📍 Душанбе, доставка · заказ в Direct ↓']
+  ],
+  tj: [
+    [['Чизе, ки дар мағоза нест, чоп мекунем', '💡 Чароғ · 🎁 тӯҳфа бо ном · бозича', '🔧 Қисм шикаст? Навашро месозем'], '📍 Душанбе · фармоиш дар Direct ↓', '📍 Душанбе, расондан · Direct ↓'],
+    [['Чопи 3D қабат ба қабат', 'Чароғ, тӯҳфа, бозича ва қисмҳо бо фармоиш', 'Чизе, ки дар мағоза нест, чоп мекунем'], 'Душанбе · нарх ва мӯҳлат — дар Direct', 'Душанбе, расондан · нарх — дар Direct'],
+    [['Тӯҳфае, ки дигар ҳеҷ кас надорад 🎁', 'Шабчароғ бо акси шумо · брелок бо рақами мошин', 'Чароғ, бозича, ороиш'], '📍 Душанбе · фармоиш дар Direct ↓', '📍 Душанбе, расондан · фармоиш дар Direct ↓']
+  ]
+};
 const pf = ['nick','phone','addr','hours','deliv','hook'];
 pf.forEach(id => { const el = $('#' + id); const v = store.get('f.' + id, null); if(v !== null) el.value = v; el.addEventListener('input', () => { store.set('f.' + id, el.value); renderProfile(); renderChat(); renderContacts(); renderAll(); }); });
 function digits(){ return ($('#phone').value || '').replace(/\D/g,''); }
-function bioRu(){
-  const dv = +$('#deliv').value || 0;
-  return [HOOKS[+$('#hook').value || 0], 'Лампы · подарки · брелоки с номером', 'Детали и макеты на заказ', (dv > 0 ? 'Доставка по городу · ' : '') + 'Заказ — в Direct ↓'].join('\n');
+function bio(lang){
+  const v = BIO[lang][+$('#hook').value || 0];
+  return v[0].concat((+$('#deliv').value || 0) > 0 ? v[2] : v[1]).join('\n');
 }
-function bioTj(){
-  const dv = +$('#deliv').value || 0;
-  return [HOOKS_TJ[+$('#hook').value || 0], 'Чароғ · тӯҳфа · брелок бо рақам', 'Қисмҳо ва макетҳо бо фармоиш', (dv > 0 ? 'Расондан дар шаҳр · ' : '') + 'Фармоиш — дар Direct ↓'].join('\n');
-}
+function bioRu(){ return bio('ru'); }
+function bioTj(){ return bio('tj'); }
 function out(k, text, note){
-  const len = [...text].length;
+  const len = text.length;
   const cnt = note === 'bio' ? `<span class="count ${len > 150 ? 'bad' : ''}">${len} из 150 знаков</span>` : (note ? `<span class="count">${esc(note)}</span>` : '');
   return `<div class="out"><div class="k">${esc(k)}</div><pre>${esc(text)}</pre><button type="button" class="btn" data-copy>Копировать</button>${cnt ? '<div style="grid-column:1/-1">' + cnt + '</div>' : ''}</div>`;
 }
