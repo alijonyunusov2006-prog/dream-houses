@@ -172,7 +172,7 @@
   .stage-demo { font: 600 9.5px/1 var(--f-mono); letter-spacing: .2em; color: var(--warn); border: 1px dashed color-mix(in oklab, var(--warn) 60%, transparent); padding: 5px 7px; border-radius: 6px; background: var(--overlay); display: inline-block; margin-top: 6px; }
   @media (max-width: 760px) {
     .hud-tl { right: 12px; }
-    .hud-tr { top: auto; bottom: 62px; }
+    .hud-tr { top: auto; bottom: calc(var(--lg-h, 50px) + 20px); }
     .hud-br { display: none; }
     .hud-bl { right: 12px; }
     .seg-b { padding: 7px 9px; font-size: 12px; }
@@ -389,13 +389,16 @@
   .say-mic:disabled { cursor: not-allowed; opacity: .75; }
   .say-hint, .say-card, .say-honest { grid-column: 2; margin: 0; }
   .say-hint { font-size: 12px; color: var(--muted); }
+  .say-ex { color: var(--champ-ink); cursor: pointer; text-decoration: underline; text-decoration-color: color-mix(in oklab, var(--champ) 50%, transparent); text-underline-offset: 3px; text-align: left; }
+  .say-ex:hover { color: var(--ink); }
   .say-card { padding: 12px 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line-2); }
   .say-card h3 { font: 600 22px/1.15 var(--f-display); margin: 4px 0 8px; }
   .say-dl { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 6px 12px; margin: 0; font-size: 13.5px; }
   .say-dl dt { font: 500 9.5px/1.9 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
   .say-dl dd { margin: 0; color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
   .say-honest { font-size: 12.5px; color: var(--ink); padding: 8px 10px; border-radius: 9px; border: 1px dashed color-mix(in oklab, var(--warn) 60%, var(--line)); background: color-mix(in oklab, var(--warn) 8%, transparent); }
-  @media (max-width: 760px) { .say { grid-template-columns: minmax(0, 1fr); padding: 10px 12px; } .say-hint, .say-card, .say-honest { grid-column: 1; } .say-l { font-size: 18px; } .say-mic span { display: none; } .say-mic { padding: 0; width: 40px; justify-content: center; } .say-dl { grid-template-columns: 92px minmax(0, 1fr); } }
+  @media (max-width: 760px) { .say { grid-template-columns: minmax(0, 1fr); padding: 10px 12px; } .say-hint, .say-card, .say-honest { grid-column: 1; } .say-l { font-size: 18px; } .say-dl { grid-template-columns: 92px minmax(0, 1fr); } }
+  @media (max-width: 640px) { .say { gap: 8px; } .say-row { grid-template-columns: auto minmax(0, 1fr); } .say-row input { grid-column: 1 / -1; font-size: 16px; padding: 12px; } .say-mic { min-height: 44px; padding: 0 12px; } .say-row .btn { min-height: 44px; font-size: 15px; } .say-hint { font-size: 12.5px; line-height: 1.45; } }
   /* таблички офисов */
   .ol { pointer-events: auto; cursor: pointer; display: grid; justify-items: center; gap: 2px; padding: 8px 14px 9px; border-radius: 10px; background: var(--overlay-2); border: 1px solid color-mix(in oklab, var(--champ) 60%, var(--line)); box-shadow: var(--shadow); white-space: nowrap; }
   .ol b { font: 600 22px/1 var(--f-display); letter-spacing: -.01em; color: var(--ink); }
@@ -424,19 +427,24 @@
   /* таблички мест и подписи зон */
   .rl.pl { background: color-mix(in oklab, var(--brand-soft) 70%, var(--overlay)); border-color: color-mix(in oklab, var(--champ) 40%, var(--line)); }
   .rl.pl .rl-sub { font-style: italic; }
-  .labels.f1 .rl.pl .rl-sub { display: block; }
+  .labels.f1 .rl.pl .rl-sub { display: block; max-width: 104px; }
   .labels.fall .rl:not(.is-sel) { padding: 4px; border-radius: 50%; }
   .labels.fall .rl:not(.is-sel) .rl-top > :not(.dot), .labels.fall .rl:not(.is-sel) .rl-sub { display: none !important; }
   .labels.fall .rl .dot { width: 9px; height: 9px; }
-  @media (max-width: 640px) { .labels.fall .rl.pl:not(.is-sel), .labels.fall .dl, .labels.fall .zl, .labels.fall .mini { display: none !important; } .labels.fall .rl:not(.is-sel) { padding: 3px; } .labels.fall .rl .dot { width: 7px; height: 7px; box-shadow: none; } }
+  .rl.is-ping { animation: dh-ping .85s ease-out 3; border-color: var(--champ) !important; }
+  @keyframes dh-ping { 0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--champ) 85%, transparent); } 100% { box-shadow: 0 0 0 16px color-mix(in oklab, var(--champ) 0%, transparent); } }
+  @media (prefers-reduced-motion: reduce) { .rl.is-ping { animation: none; outline: 2px solid var(--champ); outline-offset: 2px; } }
+  @media (max-width: 640px) { .labels.fall .dl, .labels.fall .zl, .labels.fall .mini { display: none !important; } .labels.fall .rl:not(.is-sel) { padding: 3px; } .labels.fall .rl .dot { width: 7px; height: 7px; box-shadow: none; } }
   .rl.st-free { border-color: color-mix(in oklab, var(--champ) 50%, var(--line)); }
   .zl { pointer-events: auto; cursor: pointer; font: 500 10px/1.2 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--earth); padding: 3px 7px; border-radius: 6px; background: var(--overlay); border: 1px solid var(--line); white-space: nowrap; }
   .zl span { color: var(--faint); margin-right: 6px; letter-spacing: .06em; }
   .zl.is-sel, .zl:hover { border-color: var(--champ); color: var(--ink); }
   /* карточка сотрудника и форма */
   .now-line { margin: -4px 0 12px; font-size: 13px; color: var(--ink); } .now-line span { font: 500 9.5px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--champ-ink); margin-right: 8px; }
-  .acl { pointer-events: none; font: 500 10px/1.3 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--ink); padding: 5px 9px; border-radius: 7px; background: var(--overlay-2); border: 1px solid color-mix(in oklab, var(--champ) 55%, var(--line)); white-space: nowrap; }
+  .acl { pointer-events: auto; cursor: pointer; font: 500 10px/1.3 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink); padding: 5px 9px; border-radius: 7px; background: var(--overlay-2); border: 1px solid color-mix(in oklab, var(--champ) 55%, var(--line)); white-space: nowrap; }
   .acl b { color: var(--champ-ink); font-weight: 600; }
+  .acl:hover { border-color: var(--champ); }
+  @media (max-width: 640px) { .acl { font-size: 8px; letter-spacing: .06em; padding: 4px 6px; } }
   .name-ph { margin: -2px 0 10px; font: italic 400 13px/1.4 var(--f-body); color: var(--muted); }
   .name-ph.is-name { font-style: normal; color: var(--ink); font-weight: 600; }
   ul.ptasks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
@@ -464,7 +472,7 @@
   .sys .link-btn { font-size: 12px; }
   ul.sysl { list-style: none; margin: 0 0 4px; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-size: 12.5px; color: var(--earth); }
   ul.sysl li { display: flex; gap: 7px; align-items: center; }
-  .dl { pointer-events: auto; cursor: pointer; font: 600 10.5px/1 var(--f-mono); letter-spacing: .22em; text-transform: uppercase; color: var(--champ-ink); padding: 6px 10px; border-radius: 7px; background: var(--overlay-2); border: 1px solid color-mix(in oklab, var(--champ) 60%, var(--line)); white-space: nowrap; box-shadow: var(--shadow); }
+  .dl { pointer-events: auto; cursor: pointer; font: 600 10.5px/1 var(--f-mono); letter-spacing: .13em; text-transform: uppercase; color: var(--champ-ink); padding: 6px 10px; border-radius: 7px; background: var(--overlay-2); border: 1px solid color-mix(in oklab, var(--champ) 60%, var(--line)); white-space: nowrap; box-shadow: var(--shadow); }
   .dl:hover, .dl.is-sel { background: var(--brand-soft); color: var(--ink); }
   .dl small { font: 500 9px var(--f-mono); color: var(--muted); letter-spacing: .1em; margin-left: 6px; }
   .labels:not(.far) .dl { display: none; }
@@ -526,7 +534,7 @@
       <button type="button" class="icon-btn say-mic" id="say-mic" disabled aria-label="Микрофон: голос — на ПК" title="голос — на ПК"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg><span>голос — на ПК</span></button>
       <button class="btn primary" type="submit" id="say-go">Передать</button>
     </div>
-    <p class="say-hint" id="say-hint">Джарвис разбирает фразу по ключевым словам: кому, что сделать, срок. Демо — ничего не отправляется.</p>
+    <p class="say-hint" id="say-hint">Попробуйте: <a href="#say-in" class="say-ex" id="say-ex" role="button">«Дай менеджеру задачу обзвонить три новые заявки до 18:00»</a>. Джарвис разберёт: кому, что сделать, срок. Демо — ничего не отправляется.</p>
     <div class="say-card" id="say-card" hidden aria-live="polite"></div>
     <p class="say-honest" id="say-honest" hidden></p>
   </form>
@@ -1702,7 +1710,7 @@ function sayParse(raw) {
   if (!hit) { hit = sayFind(text, SAY_TOPICS); kind = 'agent'; }
   if (!hit) return null;
   let due = '', w = raw;
-  const tm = raw.match(/до\s+(\d{1,2})[:.](\d{2})/i), th = raw.match(/до\s+(\d{1,2})\s*(?:часов|час|ч)\b/i), dm = raw.match(new RegExp('(?:до|к)?\\s*(\\d{1,2})\\s+(' + MONTHS_RE + ')', 'i')), wd = raw.match(/к\s+(понедельник|вторник|сред|четверг|пятниц|суббот)\S*/i);
+  const tm = raw.match(/до\s+(\d{1,2})[:.](\d{2})/i), th = raw.match(/до\s+(\d{1,2})\s*(?:часов|часа|час|ч)(?!\p{L})/iu), dm = raw.match(new RegExp('(?:до|к)?\\s*(\\d{1,2})\\s+(' + MONTHS_RE + ')', 'i')), wd = raw.match(/к\s+(понедельник|вторник|сред|четверг|пятниц|суббот)\S*/i);
   const tomorrow = /послезавтра/i.test(raw) ? 'послезавтра' : /завтра/i.test(raw) ? 'завтра' : '';
   if (tm) { due = (tomorrow || 'сегодня') + ' до ' + pad(+tm[1]) + ':' + tm[2]; w = w.replace(tm[0], ''); }
   else if (th) { due = (tomorrow || 'сегодня') + ' до ' + pad(+th[1]) + ':00'; w = w.replace(th[0], ''); }
@@ -1710,13 +1718,13 @@ function sayParse(raw) {
   else if (wd) { due = wd[0].toLowerCase(); w = w.replace(wd[0], ''); }
   else if (tomorrow) due = tomorrow;
   else if (/сегодня|срочно/i.test(raw)) due = 'сегодня';
-  w = w.replace(/\b(послезавтра|завтра|сегодня)\b/gi, '');
+  w = w.replace(/(?<!\p{L})(послезавтра|завтра|сегодня|срочно)(?!\p{L})/giu, '');
   // убрать слово-адресата, глаголы-команды и «задачу»
   const lw = w.toLowerCase().replace(/ё/g, 'е'); const pos = lw.indexOf(hit.k);
-  if (pos >= 0 && kind === 'person' || (pos >= 0 && SAY_AGENTS[hit.id] && SAY_AGENTS[hit.id].includes(hit.k))) { let a = pos, b = pos; while (a > 0 && /\S/.test(w[a - 1])) a--; while (b < w.length && /\S/.test(w[b])) b++; w = w.slice(0, a) + w.slice(b); w = w.replace(/\b(для|у)\s+(?=\s|$)/i, ''); }
-  w = w.replace(/^\s*(джарвис|jarvis)[,!:\s]*/i, '').replace(/\b(пожалуйста)\b/gi, '')
+  if (pos >= 0 && kind === 'person' || (pos >= 0 && SAY_AGENTS[hit.id] && SAY_AGENTS[hit.id].includes(hit.k))) { let a = pos, b = pos; while (a > 0 && /\S/.test(w[a - 1])) a--; while (b < w.length && /\S/.test(w[b])) b++; w = w.slice(0, a) + w.slice(b); w = w.replace(/(?<!\p{L})(для|у)\s+(?=\s|$)/iu, ''); }
+  w = w.replace(/^\s*(джарвис|jarvis)[,!:\s]*/i, '').replace(/(?<!\p{L})пожалуйста(?!\p{L})/giu, '')
     .replace(/^\s*(дай|дайте|поставь|поставьте|передай|передайте|поручи|поручите|скажи|скажите|попроси|попросите|пусть|нужно|надо|сделай|сделайте|подготовь)\s+/i, (m) => (/сделай|подготовь/i.test(m) ? m : ''))
-    .replace(/\b(задачу|задание|поручение)\b\s*/i, '').replace(/^\s*(чтобы|:|—|-)\s*/i, '').replace(/\s{2,}/g, ' ').trim().replace(/[.,;!]+$/, '');
+    .replace(/(?<!\p{L})(задачу|задачи|задание|поручение)(?!\p{L})\s*/iu, '').replace(/^\s*(чтобы|:|—|-)\s*/i, '').replace(/\s{2,}/g, ' ').trim().replace(/[.,;!]+$/, '');
   if (w.length < 3) w = raw.trim();
   w = w.charAt(0).toUpperCase() + w.slice(1);
   if (kind === 'person') { const p = byPid[hit.id]; return { kind, id: 'p:' + p.id, p, what: w, due: due || 'не указан — поставлю на завтра', to: p.role + ' · реальный офис, место ' + p.n, via: 'DH OS → Telegram от бота компании, после вашего «да»' }; }
@@ -1751,6 +1759,7 @@ $('#say-card').addEventListener('click', (e) => {
   h.hidden = false; $('#say-in').value = '';
   if (state.selected === r.id) renderSide();
 });
+$('#say-ex').addEventListener('click', (e) => { e.preventDefault(); $('#say-in').value = 'Дай менеджеру задачу обзвонить три новые заявки до 18:00'; $('#say').requestSubmit(); });
 
 /* ---------- план месяца (демо) ---------- */
 function renderMonth() {
@@ -2099,7 +2108,7 @@ const L = {
 };
 const OL = { planner: { cx: -11.25, cz: -7.2 }, developer: { cx: -3.75, cz: -7.2 }, tester: { cx: 3.75, cz: -7.2 }, secretary: { cx: 12.75, cz: 7.2, xb: 14.88 } };
 for (const id in L) { const r = L[id]; r.xa = r.x0 + INS; r.xb = r.x1 - INS; r.za = r.z0 + INS; r.zb = r.z1 - INS; r.cx = (r.x0 + r.x1) / 2; r.cz = (r.z0 + r.z1) / 2; r.w = r.xb - r.xa; r.d = r.zb - r.za; }
-const PAV = new V3(-22.55, 5.0, -15.2), DPV = new V3(-18.1, 4.1, -5.6);
+const PAV = new V3(-18.1, 5.0, -15.8), DPV = new V3(-18.1, 4.1, -5.6);
 
 const RM = {};
 const POOL = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const gr = g.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.55, '#8a8a8a'); gr.addColorStop(1, '#141414'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
@@ -2532,6 +2541,9 @@ function buildStudio() {
   // места команды — из массива STAFF
   STUDIO.slots = layoutStaff();
   const RT = ROLE_TEX();
+  /* табличка крайнего левого стола смещена влево, крайнего правого — вправо: соседние таблички в ряду не налезают */
+  const DXS = [...new Set(STUDIO.slots.filter((q) => q.kind === 'desk').map((q) => Math.round(q.x * 10) / 10))].sort((a, b) => a - b);
+  const labelCx = (sl) => { if (sl.kind !== 'desk' || DXS.length < 3) return 0.5; const x = Math.round(sl.x * 10) / 10; return x === DXS[0] ? 0.8 : x === DXS[DXS.length - 1] ? 0.2 : 0.5; };
   STUDIO.slots.forEach((sl) => {
     const p = sl.p, id = 'p:' + p.id;
     let pos, face, mode, deskTop;
@@ -2574,7 +2586,7 @@ function buildStudio() {
     el.addEventListener('click', (e) => { e.stopPropagation(); DH.select(id); });
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); DH.select(id); } });
     el.addEventListener('pointerenter', () => { hoverId = id; }); el.addEventListener('pointerleave', () => { if (hoverId === id) hoverId = null; });
-    const lo = new CSS2DObject(el); lo.center.set(0.5, 1); lo.position.set(pos.x, mode === 'sit' ? 1.62 : 1.95, pos.z); ROOT.add(lo);
+    const lo = new CSS2DObject(el); lo.center.set(labelCx(sl), 1); lo.position.set(pos.x, mode === 'sit' ? 1.62 : 1.95, pos.z); ROOT.add(lo);
     STUDIO.labels[id] = { o: lo, el, dot: el.querySelector('.dot') };
   });
   // зоны: подписи и области клика
@@ -2584,7 +2596,10 @@ function buildStudio() {
     const el = document.createElement('div'); el.className = 'zl'; el.dataset.room = 'z:' + z.id; el.setAttribute('role', 'button'); el.tabIndex = 0;
     el.innerHTML = '<span>' + z.code + '</span>' + esc3(z.name);
     el.addEventListener('click', (e) => { e.stopPropagation(); DH.select('z:' + z.id); });
-    const lo = new CSS2DObject(el); lo.center.set(0, 1); lo.position.set(g.x0 + 0.5, 0.05, g.z1 - 0.35); ROOT.add(lo);
+    const lo = new CSS2DObject(el);
+    /* «Переговорная» — у правой стены, выровнена вправо: не налезает на таблички людей и не уходит за край экрана */
+    if (z.id === 'meet') { lo.center.set(1, 1); lo.position.set(g.x1 + 0.3, 0.05, g.z1 - 4.6); } else { lo.center.set(0, 1); lo.position.set(g.x0 + 0.5, 0.05, g.z1 - 0.35); }
+    ROOT.add(lo);
     STUDIO.zlabels[z.id] = { o: lo, el };
   });
 }
@@ -2606,7 +2621,9 @@ function buildAcademy() {
   }
   const el = document.createElement('div'); el.className = 'acl';
   el.innerHTML = 'DH Academy · курс <b>«' + esc3(A.course) + '»</b><br>урок: ' + esc3(A.lesson) + ' · ' + n + ' студ.';
-  const lo = new CSS2DObject(el); lo.center.set(0, 1); lo.position.set(11.6, 2.5, -0.45); ROOT.add(lo); STUDIO.acl = lo;
+  el.setAttribute('role', 'button'); el.tabIndex = 0; el.addEventListener('click', (e) => { e.stopPropagation(); DH.select('z:academy'); });
+  /* в виде «Реальный офис» эта подпись стоит вместо «1.04 Класс DH Academy»: у передней стены класса, выровнена вправо */
+  const lo = new CSS2DObject(el); lo.center.set(1, 1); lo.position.set(14.7, 0.05, 9.65); ROOT.add(lo); STUDIO.acl = lo;
 }
 function esc3(t) { return String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 function plantG(x, z, k) { k = k || 1; add(M.model, cylG(0.17 * k, 0.13 * k, 0.32 * k, x, 0.16 * k, z, 16)); const sp = new THREE.SphereGeometry(0.3 * k, 16, 12); sp.translate(x, 0.32 * k + 0.26 * k, z); add(M.figure, sp); }
@@ -2827,12 +2844,12 @@ function buildDhPavilion() {
 }
 const OSIGN = {};
 function buildOfficeSigns() {
-  [['1', X1, -11.2, 'Реальный офис', 'Dream House · люди студии'], ['2', X2 + 3.0, -17.9, 'Мои агенты', 'JARVIS · 21 агент · 6 отделов']].forEach(([k, x, z, nm, sub]) => {
+  [['1', X1 - 1.2, -11.6, 'Реальный офис', 'Dream House · люди студии'], ['2', X2 + 3.0, -18.8, 'Мои агенты', 'JARVIS · 21 агент · 6 отделов']].forEach(([k, x, z, nm, sub]) => {
     const el = document.createElement('div'); el.className = 'ol'; el.setAttribute('role', 'button'); el.tabIndex = 0;
     el.innerHTML = '<b>' + nm + '</b><small>' + sub + '</small>';
     el.addEventListener('click', (e) => { e.stopPropagation(); DH.setFloor(k); });
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); DH.setFloor(k); } });
-    const o = new CSS2DObject(el); o.center.set(0.5, 1); o.position.set(x, 2.5, z); scene.add(o); OSIGN[k] = { o, el };
+    const o = new CSS2DObject(el); o.center.set(0.5, 1); o.position.set(x, 2.7, z); scene.add(o); OSIGN[k] = { o, el };
   });
 }
 /* коробочки-задачи: из кабинета JARVIS через DH OS к столам людей и отчёты обратно */
@@ -2849,8 +2866,21 @@ function launchTask(toId, kind) {
   const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
   const g = new THREE.Group(); const m = new THREE.Mesh(tboxGeo, M.model); m.castShadow = true;
   const em = new THREE.LineBasicMaterial({ toneMapped: false }); em.color.copy(kind === 'report' ? C.champ : C.glow).multiplyScalar(kind === 'say' ? 3 : 2);
-  g.add(m, new THREE.LineSegments(tboxEdges, em)); if (kind === 'say') g.scale.setScalar(1.35); scene.add(g);
-  taskFlights.push({ curve, u: 0, speed: 1 / Math.max(2.2, curve.getLength() / 9), g });
+  g.add(m, new THREE.LineSegments(tboxEdges, em)); scene.add(g);
+  const f = { curve, u: 0, speed: 1 / Math.max(2.2, curve.getLength() / 9), g, to: toId, kind };
+  if (kind === 'say') {
+    /* задание владельца: коробочка крупнее и оставляет светящийся след — его видно и на телефоне */
+    g.scale.setScalar(narrow() ? 3.2 : 1.9); f.speed *= 0.8;
+    if (REDUCED) f.u = 1;   // без анимации: след сразу целиком, адресат подсвечен
+    const lm = new THREE.MeshBasicMaterial({ toneMapped: false, transparent: true, opacity: 0.9, depthWrite: false }); lm.color.copy(C.glow).multiplyScalar(2.2);
+    f.trail = new THREE.Mesh(new THREE.TubeGeometry(curve, 120, narrow() ? 0.2 : 0.075, 6, false), lm); f.trail.geometry.setDrawRange(0, 0); f.trail.renderOrder = 6; scene.add(f.trail);
+  }
+  taskFlights.push(f);
+}
+function pingLabel(id) {
+  const lb = id.startsWith('p:') ? STUDIO.labels[id] : labels[id]; if (!lb) return;
+  lb.el.classList.remove('is-ping'); void lb.el.offsetWidth; lb.el.classList.add('is-ping');
+  setTimeout(() => lb.el.classList.remove('is-ping'), 2600);
 }
 let nextTaskFlight = 3;
 function updTaskFlights(dt, t) {
@@ -2861,6 +2891,10 @@ function updTaskFlights(dt, t) {
   }
   for (let i = taskFlights.length - 1; i >= 0; i--) {
     const f = taskFlights[i]; f.u += dt * f.speed;
+    if (f.trail) {
+      f.trail.geometry.setDrawRange(0, Math.min(120, Math.ceil(f.u * 120)) * 36);
+      if (f.u >= 1) { if (!f.landed) { f.landed = true; scene.remove(f.g); pingLabel(f.to); } f.trail.material.opacity = Math.max(0, 0.95 - (f.u - 1) * 1.2); if (f.u < 1.8) continue; scene.remove(f.trail); f.trail.geometry.dispose(); taskFlights.splice(i, 1); continue; }
+    }
     if (f.u >= 1) { scene.remove(f.g); taskFlights.splice(i, 1); continue; }
     f.curve.getPointAt(Math.min(1, f.u), f.g.position); f.g.rotation.y += dt * 1.5;
   }
@@ -2909,13 +2943,14 @@ function buildLabels() {
     el.innerHTML = esc3(d.name) + '<small>' + d.rooms.length + '</small>';
     el.addEventListener('click', (e) => { e.stopPropagation(); DH.select('d:' + d.id); });
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); DH.select('d:' + d.id); } });
-    const DP = { mgmt: [0, 2.6, -1.0], prod: [-16.0, 2.2, -1.5], mk: [-5.0, 2.8, -17.6], money: [17.5, 2.8, -17.8], sales: [22.4, 2.2, 1.5], svc: [8.5, 1.4, 10.8] }; const pp = DP[d.id] || [c.x, 2.6, c.z];
-    const o = new CSS2DObject(el); o.center.set(0.5, 1); o.position.set(pp[0], pp[1], pp[2]); ROOT.add(o);
+    const DP = { mgmt: [0, 2.3, 0.9], prod: [-12.0, 2.3, 0.6], mk: [-5.0, 2.3, -14.8], money: [17.5, 2.3, -14.8], sales: [19.6, 2.3, 2.3], svc: [8.5, 0.15, 11.3] }; const pp = DP[d.id] || [c.x, 2.6, c.z];
+    const o = new CSS2DObject(el); o.center.set(0.5, d.id === 'svc' || d.id === 'mgmt' ? 0 : 1); o.position.set(pp[0], pp[1], pp[2]); ROOT.add(o);
     deptLabels[d.id] = { o, el };
   });
-  const mk = (key, txt, pos, cls) => { const el = document.createElement('div'); el.className = 'mini ' + (cls || ''); el.textContent = txt; const o = new CSS2DObject(el); o.center.set(0.5, 1); o.position.copy(pos); ROOT.add(o); minis[key] = el; };
-  mk('p1s', 'P1S', new V3(-13.45, 1.95, 8.95)); mk('k1', 'K1', new V3(-11.3, 1.85, 8.95));
-  mk('c', 'C: 96 %', new V3(13.0, 1.45, -6.4), 'bad'); mk('d', 'D: нет диска', new V3(14.05, 1.0, -6.4), 'warn');
+  const mk = (key, txt, pos, cls, cx) => { const el = document.createElement('div'); el.className = 'mini ' + (cls || ''); el.textContent = txt; const o = new CSS2DObject(el); o.center.set(cx == null ? 0.5 : cx, 1); o.position.copy(pos); ROOT.add(o); minis[key] = el; };
+  /* соседние мини-подписи расходятся в стороны, чтобы не налезать */
+  mk('p1s', 'P1S', new V3(-13.25, 1.95, 8.95), '', 1); mk('k1', 'K1', new V3(-11.5, 1.85, 8.95), '', 0);
+  mk('c', 'C: 96 %', new V3(12.8, 1.45, -6.4), 'bad', 1); mk('d', 'D: нет диска', new V3(14.25, 1.0, -6.4), 'warn', 0);
   mk('gpu', 'Видеокарта', new V3(12.6, 1.5, -8.6));
 }
 let hoverId = null, selected = DH.state.selected, view = DH.state.view, floor = DH.state.floor || 'all';
@@ -2954,8 +2989,8 @@ function updateLabels() {
     lb.dot.className = 'dot ' + (st === 'late' ? 'bad' : st);
   }
   if (STUDIO.acl) STUDIO.acl.visible = floor === '1';
-  for (const k in OSIGN) OSIGN[k].el.classList.toggle('is-on', floor === k);
-  for (const id in STUDIO.zlabels) { const z = STUDIO.zlabels[id]; z.o.visible = showF1; z.el.classList.toggle('is-sel', selected === 'z:' + id); }
+  for (const k in OSIGN) OSIGN[k].o.visible = floor === 'all' && view !== 'plan';
+  for (const id in STUDIO.zlabels) { const z = STUDIO.zlabels[id]; z.o.visible = showF1 && !(id === 'academy' && floor === '1'); z.el.classList.toggle('is-sel', selected === 'z:' + id); }
 }
 
 /* ---------- свет: солнце Душанбе (38,56° с. ш.), ночью — свет витрины ---------- */
@@ -3037,31 +3072,64 @@ function floorBox(f) {
   return f === '1' ? b1 : f === '2' ? b2 : b1.union(b2);
 }
 const tmpCam = new THREE.PerspectiveCamera();
-function fit(bx, dir, margin, tgt) {
-  const target = tgt || bx.getCenter(new V3()).setY(Math.max(0, bx.min.y));
-  dir = dir.clone().normalize();
-  const corners = []; for (let i = 0; i < 8; i++) corners.push(new V3(i & 1 ? bx.max.x : bx.min.x, i & 2 ? bx.max.y : bx.min.y, i & 4 ? bx.max.z : bx.min.z));
+const boxPts = (bx) => { const o = []; for (let i = 0; i < 8; i++) o.push({ v: new V3(i & 1 ? bx.max.x : bx.min.x, i & 2 ? bx.max.y : bx.min.y, i & 4 ? bx.max.z : bx.min.z) }); return o; };
+/* свободная часть сцены между верхними кнопками и нижней легендой, в координатах экрана −1…1 */
+function stageFree() {
+  const sr = stage.getBoundingClientRect(); if (!sr.height || !sr.width) return { x: 0.96, t: 0.96, b: -0.96, w: 1, h: 1 };
+  let top = sr.top, bot = sr.bottom;
+  stage.querySelectorAll('.hud-tl, .hud-tr').forEach((e) => { const r = e.getBoundingClientRect(); if (r.height && r.bottom < sr.top + sr.height * 0.5) top = Math.max(top, r.bottom); });
+  stage.querySelectorAll('.hud-bl, .hud-br, .hud-tr').forEach((e) => { const r = e.getBoundingClientRect(); if (r.height && r.top > sr.top + sr.height * 0.5) bot = Math.min(bot, r.top); });
+  const px = 6, py = 8;
+  return { x: 1 - 2 * px / sr.width, t: 1 - 2 * (top - sr.top + py) / sr.height, b: -1 + 2 * (sr.bottom - bot + py) / sr.height, w: sr.width, h: sr.height };
+}
+function fitPts(pts, dir, mg, target) {
+  dir = dir.clone().normalize(); target = target.clone();
   tmpCam.fov = camera.fov; tmpCam.aspect = camera.aspect; tmpCam.near = 0.1; tmpCam.far = 1000; tmpCam.updateProjectionMatrix();
-  let lo = 2, hi = 400;
-  for (let it = 0; it < 26; it++) {
-    const d = (lo + hi) / 2;
-    tmpCam.position.copy(target).addScaledVector(dir, d); tmpCam.lookAt(target); tmpCam.updateMatrixWorld();
-    let ok = true; const pv = new V3();
-    for (const c of corners) { pv.copy(c).project(tmpCam); if (Math.abs(pv.x) > margin || Math.abs(pv.y) > margin || pv.z > 1) { ok = false; break; } }
-    if (ok) hi = d; else lo = d;
+  const pv = new V3(), up = new V3();
+  const place = (d) => { tmpCam.position.copy(target).addScaledVector(dir, d); tmpCam.lookAt(target); tmpCam.updateMatrixWorld(); };
+  const ext = () => {
+    let x = 0, y0 = 9, y1 = -9, bad = false;
+    for (const p of pts) { pv.copy(p.v).project(tmpCam); if (pv.z > 1) bad = true; x = Math.max(x, Math.abs(pv.x) + (p.half ? 2 * p.half / mg.w : 0)); y0 = Math.min(y0, pv.y - (p.down ? 2 * p.down / mg.h : 0)); y1 = Math.max(y1, pv.y + (p.up ? 2 * p.up / mg.h : 0)); }
+    return { x, y0, y1, bad };
+  };
+  let hi = 400;
+  for (let pass = 0; pass < 4; pass++) {
+    let lo = 2; hi = 400;
+    for (let it = 0; it < 26; it++) { const d = (lo + hi) / 2; place(d); const e = ext(); if (!e.bad && e.x <= mg.x && e.y1 <= mg.t && e.y0 >= mg.b - (mg.sym ? 0 : 9) && e.y1 - e.y0 <= mg.t - mg.b) hi = d; else lo = d; }
+    if (mg.sym) break;
+    place(hi); const e = ext(); const dy = (mg.t + mg.b) / 2 - (e.y1 + e.y0) / 2; if (Math.abs(dy) < 0.004) break;
+    up.set(0, 1, 0).applyQuaternion(tmpCam.quaternion);
+    target.addScaledVector(up, -dy * Math.tan(THREE.MathUtils.degToRad(tmpCam.fov / 2)) * hi);
   }
   return { pos: target.clone().addScaledVector(dir, hi), target };
+}
+function fit(bx, dir, margin, tgt) {
+  const target = tgt || bx.getCenter(new V3()).setY(Math.max(0, bx.min.y));
+  const mg = typeof margin === 'number' ? { x: margin, t: margin, b: -margin, w: 1, h: 1, sym: true } : margin;
+  return fitPts(boxPts(bx), dir, mg, target);
+}
+/* кадр офиса с табличкой над ним: табличка тоже должна поместиться под верхними кнопками */
+function fitFloor(bx, dir, tgt, keys, k) {
+  const fr = stageFree(); fr.x *= k || 1; const pts = boxPts(bx);
+  keys.forEach((key) => { const s = OSIGN[key]; if (!s) return; pts.push({ v: s.o.position, up: (s.el.offsetHeight || 40) + 4, half: (s.el.offsetWidth || 160) / 2 + 4 }); });
+  const wasFar = labelsEl.classList.contains('far'); labelsEl.classList.add('far');   // общий вид всегда «издалека»: меряем подписи отделов в этом режиме
+  const ag = keys.includes('2') || keys.includes('2-');
+  const sv = deptLabels.svc; if (ag && sv && sv.el.offsetHeight) pts.push({ v: W2(sv.o.position), down: sv.el.offsetHeight + 4 });
+  const sl = deptLabels.sales; if (ag && sl && sl.el.offsetWidth) pts.push({ v: W2(sl.o.position), half: sl.el.offsetWidth / 2 + 2 });
+  if (!wasFar) labelsEl.classList.remove('far');
+  return fitPts(pts, dir, fr, tgt);
 }
 const narrow = () => camera.aspect < 1.05;
 function preset(name) {
   if (name === 'plan') {
     const pb = floorBox(floor); pb.min.y = 0; pb.max.y = 0.5;
-    return fit(pb, new V3(0, 1, 0.015), narrow() ? 0.96 : 0.94);
+    return fitFloor(pb, new V3(0, 1, 0.015), pb.getCenter(new V3()).setY(0), floor === '1' ? [] : ['2-']);   // на плане таблички офисов скрыты
   }
   const b = floorBox(floor);
-  if (floor === '1') return fit(b, narrow() ? new V3(0.18, 0.95, 0.75) : new V3(0.3, 0.68, 0.7), narrow() ? 1.0 : 0.97, new V3(X1, 0, 0.4));
-  if (floor === '2') return fit(b, narrow() ? new V3(0.22, 0.95, 0.75) : new V3(0.34, 0.6, 0.74), narrow() ? 1.0 : 0.98, new V3(X2 + 3.0, 0, -3.0));
-  return fit(b, narrow() ? new V3(-0.66, 0.66, 0.36) : new V3(0.06, 0.8, 0.6), narrow() ? 1.0 : 1.0, new V3(0, 0, narrow() ? -3 : -2.6));
+  if (floor === '1') return fitFloor(b, narrow() ? new V3(0.1, 0.95, 0.62) : new V3(0.12, 0.84, 0.64), new V3(X1, 0, 0.1), []);
+  if (floor === '2') return fitFloor(b, narrow() ? new V3(0.12, 0.95, 0.62) : new V3(0.26, 0.7, 0.72), new V3(X2 + 3.0, 0, -3.2), ['2-']);
+  /* оба офиса рядом: фронтально, плотно по ширине; таблички «Реальный офис» и «Мои агенты» над офисами */
+  return fitFloor(b, narrow() ? new V3(0, 0.9, 0.44) : new V3(0, 0.8, 0.6), new V3(-0.05, 0, -3.2), ['1', '2']);
 }
 let fly = null, lastInput = performance.now();
 function flyTo(pos, target, dur) {
@@ -3176,7 +3244,10 @@ function resize() {
   if (composer) { composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(w, h); }
 }
 new ResizeObserver(resize).observe(stage); resize();
+{ const bl = stage.querySelector('.hud-bl'); const setLg = () => stage.style.setProperty('--lg-h', bl.offsetHeight + 'px'); new ResizeObserver(setLg).observe(bl); setLg(); }
 {
+  /* подписи попадают в DOM при первом проходе — тогда известны их размеры для кадра */
+  camera.position.set(0, 70, 60); camera.lookAt(0, 0, -3); camera.updateMatrixWorld(); scene.updateMatrixWorld(); labelRenderer.render(scene, camera);
   const p = preset('overview');
   if (DH.state.selected) { const f = fitRoom(DH.state.selected); camera.position.copy(f.pos); controls.target.copy(f.target); }
   else { camera.position.copy(p.pos).add(new V3(10, 14, 16)); controls.target.copy(p.target); flyTo(p.pos, p.target, 2.6); }
@@ -3374,7 +3445,7 @@ function frame() {
     controls.target.lerpVectors(fly.t0, fly.t1, k); camera.lookAt(controls.target);
     if (k >= 1) { fly = null; controls.enabled = true; controls.update(); }
   } else {
-    controls.autoRotate = !REDUCED && view === 'overview' && !selected && performance.now() - lastInput > 25000;
+    controls.autoRotate = !REDUCED && view === 'overview' && floor !== 'all' && !narrow() && !selected && performance.now() - lastInput > 25000;   // общий вид и телефон кадрированы плотно — без автоповорота
     controls.update();
   }
   if (hoverPending && lastHoverEvt) { hoverPending = false; const id = pick(lastHoverEvt.clientX, lastHoverEvt.clientY); if (id !== hoverId) { hoverId = id; updateLabels(); } renderer.domElement.style.cursor = id ? 'pointer' : ''; }
@@ -3400,7 +3471,7 @@ function frame() {
     if (perf.t > 4) { perf.done = true; if (perf.n / perf.t < 24) downgrade(); }
   }
 }
-DH.scene = { renderer, scene, camera, controls, quality: () => Q, flying: () => !!fly, studio: STUDIO };
+DH.scene = { renderer, scene, camera, controls, quality: () => Q, flying: () => !!fly, studio: STUDIO, flights: () => taskFlights.length };
 DH.sceneReady();
 frame();
 </script>
