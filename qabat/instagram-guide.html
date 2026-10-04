@@ -1,0 +1,336 @@
+<title>Qabat Instagram</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* Макет: стол выбора — сначала шесть логотипов, затем живой предпросмотр профиля и пошаговый запуск Instagram с полями и чек-листом. */
+  :root {
+    --bg: #eceeea; --surface: #f8f9f6; --ink: #141a22; --muted: #5a6371; --line: #d1d6ce;
+    --accent: #2b50e8; --accent-ink: #ffffff; --accent-soft: #dfe5fb; --ok: #2f7d4f;
+    --logo-ink: #141a22; --logo-bg: #eceeea; --logo-accent: #2b50e8;
+    --f-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+    --f-body: "Golos Text", "Segoe UI", system-ui, sans-serif;
+    --f-mono: "JetBrains Mono", ui-monospace, monospace;
+    --r: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1318; --surface: #161c23; --ink: #e7eaee; --muted: #9aa4b2; --line: #28313a;
+      --accent: #7090ff; --accent-ink: #0b1020; --accent-soft: #1c2542; --ok: #6fc28f; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1318; --surface: #161c23; --ink: #e7eaee; --muted: #9aa4b2; --line: #28313a;
+    --accent: #7090ff; --accent-ink: #0b1020; --accent-soft: #1c2542; --ok: #6fc28f; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--f-body); padding-inline: 16px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding-block: 28px 64px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+  .eyebrow { font: 500 12px/1.4 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+  h1 { margin: 0 0 10px; font: 800 clamp(28px, 5vw, 46px)/1.08 var(--f-display); letter-spacing: -.015em; text-wrap: balance; }
+  h2 { margin: 0 0 6px; font: 600 clamp(20px, 3vw, 26px)/1.2 var(--f-display); text-wrap: balance; }
+  .intro { color: var(--muted); max-width: 62ch; margin: 0; }
+  section { padding-block: 40px; border-top: 1px solid var(--line); }
+  header.page { padding-bottom: 28px; }
+  .sub { color: var(--muted); margin: 0 0 22px; max-width: 62ch; }
+
+  /* Логотипы */
+  .logos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .logo-card { position: relative; display: grid; grid-template-rows: auto auto auto; gap: 0; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); overflow: hidden; cursor: pointer; text-align: left; padding: 0; color: inherit; font: inherit; }
+  .logo-card[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .logo-card .stage { display: grid; grid-template-columns: 1fr 1fr; }
+  .logo-card .pane { padding: 18px 14px; display: grid; place-items: center; min-height: 150px; }
+  .pane.light { --logo-ink: #141a22; --logo-bg: #eceeea; --logo-accent: #2b50e8; background: #eceeea; }
+  .pane.dark { --logo-ink: #eef1f4; --logo-bg: #141a22; --logo-accent: #7090ff; background: #141a22; }
+  .pane svg { width: 100%; height: auto; max-height: 120px; }
+  .logo-card .meta { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid var(--line); }
+  .avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex: none; border: 1px solid var(--line); }
+  .avatar svg { width: 100%; height: 100%; display: block; }
+  .logo-card .name { font-weight: 600; }
+  .logo-card .why { color: var(--muted); font-size: 14px; line-height: 1.4; }
+  .pick { margin-left: auto; font: 500 11px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 9px; white-space: nowrap; }
+  .logo-card[aria-pressed="true"] .pick { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+  /* Профиль */
+  .studio { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 28px; align-items: start; }
+  .fields { display: grid; gap: 14px; min-width: 0; }
+  label { display: grid; gap: 6px; font-size: 14px; color: var(--muted); }
+  input, textarea { font: 400 16px/1.4 var(--f-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; width: 100%; }
+  textarea { min-height: 92px; resize: vertical; }
+  .row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+  .handles { display: flex; flex-wrap: wrap; gap: 8px; }
+  .handle { font: 500 13px/1 var(--f-mono); padding: 8px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .handle:hover { border-color: var(--accent); }
+  .phone { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); border: 1px solid var(--line); border-radius: 28px; background: var(--surface); padding: 18px 16px 20px; display: grid; gap: 12px; }
+  .phone .bar { display: flex; justify-content: center; font: 600 15px/1 var(--f-body); }
+  .profile { display: grid; grid-template-columns: 86px 1fr; gap: 14px; align-items: center; }
+  .profile .avatar { width: 86px; height: 86px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; font-size: 13px; color: var(--muted); }
+  .stats b { display: block; color: var(--ink); font-size: 16px; }
+  .p-name { font-weight: 600; font-size: 14px; }
+  .p-cat { color: var(--muted); font-size: 13px; }
+  .p-bio { white-space: pre-line; font-size: 14px; line-height: 1.45; }
+  .p-link { color: var(--accent); font-size: 14px; word-break: break-all; }
+  .p-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .p-btns span { text-align: center; font-size: 13px; font-weight: 600; background: var(--bg); border-radius: 8px; padding: 7px 4px; }
+  .hl { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 2px; }
+  .hl figure { margin: 0; display: grid; justify-items: center; gap: 4px; font-size: 11px; color: var(--muted); flex: none; width: 58px; text-align: center; }
+  .hl svg { width: 54px; height: 54px; }
+  .grid9 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+  .grid9 div { aspect-ratio: 1; background: var(--bg); border-radius: 3px; display: grid; place-items: center; text-align: center; font-size: 10px; line-height: 1.2; color: var(--muted); padding: 4px; }
+  .note { font-size: 13px; color: var(--muted); margin: 0; }
+
+  /* Шаги */
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .step { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: 16px 18px; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; }
+  .step input[type="checkbox"] { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--accent); }
+  .step h3 { margin: 0; font: 600 17px/1.35 var(--f-body); }
+  .step .body { grid-column: 2; color: var(--muted); font-size: 15px; display: grid; gap: 8px; }
+  .step.done h3 { text-decoration: line-through; color: var(--muted); }
+  .copy { display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap; }
+  .copy pre { margin: 0; flex: 1 1 260px; min-width: 0; white-space: pre-wrap; font: 400 14px/1.5 var(--f-body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; padding: 10px 14px; font: 600 14px/1 var(--f-body); border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .progress { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; }
+  .progress .track { flex: 1; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+  .progress .fill { height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+  .progress span { font: 500 13px/1 var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .handoff { display: grid; gap: 10px; background: var(--accent-soft); border-radius: var(--r); padding: 18px; }
+  .handoff pre { margin: 0; white-space: pre-wrap; font: 400 14px/1.5 var(--f-mono); }
+  @media (prefers-reduced-motion: reduce) { .progress .fill { transition: none; } }
+  @media (max-width: 900px) { .logos { grid-template-columns: repeat(2, minmax(0, 1fr)); } .studio { grid-template-columns: minmax(0, 1fr); } .phone { position: static; } }
+  @media (max-width: 560px) { .logos, .row2 { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<div class="wrap">
+  <header class="page">
+    <p class="eyebrow">Qabat · 3D-печать · Душанбе</p>
+    <h1>Логотип и запуск Instagram</h1>
+    <p class="intro">Выберите логотип, заполните поля и пройдите шаги по порядку. Справа сразу видно, как будет выглядеть профиль. В конце скопируйте итог и пришлите Джарвису.</p>
+  </header>
+
+  <section aria-labelledby="h-logo">
+    <p class="eyebrow">Шаг 1 из 3</p>
+    <h2 id="h-logo">Выберите логотип</h2>
+    <p class="sub">Буквы нарезаны на слои, как их видит принтер: слой за слоем. Каждый вариант показан на светлом и тёмном фоне, а в кружке — как аватарка в Instagram.</p>
+    <div class="logos" id="logos"></div>
+  </section>
+
+  <section aria-labelledby="h-prof">
+    <p class="eyebrow">Шаг 2 из 3</p>
+    <h2 id="h-prof">Заполните профиль</h2>
+    <p class="sub">Что вы впишете здесь, то и вставите в Instagram. Поля сохраняются в этом браузере.</p>
+    <div class="studio">
+      <div class="fields">
+        <label for="f-user">Имя пользователя: что удалось занять в Instagram
+          <input id="f-user" placeholder="qabat" autocomplete="off">
+        </label>
+        <div class="handles" aria-label="Варианты имени">
+          <button class="handle" type="button" data-h="qabat">qabat</button>
+          <button class="handle" type="button" data-h="qabat.tj">qabat.tj</button>
+          <button class="handle" type="button" data-h="qabat.print">qabat.print</button>
+          <button class="handle" type="button" data-h="qabatprintlab">qabatprintlab</button>
+          <button class="handle" type="button" data-h="qabat.printlab">qabat.printlab</button>
+        </div>
+        <label for="f-name">Имя в профиле: по нему ищут
+          <input id="f-name" value="Qabat · 3D-печать в Душанбе">
+        </label>
+        <label for="f-bio">Описание: до 150 знаков
+          <textarea id="f-bio" maxlength="150">3D-печать слой за слоем.
+Лампы «Чароғ» · вещи для дома · подарки
+Печать и моделирование по вашей идее</textarea>
+        </label>
+        <div class="row2">
+          <label for="f-wa">WhatsApp для заказов
+            <input id="f-wa" type="tel" placeholder="+992 …">
+          </label>
+          <label for="f-tg">Telegram
+            <input id="f-tg" placeholder="@…">
+          </label>
+        </div>
+        <label for="f-addr">Адрес или район: где забрать заказ
+          <input id="f-addr" placeholder="Душанбе, …">
+        </label>
+        <p class="note">Номер телефона и адрес лучше указать бизнесовые. Личные не нужны.</p>
+      </div>
+      <aside class="phone" aria-label="Предпросмотр профиля">
+        <div class="bar" id="p-user">qabat</div>
+        <div class="profile">
+          <div class="avatar" id="p-avatar"></div>
+          <div class="stats"><div><b>0</b>публикаций</div><div><b>0</b>подписчиков</div><div><b>0</b>подписок</div></div>
+        </div>
+        <div>
+          <div class="p-name" id="p-name"></div>
+          <div class="p-cat">Товары и услуги</div>
+          <div class="p-bio" id="p-bio"></div>
+          <div class="p-link" id="p-link"></div>
+        </div>
+        <div class="p-btns"><span>Написать</span><span>WhatsApp</span><span>Адрес</span></div>
+        <div class="hl" id="p-hl"></div>
+        <div class="grid9" aria-label="План первых девяти публикаций">
+          <div>Знакомство: кто мы</div><div>Таймлапс печати</div><div>Лампа «Чароғ» в темноте</div>
+          <div>Как заказать: 4 шага</div><div>Из фото в 3D-модель</div><div>Принтеры P1S и K1</div>
+          <div>PLA или PETG</div><div>Подарок к празднику</div><div>Печать по вашему файлу</div>
+        </div>
+        <p class="note">Сетка — план первых девяти публикаций. Снимаем по нему.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-steps">
+    <p class="eyebrow">Шаг 3 из 3</p>
+    <h2 id="h-steps">Создайте Instagram по шагам</h2>
+    <div class="progress"><div class="track"><div class="fill" id="prog"></div></div><span id="prog-t">0 из 9</span></div>
+    <ol class="steps" id="steps">
+      <li class="step"><input type="checkbox" id="s1" aria-labelledby="t1"><h3 id="t1">Подготовьте почту и логотип</h3>
+        <div class="body">Заведите отдельную почту для Qabat, например в Gmail. Логотип выберите выше: скажите Джарвису номер, и он пришлёт файл для аватарки.</div></li>
+      <li class="step"><input type="checkbox" id="s2" aria-labelledby="t2"><h3 id="t2">Создайте аккаунт</h3>
+        <div class="body">В приложении Instagram: профиль → меню → «Добавить аккаунт» → «Создать новый». Имя пробуйте по порядку из вариантов выше. Свободное впишите в поле «Имя пользователя».</div></li>
+      <li class="step"><input type="checkbox" id="s3" aria-labelledby="t3"><h3 id="t3">Переключите на бизнес-аккаунт</h3>
+        <div class="body">Настройки → «Тип аккаунта и инструменты» → «Переключиться на профессиональный аккаунт» → «Бизнес». Категория: «Товары/услуги» или ближайшая по поиску «3D».</div></li>
+      <li class="step"><input type="checkbox" id="s4" aria-labelledby="t4"><h3 id="t4">Заполните профиль</h3>
+        <div class="body">«Редактировать профиль»: поставьте аватарку и вставьте имя и описание.
+          <div class="copy"><pre id="c-name"></pre><button class="btn" type="button" data-copy="c-name">Скопировать имя</button></div>
+          <div class="copy"><pre id="c-bio"></pre><button class="btn" type="button" data-copy="c-bio">Скопировать описание</button></div>
+        </div></li>
+      <li class="step"><input type="checkbox" id="s5" aria-labelledby="t5"><h3 id="t5">Добавьте кнопки связи</h3>
+        <div class="body">«Редактировать профиль» → «Варианты связи»: WhatsApp и адрес. В ссылку профиля поставьте WhatsApp или Telegram — так заказ приходит в один клик.
+          <div class="copy"><pre id="c-link"></pre><button class="btn" type="button" data-copy="c-link">Скопировать ссылку</button></div>
+        </div></li>
+      <li class="step"><input type="checkbox" id="s6" aria-labelledby="t6"><h3 id="t6">Сделайте «Актуальное»</h3>
+        <div class="body">Пять кружков под описанием: Лампы, Для дома, Подарки, Как заказать, Отзывы. Обложки в стиле логотипа видны в предпросмотре. Джарвис пришлёт их файлами.</div></li>
+      <li class="step"><input type="checkbox" id="s7" aria-labelledby="t7"><h3 id="t7">Подключите страницу Facebook и Meta Business Suite</h3>
+        <div class="body">Настройки → «Центр аккаунтов» → добавьте страницу Facebook для Qabat. Без неё не будет рекламы и чат-бота, который отвечает клиентам.</div></li>
+      <li class="step"><input type="checkbox" id="s8" aria-labelledby="t8"><h3 id="t8">Добавьте Qabat в Metricool</h3>
+        <div class="body">В Metricool создайте второй бренд «Qabat» и подключите новый Instagram. Тогда Джарвис сможет готовить публикации и смотреть статистику, как у Dream House.</div></li>
+      <li class="step"><input type="checkbox" id="s9" aria-labelledby="t9"><h3 id="t9">Пришлите итог Джарвису</h3>
+        <div class="body">Нажмите кнопку ниже и вставьте текст в чат. Джарвис подготовит первые девять публикаций и обложки.</div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="h-hand">
+    <div class="handoff">
+      <h2 id="h-hand">Итог для Джарвиса</h2>
+      <pre id="summary"></pre>
+      <div><button class="btn primary" type="button" id="copy-sum">Скопировать итог</button> <span class="note" id="copy-msg" role="status"></span></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  // Буквы режем на слои, как слайсер: полосы-слои, тонкий зазор между ними, верхний или нижний слой — акцент.
+  var NS = 'http://www.w3.org/2000/svg', n = 0;
+  function uid(p) { n += 1; return p + n; }
+  var FONT = 'Unbounded, "Arial Black", system-ui, sans-serif';
+  function word(text, o) {
+    // o: x, y (базовая линия), size, anchor, period, accent: 'top' | 'bottom' | {x0,x1} , outline
+    var id = uid('q'), per = o.period, solid = per * 0.74, top = o.y - o.size * 0.74, h = o.size * 0.78;
+    var t = '<text x="' + o.x + '" y="' + o.y + '" text-anchor="' + (o.anchor || 'middle') + '" font-family=' + "'" + FONT + "'" + ' font-weight="800" font-size="' + o.size + '" letter-spacing="' + (o.ls || 0) + '"';
+    var defs = '<defs><pattern id="' + id + 'p" width="4" height="' + per + '" patternUnits="userSpaceOnUse" y="' + top + '"><rect width="4" height="' + solid + '" fill="#fff"/></pattern>' +
+      '<mask id="' + id + 'm" maskUnits="userSpaceOnUse" x="-50" y="-50" width="600" height="300"><rect x="-50" y="-50" width="600" height="300" fill="url(#' + id + 'p)"/></mask>';
+    var band = '';
+    if (o.accent === 'top') band = '<rect x="-50" y="' + (top - 2) + '" width="600" height="' + (per + 2) + '"/>';
+    if (o.accent === 'bottom') band = '<rect x="-50" y="' + (o.y - per) + '" width="600" height="' + (per + 4) + '"/>';
+    if (o.accent && o.accent.x0 != null) band = '<rect x="' + o.accent.x0 + '" y="' + (top - 2) + '" width="' + (o.accent.x1 - o.accent.x0) + '" height="' + (per + 2) + '"/>';
+    defs += band ? '<clipPath id="' + id + 'c">' + band + '</clipPath></defs>' : '</defs>';
+    var body = o.outline
+      ? t + ' fill="none" stroke="var(--logo-ink)" stroke-width="' + (o.size * 0.03) + '">' + text + '</text>'
+      : '<g mask="url(#' + id + 'm)">' + t + ' fill="var(--logo-ink)">' + text + '</text></g>';
+    var acc = band ? '<g clip-path="url(#' + id + 'c)"' + (o.outline ? ' mask="url(#' + id + 'm)"' : ' mask="url(#' + id + 'm)"') + '>' + t + ' fill="var(--logo-accent)">' + text + '</text></g>' : '';
+    return defs + body + acc;
+  }
+  function sub(text, x, y, size, anchor) {
+    return '<text x="' + x + '" y="' + y + '" font-family="JetBrains Mono, ui-monospace, monospace" font-weight="500" font-size="' + size + '" letter-spacing="' + (size * 0.62) + '" text-anchor="' + (anchor || 'middle') + '" fill="var(--logo-ink)">' + text + '</text>';
+  }
+  function svg(vb, inner) { return '<svg xmlns="' + NS + '" viewBox="' + vb + '" role="img" aria-label="Qabat Print Lab">' + inner + '</svg>'; }
+  function avatarWrap(inner) { return '<svg xmlns="' + NS + '" viewBox="0 0 100 100"><rect width="100" height="100" fill="var(--logo-bg)"/>' + inner + '</svg>'; }
+  function dots(x0, y0, step, k, r) { var d = ''; for (var i = 0; i < k; i++) for (var j = 0; j < k; j++) d += '<circle cx="' + (x0 + i * step) + '" cy="' + (y0 + j * step) + '" r="' + r + '" fill="var(--logo-ink)" opacity=".3"/>'; return d; }
+
+  var V = [
+    { id: 'nit', name: '1 · Слой', why: 'Буквы нарезаны на слои печати. Верхний слой синий: деталь печатается прямо сейчас.',
+      full: function () { return svg('0 0 400 150', word('QABAT', { x: 200, y: 98, size: 88, period: 8, accent: 'top', ls: -2 }) + sub('PRINT LAB', 200, 138, 17)); },
+      ava: function () { return avatarWrap(word('Q', { x: 50, y: 74, size: 70, period: 7, accent: 'top' })); } },
+    { id: 'sloi', name: '2 · Тонкий слой', why: 'Слои тоньше и чаще, как при печати с высокой детализацией. Спокойный и строгий.',
+      full: function () { return svg('0 0 400 150', word('QABAT', { x: 200, y: 98, size: 88, period: 5, ls: -2 }) + '<rect x="40" y="18" width="320" height="3" rx="1.5" fill="var(--logo-accent)"/>' + sub('PRINT LAB', 200, 138, 17)); },
+      ava: function () { return avatarWrap(word('Q', { x: 50, y: 74, size: 70, period: 4.5 }) + '<rect x="24" y="13" width="52" height="3" rx="1.5" fill="var(--logo-accent)"/>'); } },
+    { id: 'soplo', name: '3 · Сопло', why: 'Сопло над буквой T докладывает последний слой. Видно, что это печать, даже без слов.',
+      full: function () { return svg('0 0 400 160', '<path d="M335 8h20l-6 12h-8z" fill="var(--logo-accent)"/><rect x="344" y="20" width="2" height="12" fill="var(--logo-accent)"/>' + word('QABAT', { x: 200, y: 108, size: 88, period: 8, accent: { x0: 0, x1: 345 }, ls: -2 }) + sub('PRINT LAB', 372, 148, 17, 'end')); },
+      ava: function () { return avatarWrap('<path d="M40 14h20l-6 12h-8z" fill="var(--logo-accent)"/><rect x="49" y="26" width="2" height="9" fill="var(--logo-accent)"/>' + word('Q', { x: 50, y: 88, size: 60, period: 6, accent: { x0: 0, x1: 50 } })); } },
+    { id: 'plitka', name: '4 · Платформа', why: 'Буква Q на печатной платформе с сеткой. Лучше всех держится в маленьком кружке аватарки.',
+      full: function () { return svg('0 0 400 130', '<rect x="4" y="12" width="106" height="106" rx="20" fill="none" stroke="var(--logo-ink)" stroke-width="2.5"/>' + dots(22, 30, 23.5, 4, 1.3) + word('Q', { x: 57, y: 92, size: 70, period: 7, accent: 'top' }) + word('QABAT', { x: 130, y: 78, size: 54, period: 6, anchor: 'start', ls: -1 }) + sub('PRINT LAB', 131, 108, 13, 'start')); },
+      ava: function () { return avatarWrap(dots(17, 17, 22, 4, 1.4) + word('Q', { x: 50, y: 74, size: 66, period: 7, accent: 'top' })); } },
+    { id: 'kontur', name: '5 · Первый слой', why: 'Буквы контуром, нижний слой сплошной синий — первый слой, на котором держится вся деталь.',
+      full: function () { return svg('0 0 400 150', word('QABAT', { x: 200, y: 98, size: 88, period: 8, accent: 'bottom', outline: true, ls: -2 }) + sub('PRINT LAB', 200, 138, 17)); },
+      ava: function () { return avatarWrap(word('Q', { x: 50, y: 74, size: 70, period: 7, accent: 'bottom', outline: true })); } },
+    { id: 'kabat', name: '6 · Қабат', why: 'Кириллица с таджикской буквой Қ: «слой» по-таджикски. Для местной публики.',
+      full: function () { return svg('0 0 400 150', word('ҚАБАТ', { x: 200, y: 98, size: 82, period: 8, accent: 'top', ls: -2 }) + sub('PRINT LAB', 200, 138, 17)); },
+      ava: function () { return avatarWrap(word('Қ', { x: 50, y: 74, size: 70, period: 7, accent: 'top' })); } }
+  ];
+
+  var store = { get: function (k) { try { return localStorage.getItem('qabat-' + k); } catch (e) { return null; } },
+                set: function (k, v) { try { localStorage.setItem('qabat-' + k, v); } catch (e) {} } };
+  var chosen = store.get('logo') || 'nit';
+
+  var box = document.getElementById('logos');
+  V.forEach(function (v) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'logo-card'; b.dataset.id = v.id;
+    b.innerHTML = '<div class="stage"><div class="pane light">' + v.full() + '</div><div class="pane dark">' + v.full() + '</div></div>' +
+      '<div class="meta"><div class="avatar">' + v.ava() + '</div><div><div class="name">' + v.name + '</div><div class="why">' + v.why + '</div></div><span class="pick">выбрать</span></div>';
+    b.addEventListener('click', function () { chosen = v.id; store.set('logo', chosen); paint(); });
+    box.appendChild(b);
+  });
+
+  var ids = ['f-user', 'f-name', 'f-bio', 'f-wa', 'f-tg', 'f-addr'];
+  ids.forEach(function (id) { var el = document.getElementById(id), v = store.get(id); if (v != null) el.value = v; el.addEventListener('input', function () { store.set(id, el.value); paint(); }); });
+  document.querySelectorAll('.handle').forEach(function (h) { h.addEventListener('click', function () { var el = document.getElementById('f-user'); el.value = h.dataset.h; store.set('f-user', el.value); paint(); }); });
+
+  var steps = document.querySelectorAll('#steps input[type="checkbox"]');
+  steps.forEach(function (cb) { cb.checked = store.get(cb.id) === '1'; cb.addEventListener('change', function () { store.set(cb.id, cb.checked ? '1' : '0'); paint(); }); });
+
+  function hlCover(label, i) {
+    var rows = ''; for (var r = 0; r < 4; r++) rows += '<rect x="' + (20 - (r % 2) * 4) + '" y="' + (26 + r * 9) + '" width="' + (24 + (r % 2) * 8) + '" height="6" rx="3" fill="' + (r === 0 ? 'var(--logo-accent)' : 'var(--logo-ink)') + '"/>';
+    return '<figure><svg viewBox="0 0 64 64" style="--logo-ink: var(--ink); --logo-accent: var(--accent)"><circle cx="32" cy="32" r="30" fill="var(--bg)" stroke="var(--line)" stroke-width="2"/>' + rows + '</svg>' + label + '</figure>';
+  }
+
+  function val(id) { return document.getElementById(id).value.trim(); }
+  function linkText() { var wa = val('f-wa').replace(/[^\d]/g, ''); if (wa) return 'wa.me/' + wa; var tg = val('f-tg').replace(/^@/, ''); return tg ? 't.me/' + tg : 'ссылка на WhatsApp или Telegram'; }
+
+  function paint() {
+    document.querySelectorAll('.logo-card').forEach(function (c) { c.setAttribute('aria-pressed', c.dataset.id === chosen ? 'true' : 'false'); c.querySelector('.pick').textContent = c.dataset.id === chosen ? 'выбран' : 'выбрать'; });
+    var v = V.filter(function (x) { return x.id === chosen; })[0] || V[0];
+    var av = document.getElementById('p-avatar'); av.innerHTML = v.ava(); av.style.cssText = '--logo-ink: var(--ink); --logo-bg: var(--bg); --logo-accent: var(--accent)';
+    document.getElementById('p-user').textContent = val('f-user') || 'qabat';
+    document.getElementById('p-name').textContent = val('f-name');
+    document.getElementById('p-bio').textContent = val('f-bio');
+    document.getElementById('p-link').textContent = linkText();
+    document.getElementById('c-name').textContent = val('f-name');
+    document.getElementById('c-bio').textContent = val('f-bio');
+    document.getElementById('c-link').textContent = linkText();
+    document.getElementById('p-hl').innerHTML = ['Лампы', 'Для дома', 'Подарки', 'Как заказать', 'Отзывы'].map(hlCover).join('');
+    var n = 0; steps.forEach(function (cb) { if (cb.checked) n++; cb.closest('.step').classList.toggle('done', cb.checked); });
+    document.getElementById('prog').style.width = (n / steps.length * 100) + '%';
+    document.getElementById('prog-t').textContent = n + ' из ' + steps.length;
+    document.getElementById('summary').textContent =
+      'Qabat — итог для Джарвиса\n' +
+      'Логотип: ' + v.name + '\n' +
+      'Instagram: @' + (val('f-user') || '—') + '\n' +
+      'Имя в профиле: ' + val('f-name') + '\n' +
+      'WhatsApp: ' + (val('f-wa') || '—') + '\n' +
+      'Telegram: ' + (val('f-tg') || '—') + '\n' +
+      'Адрес: ' + (val('f-addr') || '—') + '\n' +
+      'Сделано шагов: ' + n + ' из ' + steps.length;
+  }
+
+  function copyText(text, msgEl) {
+    var done = function (ok) { if (msgEl) msgEl.textContent = ok ? 'Скопировано' : 'Не получилось скопировать. Выделите текст и скопируйте вручную.'; };
+    try { navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); }); } catch (e) { done(false); }
+  }
+  document.querySelectorAll('[data-copy]').forEach(function (b) { b.addEventListener('click', function () { var t = document.getElementById(b.dataset.copy).textContent; copyText(t, null); var old = b.textContent; b.textContent = 'Скопировано'; setTimeout(function () { b.textContent = old; }, 1400); }); });
+  document.getElementById('copy-sum').addEventListener('click', function () { copyText(document.getElementById('summary').textContent, document.getElementById('copy-msg')); });
+
+  paint();
+})();
+</script>
