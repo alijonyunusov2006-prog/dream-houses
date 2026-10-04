@@ -82,6 +82,8 @@ ul.tips{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;fo
 .imgs figcaption{font-size:12.5px}
 .ava{display:flex;gap:14px;align-items:center}
 .ava img{width:132px;height:132px;max-width:100%;border-radius:50%;box-shadow:0 0 0 1px var(--line)}
+.variant{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;border:1px solid var(--line)}
+.variant.best{border-color:var(--mint);background:var(--mint-soft)}
 .hlrow{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;align-items:start;padding-top:12px;border-top:1px solid var(--line)}
 .hlrow:first-of-type{border-top:0;padding-top:0}
 .hlrow img{width:64px;height:64px;border-radius:50%;box-shadow:0 0 0 1px var(--line)}
@@ -119,7 +121,7 @@ footer{margin-top:32px;font-size:13px;color:var(--muted)}
     <label class="f">Где забрать (район, ориентир)<input id="addr" type="text" placeholder="например Сино, рядом с …"></label>
     <label class="f">Часы работы<input id="hours" type="text" value="Пн–Сб 10:00–20:00"></label>
     <label class="f">Доставка по Душанбе, сомони (0 — нет)<input id="deliv" type="number" min="0" step="1" value="0"></label>
-    <label class="f">Вариант описания<select id="biov"></select></label>
+    <label class="f">Какой вариант описания поставили<select id="biov"></select></label>
   </div>
 </div>
 
@@ -153,7 +155,8 @@ F.forEach(id => { const el = $('#' + id); const v = store.get('f.' + id, null); 
 const val = id => $('#' + id).value.trim();
 const digits = () => val('phone').replace(/\D/g, '');
 const dv = () => +val('deliv') || 0;
-function bio(lang){ const v = D.bio[lang][+val('biov') || 0]; return v[0].concat(dv() > 0 ? v[2] : v[1]).join('\n'); }
+function bioV(lang, i){ const v = D.bio[lang][i]; return v[0].concat(dv() > 0 ? v[2] : v[1]).join('\n'); }
+function bio(lang){ return bioV(lang, +val('biov') || 0); }
 function fill(t){
   return t.replace('{hours}', val('hours') || 'Пн–Сб 10:00–20:00')
           .replace('{deliv}', dv() > 0 ? `Самовывоз или доставка по Душанбе — ${dv()} сомони.` : 'Забираете в мастерской.');
@@ -188,9 +191,11 @@ function steps(){
     { t: 'Впишите имя профиля', why: 'По имени ищут в Instagram, поэтому в нём слова «3D-печать» и «Душанбе».',
       body: path(['Редактировать профиль', 'Имя']) + copyBox('Имя', D.profileName) +
         `<div class="warn"><b>Внимательно:</b> имя можно менять только 2 раза за 14 дней.</div>` },
-    { t: 'Вставьте описание', why: 'Вариант выбирается в поле «Ваши данные» вверху.',
-      body: path(['Редактировать профиль', 'О себе']) + copyBox('Описание по-русски', bio('ru'), true) +
-        copyBox('Если хотите на тоҷикӣ (проверьте перевод)', bio('tj'), true) },
+    { t: 'Вставьте описание', why: 'Три готовых варианта. Скопируйте тот, что нравится, и вставьте в «О себе». Все до 150 знаков.',
+      body: path(['Редактировать профиль', 'О себе']) +
+        D.bio.ru.map((_, i) => `<div class="variant${i === 0 ? ' best' : ''}"><p class="lbl">${esc(D.bioNames[i])}</p>` +
+          copyBox('По-русски', bioV('ru', i), true) + copyBox('На тоҷикӣ — проверьте перевод', bioV('tj', i), true) + '</div>').join('') +
+        tips(['В поле «Какой вариант описания поставили» вверху отметьте свой — он попадёт в итог для Джарвиса.']) },
     { t: 'Добавьте ссылку на WhatsApp', why: 'Клиент нажмёт и сразу напишет вам.',
       body: path(['Редактировать профиль', 'Ссылки', 'Добавить внешнюю ссылку']) +
         (wa ? copyBox('Ссылка', wa) + copyBox('Название ссылки', 'WhatsApp') : `<div class="warn"><b>Впишите номер</b> в поле «WhatsApp или телефон» вверху — ссылка появится здесь.</div>`) },
