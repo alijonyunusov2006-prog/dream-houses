@@ -7,11 +7,47 @@ from marks import avatar, MINT, INK, PAPER
 colors = [("Мята", MINT, "акцент: трубка, верхний слой, кнопки"), ("Графит", INK, "текст и знак"),
           ("Тёплый белый", PAPER, "фон"), ("Светлая мята", "#E2F6EF", "подложки, обложки"),
           ("Тёмная мята", "#1F7F69", "ссылки и мелкий акцент"), ("Серый", "#6B7471", "подписи")]
-D = dict(defaults=data.DEFAULTS, pack=data.PACK, products=data.PRODUCTS, services=data.SERVICES,
+import re, html as _html, datetime, content
+BRAIN = os.path.join(HERE, '..', '..', 'jarvis', 'brain')
+def md(t):
+    t = _html.escape(t.strip(), quote=False)
+    t = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', t)
+    return re.sub(r'`([^`]+)`', r'<code>\1</code>', t)
+decisions = []
+for line in open(os.path.join(BRAIN, '10-rules', 'decided.md')):
+    cells = [c.strip() for c in line.strip().strip('|').split('|')]
+    if len(cells) >= 3 and re.match(r'\d{4}-\d\d-\d\d', cells[0]):
+        text = '|'.join(cells[1:-1])
+        if '3D-бизнес' in cells[-1] or 'Qabat' in text or 'Higgsfield больше не тратить' in text:
+            decisions.append((cells[0], md(text)))
+decisions.reverse()
+questions, inside = [], False
+for line in open(os.path.join(BRAIN, '00-inbox', 'questions.md')):
+    if line.startswith('## '): inside = line.startswith('## Открытые')
+    elif inside and line.startswith('- ') and ('Qabat' in line or '3D' in line):
+        parts = [p.strip() for p in line[2:].split('·')]
+        topic = parts[1] if len(parts) > 2 else ''
+        body = ' · '.join(parts[2:] if topic == 'Qabat' else parts[1:])
+        questions.append(md(body) + f' <span class="muted" style="white-space:nowrap">({parts[0]})</span>')
+HF = 'https://d8j0ntlcm91z4.cloudfront.net/user_3ElkwKvj3PbkMSEZvzI8hrexIy2/'
+ZIP = 'https://d2ol7oe51mr4n9.cloudfront.net/user_3ElkwKvj3PbkMSEZvzI8hrexIy2/'
+link = lambda u, t: f'<a href="{u}" target="_blank" rel="noopener">{t}</a>'
+where = [
+ '<b>Эта страница</b> — главная и единственная по Qabat. Ссылка не меняется, всё новое JARVIS добавляет сюда.',
+ '<b>Брендбук PDF и архив картинок</b> — в нашем чате от 4 октября и в GitHub (репозиторий <code>dream-houses</code>, папка <code>qabat/</code>): <code>brandbook/Qabat-brandbook.pdf</code>, обложки <code>kit/hl/</code>, логотипы <code>kit/logo/</code>.',
+ '<b>Память JARVIS</b> — <code>jarvis/brain/30-projects/3d-print-biznes/</code>: статус, каталог и цены, закупка, чат-бот, вечерняя печать, варианты логотипа.',
+ '<b>Исходники логотипа из Higgsfield</b>, на случай если захотите вернуться: ' + link(HF + 'hf_20261004_191046_3b721a0e-5ecd-4b13-b33d-d0754c2ac4de.svg', 'знак для аватарки (SVG)') + ', ' +
+   link(HF + 'hf_20261004_200536_4855ebfd-81ad-4521-84b6-153e243e6b70.svg', 'полный логотип L1 (SVG)') + ', ' +
+   link(ZIP + 'b9f871a8-1eaf-4ed9-9395-6d04330390c3.zip', '12 первых вариантов (ZIP)') + ', ' + link(ZIP + '5f50e104-f13e-46ce-878f-b8b1c6f1075a.zip', '6 доработок (ZIP)') + '.',
+ 'После переноса JARVIS на ПК всё это будет и в папке проекта на компьютере.',
+]
+logos = [("znak-avatarka.png", "Знак в круге — аватарка"), ("logo-svetlyj.png", "Полный логотип на светлом"),
+         ("logo-tyomnyj.png", "Полный логотип на тёмном"), ("logo-prozrachnyj.png", "Без фона — для наклеек и упаковки")]
+D = dict(brand=content.as_dict(), logos=logos, where=where, decisions=decisions, questions=questions, defaults=data.DEFAULTS, pack=data.PACK, products=data.PRODUCTS, services=data.SERVICES,
          purchases=data.PURCHASES, highlights=data.HIGHLIGHTS, posts=data.POSTS, checklist=data.CHECKLIST, colors=colors)
 html = open(os.path.join(HERE, 'template.html')).read()
 ava = avatar(size=96).replace('width="96" height="96"', 'width="100%" height="100%"')
-html = html.replace('/*AVATAR*/', ava).replace('/*DATA*/', json.dumps(D, ensure_ascii=False))
+html = html.replace('/*AVATAR*/', ava).replace('/*DATA*/', json.dumps(D, ensure_ascii=False)).replace('/*UPDATED*/', datetime.date.today().strftime('%d.%m.%Y'))
 out = os.path.join(HERE, '..', 'instagram-guide.html')
 open(out, 'w').write(html)
 print('ok', len(html))

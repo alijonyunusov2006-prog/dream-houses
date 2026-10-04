@@ -1,4 +1,4 @@
-<title>Qabat Instagram</title>
+<title>Qabat Print Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
@@ -137,6 +137,27 @@ td input[type=number]{width:76px;padding:5px 7px;font-size:15px;text-align:right
 .brow{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start}
 .brow input{width:20px;height:20px;accent-color:var(--mint-deep);margin-top:2px}
 .brow.got .top b{text-decoration:line-through;color:var(--muted)}
+/* брендбук и логотипы */
+.aud{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.aud{grid-template-columns:minmax(0,1fr)}}
+.aud .card p{font-size:14px;margin-bottom:4px}
+.sw2{display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center}
+.sw2 span.c{width:52px;height:36px;border-radius:9px;box-shadow:0 0 0 1px var(--line)}
+.quote{border-left:4px solid var(--mint);padding:2px 0 2px 12px;font-size:15px}
+.vals{display:flex;flex-direction:column;gap:10px}
+.vals div{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start;font-size:15px}
+.vals span{width:28px;height:28px;border-radius:50%;background:var(--mint);color:#10201B;font:600 13px var(--display);display:flex;align-items:center;justify-content:center}
+.ctable{width:100%;border-collapse:collapse;font-size:14px}.ctable td{padding:8px 4px;border-bottom:1px solid var(--line);vertical-align:top}.ctable td:first-child{font-weight:600;width:38%}
+.logos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.logos figure{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.logos img{width:100%;height:auto;max-width:100%;aspect-ratio:1;border-radius:12px;box-shadow:0 0 0 1px var(--line);background:var(--card)}
+.logos img.checker{background:repeating-conic-gradient(var(--line) 0 25%,var(--card) 0 50%) 0 0/16px 16px}
+.logos figcaption{font-size:13px;color:var(--muted)}
+.dec{display:grid;grid-template-columns:86px minmax(0,1fr);gap:10px;font-size:14px;padding-top:10px;border-top:1px solid var(--line)}
+.dec:first-child{border-top:0;padding-top:0}
+.dec time{color:var(--muted);font-variant-numeric:tabular-nums;font-size:13px}
+.dec div,.card li,.card p{min-width:0;overflow-wrap:anywhere}
+code{font-size:.92em;background:var(--mint-soft);padding:0 4px;border-radius:4px;word-break:break-word}
 /* чат */
 .chat{display:flex;flex-direction:column;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px}
 .msg{max-width:85%;padding:9px 12px;border-radius:16px;font-size:14.5px;line-height:1.45}
@@ -172,8 +193,8 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-si
   <div class="ava" aria-hidden="true">/*AVATAR*/</div>
   <div>
     <div class="eyebrow">Qabat Print Lab · слой за слоем</div>
-    <h1>Комплект для запуска Instagram</h1>
-    <p class="muted" style="margin-top:6px">Всё, чтобы заполнить новый профиль и начать продавать: тексты, обложки, посты, товары с ценами, закупка, чат-бот и ночная печать. Меняйте поля — тексты и цены пересчитаются сами.</p>
+    <h1>Всё по Qabat — на одной странице</h1>
+    <p class="muted" style="margin-top:6px">Instagram, брендбук, логотип и файлы, товары с ценами, закупка, чат-бот, ночная печать, решения и вопросы. Новое по Qabat появляется здесь, по этой же ссылке. Меняйте поля — тексты и цены пересчитаются сами.</p>
   </div>
 </header>
 <div class="facts">
@@ -183,7 +204,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-si
 </div>
 
 <nav class="tabs" aria-label="Разделы">
-  <a href="#profile">Профиль</a><a href="#stories">Актуальное</a><a href="#posts">Посты</a><a href="#catalog">Товары и цены</a><a href="#buy">Закупка</a><a href="#bot">Чат-бот</a><a href="#night">Печать в 20:00</a><a href="#brand">Брендбук</a><a href="#check">Чек-лист</a>
+  <a href="#profile">Профиль</a><a href="#stories">Актуальное</a><a href="#posts">Посты</a><a href="#catalog">Товары и цены</a><a href="#buy">Закупка</a><a href="#bot">Чат-бот</a><a href="#night">Печать в 20:00</a><a href="#brand">Брендбук</a><a href="#files">Логотип и файлы</a><a href="#decisions">Решения</a><a href="#site">Сайт</a><a href="#check">Чек-лист</a>
 </nav>
 
 <!-- ПРОФИЛЬ -->
@@ -373,14 +394,38 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-si
 
 <!-- БРЕНДБУК -->
 <section id="brand">
-  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Брендбук коротко</h2>
-  <p class="muted">Полный PDF на 9 страниц я прислал в чат. Голос бренда и ценности в нём — моё предложение, поправьте голосом.</p></div>
-  <div class="grid2">
-    <div class="card"><h3 style="margin-bottom:10px">Цвета</h3><div id="swatches" class="stack" style="gap:8px"></div></div>
-    <div class="card"><h3 style="margin-bottom:10px">Шрифты и голос</h3>
-      <p style="font:600 22px var(--display)">Montserrat</p><p class="small muted" style="margin-bottom:8px">заголовки, цены, обложки</p>
-      <p style="font:500 18px var(--body)">Inter</p><p class="small muted" style="margin-bottom:12px">тексты и ответы</p>
-      <ul class="clean small"><li>На «вы», тепло, коротко.</li><li>Сначала цена, срок и как получить.</li><li>Только правда о сроке и наличии.</li></ul></div>
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Брендбук</h2>
+  <p class="muted">Полный текст брендбука. Тот же текст — в PDF на 9 страниц. Голос и ценности — моё предложение: поправьте голосом, и я обновлю обе версии.</p></div>
+  <div class="stack" id="bb"></div>
+</section>
+
+<!-- ЛОГОТИП И ФАЙЛЫ -->
+<section id="files">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Логотип и файлы</h2>
+  <p class="muted">На аватарке — знак в круге, полный логотип — L1. Основной файл вы ставите сами, эти картинки — запасные для наклеек и упаковки. Чтобы сохранить: нажмите на картинку и удерживайте.</p></div>
+  <div class="stack">
+    <div class="logos" id="logos"></div>
+    <div class="card"><h3 style="margin-bottom:8px">Где что лежит</h3><ul class="clean small" id="where"></ul></div>
+  </div>
+</section>
+
+<!-- РЕШЕНИЯ -->
+<section id="decisions">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Решения и вопросы</h2>
+  <p class="muted">Что уже решено по Qabat и что ждёт вашего ответа. Берётся из памяти JARVIS, при каждом обновлении страницы список свежий.</p></div>
+  <div class="stack">
+    <div class="card"><h3 style="margin-bottom:8px">Ждёт вашего ответа</h3><ul class="clean small" id="questions"></ul></div>
+    <div class="card"><h3 style="margin-bottom:8px">Решено</h3><div id="decided" class="stack" style="gap:10px"></div></div>
+  </div>
+</section>
+
+<!-- САЙТ -->
+<section id="site">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Сайт — потом</h2>
+  <p class="muted">Сейчас главный канал — Instagram: местные клиенты на сайты почти не заходят. Когда сайт понадобится, он соберётся из этих же товаров, цен и брендбука.</p></div>
+  <div class="card stack" style="gap:8px">
+    <p class="small"><b>Домены свободны</b> (проверено 4 октября через Vercel), <b>не куплены</b>: qabat.com — 11,25 $ в год, qabat.store, qabat.studio, qabat.shop, qabatprint.com, qabatprintlab.com. Покупка — только после вашего «да».</p>
+    <p class="small">Ранний черновик сайта лежит на старой отдельной странице: <a href="https://claude.ai/artifact/JWt1hmD3KGGH6LbaihTjMQ" target="_blank" rel="noopener">Qabat — черновик сайта</a>. Всё нужное из него уже здесь. Скажете — удалю её, чтобы осталась одна страница.</p>
   </div>
 </section>
 
@@ -398,7 +443,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-si
   </div>
 </section>
 
-<footer>Qabat Print Lab · комплект подготовил JARVIS, 4 октября 2026. Цены и сроки — оценка, решения — за владельцем.</footer>
+<footer>Qabat Print Lab · единая страница Qabat, ведёт JARVIS. Обновлено: /*UPDATED*/. Цены и сроки — оценка, решения — за владельцем.</footer>
 </div>
 <div class="toast" id="toast" hidden></div>
 
@@ -423,7 +468,7 @@ async function copy(text, btn){
 const HOOKS = ['3D-печать в Душанбе · слой за слоем', 'Печатаем вещи, которых нет в магазинах', 'Лампы и подарки на 3D-принтере · Душанбе'];
 const HOOKS_TJ = ['Чопи 3D дар Душанбе · қабат ба қабат', 'Чизҳое, ки дар мағоза нестанд', 'Чароғ ва тӯҳфа бо принтери 3D · Душанбе'];
 const pf = ['nick','phone','addr','hours','deliv','hook'];
-pf.forEach(id => { const el = $('#' + id); const v = store.get('f.' + id, null); if(v !== null) el.value = v; el.addEventListener('input', () => { store.set('f.' + id, el.value); renderProfile(); renderChat(); renderAll(); }); });
+pf.forEach(id => { const el = $('#' + id); const v = store.get('f.' + id, null); if(v !== null) el.value = v; el.addEventListener('input', () => { store.set('f.' + id, el.value); renderProfile(); renderChat(); renderContacts(); renderAll(); }); });
 function digits(){ return ($('#phone').value || '').replace(/\D/g,''); }
 function bioRu(){
   const dv = +$('#deliv').value || 0;
@@ -575,7 +620,47 @@ function renderChat(){
 $('#tgmsg').textContent = 'JARVIS, 20:00\nПартия на ночь:\n• P1S — белый PETG: брелоки с номером ×12 (заказы 3, 5, 6), 3 ч 10 мин, 96 г.\n• K1 — Silk «переливы»: флекси-дракон ×2 на склад (осталось 3), 9 ч, 140 г.\nПодготовьте: белый PETG в P1S, клей на стол; на K1 протереть стол спиртом.\nОтветьте «ок» — запущу. «Отложи K1» — напечатаю только P1S.';
 
 /* ---------- брендбук ---------- */
-$('#swatches').innerHTML = D.colors.map(([n, h, r]) => `<div style="display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center"><span style="width:44px;height:30px;border-radius:8px;background:${h};box-shadow:0 0 0 1px var(--line)"></span><div class="small"><b>${esc(n)}</b> <span class="muted">${h}</span><br><span class="muted">${esc(r)}</span></div></div>`).join('');
+function renderBrand(){
+  const B = D.brand, li = xs => xs.map(x => `<li>${esc(x)}</li>`).join('');
+  $('#bb').innerHTML = `
+  <div class="card"><h3 style="margin-bottom:8px">Кто мы</h3><p style="margin-bottom:10px">${esc(B.about.lead)}</p>
+    <div class="grid2"><div><p class="small muted" style="margin-bottom:4px">Что делаем</p><ul class="clean small">${li(B.about.what)}</ul></div>
+    <div class="small"><p class="muted">Миссия</p><p style="margin-bottom:8px">${esc(B.about.mission)}</p><p class="muted">Слоган</p><p style="font:600 20px var(--display);color:var(--mint-deep);margin-bottom:8px">${esc(B.about.slogan)}</p><p class="muted">Характер</p><p>${esc(B.about.character)}</p></div></div>
+    <p class="small muted" style="margin-top:10px">${esc(B.about.note)}</p></div>
+  <div><h3 style="margin-bottom:8px">Для кого мы</h3><div class="aud">${B.audience.map(([t, n, f, g]) => `<div class="card"><h3 style="font-size:15px;margin-bottom:6px">${esc(t)}</h3><p><b>Нужно:</b> ${esc(n)}</p><p><b>Боится:</b> ${esc(f)}</p><p><b>Даём:</b> ${esc(g)}</p></div>`).join('')}</div>
+    <p class="small" style="margin-top:8px">${esc(B.audience_common)}</p></div>
+  <div class="card"><h3 style="margin-bottom:8px">Логотип</h3><div class="grid2"><div><p class="small muted">Правила</p><ul class="clean small">${li(B.logo.rules)}</ul></div><div><p class="small muted">Нельзя</p><ul class="clean small no">${li(B.logo.no)}</ul></div></div>
+    <p class="small muted" style="margin-top:8px">${esc(B.logo.full)} ${esc(B.logo.mark)}</p></div>
+  <div class="card"><h3 style="margin-bottom:6px">Цвета</h3><p class="small muted" style="margin-bottom:10px">${esc(B.colors_lead)}</p><div class="stack" style="gap:8px">${B.colors.map(([n, h, r]) => `<div class="sw2"><span class="c" style="background:${h}"></span><div class="small"><b>${esc(n)}</b> <span class="muted">${h}</span><br><span class="muted">${esc(r)}</span></div></div>`).join('')}</div>
+    <p class="small muted" style="margin-top:8px">${esc(B.colors_note)}</p></div>
+  <div class="card"><h3 style="margin-bottom:8px">Шрифты</h3>
+    <p style="font:600 26px var(--display)">${esc(B.fonts.display[0])}</p><p class="small muted" style="margin-bottom:6px">${esc(B.fonts.display[1])}</p>
+    <p style="font:600 18px var(--display)">${esc(B.fonts.sample_title)}</p><p style="font:500 13px var(--display);letter-spacing:.18em;margin-bottom:12px">${esc(B.fonts.sample_caps)}</p>
+    <p style="font:600 24px var(--body)">${esc(B.fonts.body[0])}</p><p class="small muted" style="margin-bottom:6px">${esc(B.fonts.body[1])}</p>
+    <p>${esc(B.fonts.sample_text)}</p><p>${esc(B.fonts.sample_tj)}</p>
+    <p class="small muted" style="margin-top:8px">${esc(B.fonts.where)} ${esc(B.fonts.rule)}</p></div>
+  <div class="card"><h3 style="margin-bottom:6px">Голос бренда</h3><p class="chip" style="margin-bottom:10px">${esc(B.voice.propose)}</p>
+    <div class="grid2"><div><p class="small muted">Как говорим</p><ul class="clean small">${li(B.voice.do)}</ul></div><div><p class="small muted">Чего не говорим</p><ul class="clean small no">${li(B.voice.dont)}</ul></div></div>
+    <div class="stack" style="gap:8px;margin-top:12px">${B.voice.examples.map(q => `<p class="quote">${esc(q)}</p>`).join('')}</div>
+    <p class="small muted" style="margin-top:8px">${esc(B.voice.note)}</p></div>
+  <div class="card"><h3 style="margin-bottom:6px">Ценности и контакты</h3><p class="chip" style="margin-bottom:10px">${esc(B.values_propose)}</p>
+    <div class="vals">${B.values.map(([t, w], i) => `<div><span>${i + 1}</span><p><b>${esc(t)}.</b> ${esc(w)}</p></div>`).join('')}</div>
+    <table class="ctable" style="margin-top:12px"><tbody id="ctable"></tbody></table></div>
+  <div class="card"><h3 style="margin-bottom:8px">Стиль в Instagram</h3><ul class="clean small">${li(B.insta.photo)}</ul>
+    <p class="small" style="margin-top:8px"><b>Сетка:</b> ${esc(B.insta.grid)}</p><p class="small"><b>Подписи:</b> ${esc(B.insta.captions)}</p></div>`;
+  renderContacts();
+}
+function renderContacts(){
+  const el = $('#ctable'); if(!el) return;
+  const ph = digits(), addr = $('#addr').value.trim(), hrs = $('#hours').value.trim();
+  const rows = [['Instagram', '@' + $('#nick').value + ' (проверить, свободен ли)'], ['Facebook', 'Qabat — 3D-печать'],
+    ['WhatsApp / Telegram', ph ? '+992 ' + ph : '+992 ___ — впишите в «Профиле»'], ['Адрес', addr ? 'Душанбе, ' + addr : 'Душанбе, ___ — впишите в «Профиле»'], ['Часы работы', hrs || '—']];
+  el.innerHTML = rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('');
+}
+$('#logos').innerHTML = D.logos.map(([f, cap]) => `<figure><img src="kit/logo/${f}" alt="${esc(cap)}" width="512" height="512" class="${f.includes('prozr') ? 'checker' : ''}"><figcaption>${esc(cap)}</figcaption></figure>`).join('');
+$('#where').innerHTML = D.where.map(x => `<li>${x}</li>`).join('');
+$('#questions').innerHTML = D.questions.length ? D.questions.map(x => `<li>${x}</li>`).join('') : '<li>Открытых вопросов нет.</li>';
+$('#decided').innerHTML = D.decisions.map(([d, t]) => `<div class="dec"><time>${esc(d)}</time><div>${t}</div></div>`).join('');
 
 /* ---------- чек-лист ---------- */
 const done = store.get('done', {});
@@ -608,5 +693,5 @@ $('#copy-all').addEventListener('click', async () => { const el = $('#all-text')
   catch(e){ const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Выделил текст — скопируйте из меню'); } });
 
 $('#f-products').textContent = D.products.length;
-renderProfile(); renderHL(); renderPosts(); renderCatalog(); renderServices(); renderBuy(); renderPrepay(); renderCheck();
+renderProfile(); renderBrand(); renderHL(); renderPosts(); renderCatalog(); renderServices(); renderBuy(); renderPrepay(); renderCheck();
 </script>
