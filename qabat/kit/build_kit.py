@@ -33,7 +33,8 @@ HF = 'https://d8j0ntlcm91z4.cloudfront.net/user_3ElkwKvj3PbkMSEZvzI8hrexIy2/'
 ZIP = 'https://d2ol7oe51mr4n9.cloudfront.net/user_3ElkwKvj3PbkMSEZvzI8hrexIy2/'
 link = lambda u, t: f'<a href="{u}" target="_blank" rel="noopener">{t}</a>'
 where = [
- '<b>Эта страница</b> — главная и единственная по Qabat. Ссылка не меняется, всё новое JARVIS добавляет сюда.',
+ '<b>Эта страница</b> — главная по Qabat. Ссылка не меняется, всё новое JARVIS добавляет сюда.',
+ '<b>Настройка Instagram по шагам</b> — отдельная страница по вашей просьбе: ' + link('https://claude.ai/artifact/TYxaDRmmtiauBLB3zPXVGF', 'открыть') + '. Тексты в ней берутся из тех же данных.',
  '<b>Брендбук PDF и архив картинок</b> — в нашем чате от 4 октября и в GitHub (репозиторий <code>dream-houses</code>, папка <code>qabat/</code>): <code>brandbook/Qabat-brandbook.pdf</code>, обложки <code>kit/hl/</code>, логотипы <code>kit/logo/</code>.',
  '<b>Память JARVIS</b> — <code>jarvis/brain/30-projects/3d-print-biznes/</code>: статус, каталог и цены, закупка, чат-бот, вечерняя печать, варианты логотипа.',
  '<b>Исходники логотипа из Higgsfield</b>, на случай если захотите вернуться: ' + link(HF + 'hf_20261004_191046_3b721a0e-5ecd-4b13-b33d-d0754c2ac4de.svg', 'знак для аватарки (SVG)') + ', ' +
@@ -43,7 +44,7 @@ where = [
 ]
 logos = [("avatar-instagram.png", "Аватарка Instagram — ставьте этот файл"), ("znak-avatarka.png", "Знак без надписи — иконка и водяной знак"), ("logo-svetlyj.png", "Полный логотип на светлом"),
          ("logo-tyomnyj.png", "Полный логотип на тёмном"), ("logo-prozrachnyj.png", "Без фона — для наклеек и упаковки")]
-D = dict(brand=content.as_dict(), logos=logos, where=where, decisions=decisions, questions=questions, defaults=data.DEFAULTS, pack=data.PACK, products=data.PRODUCTS, services=data.SERVICES,
+D = dict(bio=data.BIO, brand=content.as_dict(), logos=logos, where=where, decisions=decisions, questions=questions, defaults=data.DEFAULTS, pack=data.PACK, products=data.PRODUCTS, services=data.SERVICES,
          purchases=data.PURCHASES, highlights=data.HIGHLIGHTS, posts=data.POSTS, checklist=data.CHECKLIST, colors=colors)
 html = open(os.path.join(HERE, 'template.html')).read()
 ava = avatar_full(size=96).replace('width="96" height="96"', 'width="100%" height="100%"')
@@ -96,3 +97,13 @@ s1 = sum(x[3] for x in data.PURCHASES if x[5] == 1); s = sum(x[3] for x in data.
 L += ["", f"**Итого: сразу ≈ ${s1} (≈ {s1*d['rate']:.0f} сом), весь список ≈ ${s} (≈ {s*d['rate']:.0f} сом).**"]
 open(os.path.join(B, 'закупка.md'), 'w').write('\n'.join(L) + '\n')
 print('brain ok')
+
+# --- Пошаговая настройка Instagram (отдельная страница по просьбе владельца, ссылка с главной) ---
+MAIN_URL = 'https://claude.ai/artifact/Rmkaok9Bj3GAFeVXqsMzNy'
+S = dict(nicks=data.NICKS, bioNames=data.BIO_NAMES, bio=data.BIO, category=data.CATEGORY, profileName=data.PROFILE_NAME,
+         fbPage=data.FB_PAGE, highlights=data.HIGHLIGHTS, hlOrder=data.HIGHLIGHT_ORDER, stories=data.STORIES,
+         auto=data.AUTOREPLY, posts=data.POSTS)
+sh = open(os.path.join(HERE, 'setup_template.html')).read()
+sh = sh.replace('/*DATA*/', json.dumps(S, ensure_ascii=False)).replace('/*MAIN_URL*/', MAIN_URL).replace('/*UPDATED*/', datetime.date.today().strftime('%d.%m.%Y'))
+open(os.path.join(HERE, '..', 'instagram-setup.html'), 'w').write(sh)
+print('setup ok', len(sh))

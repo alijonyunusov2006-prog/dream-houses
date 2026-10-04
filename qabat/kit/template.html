@@ -39,6 +39,8 @@ a{color:var(--mint-deep)}
 .fact b{display:block;font:600 20px/1.2 var(--display);font-variant-numeric:tabular-nums}
 .fact span{font-size:13px;color:var(--muted)}
 
+.setup-link{display:flex;flex-direction:column;gap:3px;margin-top:12px;padding:14px 16px;border-radius:14px;background:var(--mint);color:#10201B;text-decoration:none}
+.setup-link b{font:600 16px var(--display)} .setup-link span{font-size:14px}
 /* навигация */
 nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);margin-inline:-16px;padding:10px 16px;border-bottom:1px solid var(--line);overflow-x:auto;white-space:nowrap;scrollbar-width:none}
 nav.tabs::-webkit-scrollbar{display:none}
@@ -205,6 +207,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-si
   <div class="fact"><b id="f-buy">$352</b><span>закупка в первую очередь (оценка)</span></div>
 </div>
 
+<a class="setup-link" href="https://claude.ai/artifact/TYxaDRmmtiauBLB3zPXVGF" target="_blank" rel="noopener"><b>Настройка Instagram по шагам →</b><span>14 шагов: бизнес-аккаунт, имя, описание, ссылки, автоответы, «Актуальное». Тексты готовы, только копировать.</span></a>
 <nav class="tabs" aria-label="Разделы">
   <a href="#profile">Профиль</a><a href="#stories">Актуальное</a><a href="#posts">Посты</a><a href="#catalog">Товары и цены</a><a href="#buy">Закупка</a><a href="#bot">Чат-бот</a><a href="#night">Печать в 20:00</a><a href="#brand">Брендбук</a><a href="#files">Логотип и файлы</a><a href="#decisions">Решения</a><a href="#site">Сайт</a><a href="#check">Чек-лист</a>
 </nav>
@@ -212,7 +215,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-si
 <!-- ПРОФИЛЬ -->
 <section id="profile">
   <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Профиль</h2>
-  <p class="muted">Заполните поля — ниже появятся готовые тексты с кнопкой «Копировать». На аватарку — файл «Аватарка Instagram» из раздела «Логотип и файлы».</p></div>
+  <p class="muted">Заполните поля — ниже появятся готовые тексты с кнопкой «Копировать». На аватарку — файл «Аватарка Instagram» из раздела «Логотип и файлы». Куда что вставлять — <a href="https://claude.ai/artifact/TYxaDRmmtiauBLB3zPXVGF" target="_blank" rel="noopener">настройка по шагам</a>.</p></div>
   <div class="stack">
     <div class="card">
       <div class="fields">
@@ -467,20 +470,7 @@ async function copy(text, btn){
 }
 
 /* ---------- профиль ---------- */
-// Описание профиля: 4 строки ≤150 знаков. 1 — чем отличаемся, 2–3 — что заказать, 4 — где мы и что делать.
-// Длина проверена для всех вариантов, с доставкой и без (2026-10-04).
-const BIO = {
-  ru: [
-    [['Напечатаем то, чего нет в магазинах', '💡 Лампы · 🎁 подарки с именем · игрушки', '🔧 Сломалась деталь — сделаем новую'], '📍 Душанбе · заказ в Direct ↓', '📍 Душанбе, доставка · Direct ↓'],
-    [['3D-печать слой за слоем', 'Лампы, подарки, игрушки и детали на заказ', 'Печатаем то, чего нет в магазинах'], 'Душанбе · цена и срок — в Direct', 'Душанбе, доставка · цена и срок — в Direct'],
-    [['Подарок, которого нет ни у кого 🎁', 'Ночник с вашим фото · брелок с номером машины', 'Лампы, игрушки, декор'], '📍 Душанбе · заказ в Direct ↓', '📍 Душанбе, доставка · заказ в Direct ↓']
-  ],
-  tj: [
-    [['Чизе, ки дар мағоза нест, чоп мекунем', '💡 Чароғ · 🎁 тӯҳфа бо ном · бозича', '🔧 Қисм шикаст? Навашро месозем'], '📍 Душанбе · фармоиш дар Direct ↓', '📍 Душанбе, расондан · Direct ↓'],
-    [['Чопи 3D қабат ба қабат', 'Чароғ, тӯҳфа, бозича ва қисмҳо бо фармоиш', 'Чизе, ки дар мағоза нест, чоп мекунем'], 'Душанбе · нарх ва мӯҳлат — дар Direct', 'Душанбе, расондан · нарх — дар Direct'],
-    [['Тӯҳфае, ки дигар ҳеҷ кас надорад 🎁', 'Шабчароғ бо акси шумо · брелок бо рақами мошин', 'Чароғ, бозича, ороиш'], '📍 Душанбе · фармоиш дар Direct ↓', '📍 Душанбе, расондан · фармоиш дар Direct ↓']
-  ]
-};
+const BIO = D.bio; // варианты описания — qabat/kit/data.py (BIO)
 const pf = ['nick','phone','addr','hours','deliv','hook'];
 pf.forEach(id => { const el = $('#' + id); const v = store.get('f.' + id, null); if(v !== null) el.value = v; el.addEventListener('input', () => { store.set('f.' + id, el.value); renderProfile(); renderChat(); renderContacts(); renderAll(); }); });
 function digits(){ return ($('#phone').value || '').replace(/\D/g,''); }
