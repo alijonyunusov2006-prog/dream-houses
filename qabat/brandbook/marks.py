@@ -27,10 +27,23 @@ def mark_compact(ink=INK, mint=MINT):
 <rect x="90" y="396" width="300" height="42" rx="21"/></g>'''
 
 def full_logo(bg=PAPER, ink=INK, mint=MINT, width=1080):
-    """Полный логотип: знак + QABAT + PRINT LAB (шрифт Montserrat должен быть подключён на странице)."""
+    """Полный логотип: знак + QABAT + PRINT LAB (шрифт Montserrat должен быть подключён на странице).
+    Сборка по правилам логотипа (правка владельца 2026-10-04: знак стоял слишком высоко и выглядел отдельно):
+    зазор между низом знака и верхом заглавных QABAT — половина высоты заглавной буквы,
+    вся композиция стоит по центру квадрата, поля сверху и снизу одинаковые."""
+    S = 0.95                      # масштаб знака
+    top, bottom = 53, 438         # верх трубки и низ стопки в координатах знака
+    fs = 168; cap = fs * 0.70     # кегль QABAT и высота заглавной (Montserrat: 700/1000)
+    gap = cap * 0.5               # зазор знак — надпись
+    sub_gap = 82                  # от базовой линии QABAT до базовой линии PRINT LAB
+    h_mark = (bottom - top) * S
+    total = h_mark + gap + cap + sub_gap
+    y0 = (1080 - total) / 2       # верх композиции
+    ty = y0 - top * S             # сдвиг знака по вертикали
+    base = y0 + h_mark + gap + cap
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="{width}">
 <rect width="1080" height="1080" fill="{bg}"/>
-<g transform="translate(312 190) scale(0.95)">{mark_compact(ink, mint)}</g>
-<text x="540" y="840" text-anchor="middle" font-family="Montserrat" font-weight="500" font-size="168" letter-spacing="14" fill="{ink}">QABAT</text>
-<text x="548" y="922" text-anchor="middle" font-family="Montserrat" font-weight="500" font-size="44" letter-spacing="22" fill="{ink}">PRINT LAB</text>
+<g transform="translate(312 {ty:.1f}) scale({S})">{mark_compact(ink, mint)}</g>
+<text x="540" y="{base:.1f}" text-anchor="middle" font-family="Montserrat" font-weight="500" font-size="{fs}" letter-spacing="14" fill="{ink}">QABAT</text>
+<text x="548" y="{base + sub_gap:.1f}" text-anchor="middle" font-family="Montserrat" font-weight="500" font-size="44" letter-spacing="22" fill="{ink}">PRINT LAB</text>
 </svg>'''
