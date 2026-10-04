@@ -1,0 +1,13 @@
+# JARVIS — не коммитим данные, журналы, секреты и кэш
+data/
+!data/.gitkeep
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+brain/.obsidian/workspace*.json
+brain/.obsidian/cache
+*.log
