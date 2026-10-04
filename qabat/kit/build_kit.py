@@ -3,7 +3,7 @@ import json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE); sys.path.insert(0, os.path.join(HERE, '..', 'brandbook'))
 import data
-from marks import avatar, MINT, INK, PAPER
+from marks import avatar, avatar_full, MINT, INK, PAPER
 colors = [("Мята", MINT, "акцент: трубка, верхний слой, кнопки"), ("Графит", INK, "текст и знак"),
           ("Тёплый белый", PAPER, "фон"), ("Светлая мята", "#E2F6EF", "подложки, обложки"),
           ("Тёмная мята", "#1F7F69", "ссылки и мелкий акцент"), ("Серый", "#6B7471", "подписи")]
@@ -41,12 +41,12 @@ where = [
    link(ZIP + 'b9f871a8-1eaf-4ed9-9395-6d04330390c3.zip', '12 первых вариантов (ZIP)') + ', ' + link(ZIP + '5f50e104-f13e-46ce-878f-b8b1c6f1075a.zip', '6 доработок (ZIP)') + '.',
  'После переноса JARVIS на ПК всё это будет и в папке проекта на компьютере.',
 ]
-logos = [("znak-avatarka.png", "Знак в круге — аватарка"), ("logo-svetlyj.png", "Полный логотип на светлом"),
+logos = [("avatar-instagram.png", "Аватарка Instagram — ставьте этот файл"), ("znak-avatarka.png", "Знак без надписи — иконка и водяной знак"), ("logo-svetlyj.png", "Полный логотип на светлом"),
          ("logo-tyomnyj.png", "Полный логотип на тёмном"), ("logo-prozrachnyj.png", "Без фона — для наклеек и упаковки")]
 D = dict(brand=content.as_dict(), logos=logos, where=where, decisions=decisions, questions=questions, defaults=data.DEFAULTS, pack=data.PACK, products=data.PRODUCTS, services=data.SERVICES,
          purchases=data.PURCHASES, highlights=data.HIGHLIGHTS, posts=data.POSTS, checklist=data.CHECKLIST, colors=colors)
 html = open(os.path.join(HERE, 'template.html')).read()
-ava = avatar(size=96).replace('width="96" height="96"', 'width="100%" height="100%"')
+ava = avatar_full(size=96).replace('width="96" height="96"', 'width="100%" height="100%"')
 html = html.replace('/*AVATAR*/', ava).replace('/*DATA*/', json.dumps(D, ensure_ascii=False)).replace('/*UPDATED*/', datetime.date.today().strftime('%d.%m.%Y'))
 out = os.path.join(HERE, '..', 'instagram-guide.html')
 open(out, 'w').write(html)

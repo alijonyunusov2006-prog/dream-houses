@@ -26,7 +26,7 @@ def mark_compact(ink=INK, mint=MINT):
 <g fill="{ink}"><rect x="90" y="300" width="300" height="42" rx="21"/><rect x="90" y="348" width="300" height="42" rx="21"/>
 <rect x="90" y="396" width="300" height="42" rx="21"/></g>'''
 
-def full_logo(bg=PAPER, ink=INK, mint=MINT, width=1080):
+def full_logo(bg=PAPER, ink=INK, mint=MINT, width=1080, inner_only=False):
     """Полный логотип: знак + QABAT + PRINT LAB (шрифт Montserrat должен быть подключён на странице).
     Сборка по правилам логотипа (правка владельца 2026-10-04: знак стоял слишком высоко и выглядел отдельно):
     зазор между низом знака и верхом заглавных QABAT — половина высоты заглавной буквы,
@@ -41,9 +41,23 @@ def full_logo(bg=PAPER, ink=INK, mint=MINT, width=1080):
     y0 = (1080 - total) / 2       # верх композиции
     ty = y0 - top * S             # сдвиг знака по вертикали
     base = y0 + h_mark + gap + cap
+    inner = f'''<g transform="translate(312 {ty:.1f}) scale({S})">{mark_compact(ink, mint)}</g>
+<text x="540" y="{base:.1f}" text-anchor="middle" font-family="Montserrat" font-weight="500" font-size="{fs}" letter-spacing="14" fill="{ink}">QABAT</text>
+<text x="548" y="{base + sub_gap:.1f}" text-anchor="middle" font-family="Montserrat" font-weight="500" font-size="44" letter-spacing="22" fill="{ink}">PRINT LAB</text>'''
+    if inner_only:
+        return inner
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="{width}">
 <rect width="1080" height="1080" fill="{bg}"/>
-<g transform="translate(312 {ty:.1f}) scale({S})">{mark_compact(ink, mint)}</g>
-<text x="540" y="{base:.1f}" text-anchor="middle" font-family="Montserrat" font-weight="500" font-size="{fs}" letter-spacing="14" fill="{ink}">QABAT</text>
-<text x="548" y="{base + sub_gap:.1f}" text-anchor="middle" font-family="Montserrat" font-weight="500" font-size="44" letter-spacing="22" fill="{ink}">PRINT LAB</text>
+{inner}
+</svg>'''
+
+def avatar_full(bg=PAPER, ink=INK, mint=MINT, size=1080, scale=1.319, dx=4.6, dy=0.7):
+    """Аватарка Instagram — полный логотип в круге (решение владельца 2026-10-04: на аватарку — логотип с надписью).
+    Масштаб и сдвиг подобраны расчётом qabat/brandbook/fit_avatar.py: самый крупный логотип, который целиком
+    помещается в круг с запасом 8% радиуса, ровно по центру по ширине и по высоте (выбор JARVIS из трёх вариантов:
+    крупнее и выше центра — Q почти касается края; чуть выше центра; ровно по центру — самый спокойный и ровный)."""
+    g = full_logo(ink=ink, mint=mint, inner_only=True)
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="{size}" height="{size}">
+<rect width="1080" height="1080" fill="{bg}"/>
+<g transform="translate({540 + dx:.1f} {540 + dy:.1f}) scale({scale}) translate(-540 -540)">{g}</g>
 </svg>'''

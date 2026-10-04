@@ -2,7 +2,7 @@
 # Запуск: python3 build.py  → brandbook.html; затем node render.mjs → Qabat-брендбук.pdf
 import os, sys
 sys.path.insert(0, os.path.dirname(__file__))
-from marks import avatar, full_logo, MINT, INK, PAPER
+from marks import avatar, avatar_full, full_logo, MINT, INK, PAPER
 
 FONTS = sys.argv[1] if len(sys.argv) > 1 else 'fonts.css'
 css_fonts = open(FONTS).read() if os.path.exists(FONTS) else ''
@@ -45,7 +45,7 @@ L = C.LOGO
 logo = page(4, 'Логотип', f"""
 <div class="grid2 center">
  <div><div class="frame">{full_logo(width=300)}</div><div class="cap">{L['full']}</div></div>
- <div><div class="frame round">{avatar(size=300)}</div><div class="cap">{L['mark']}</div></div>
+ <div><div class="frame round">{avatar_full(size=300)}</div><div class="cap">{L['avatar']} {L['mark']}</div></div>
 </div>
 <div class="grid2">
  <div><div class="label">Правила</div><ul>{li(L['rules'])}</ul></div>
