@@ -1,13 +1,17 @@
 # Картинки историй 1080×1920 для разделов «Актуального» Qabat. Тексты — data.STORIES, обложки — hl/A-*.png.
-# Запуск: python3 stories.py <fonts.css> → stories/*.html, затем node render_stories.mjs → stories/*.jpg
+# Запуск: python3 stories.py <fonts.css> [bez-cen] → stories/ или stories-bez-cen/*.html, затем node render_stories.mjs → stories/*.jpg
 import os, sys, base64, html
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 import data
 css = open(sys.argv[1]).read() if len(sys.argv) > 1 else ''
+NOPRICE = len(sys.argv) > 2 and sys.argv[2] == 'bez-cen'
+SRC = data.STORIES_NOPRICE if NOPRICE else data.STORIES
+OUT = os.path.join(HERE, 'stories-bez-cen' if NOPRICE else 'stories')
+os.makedirs(OUT, exist_ok=True)
 names = {k: n for k, n, _ in data.HIGHLIGHTS}
 DELIV = 'Самовывоз или доставка по Душанбе.'
 for k in data.HIGHLIGHT_ORDER:
-    text = data.STORIES[k].replace('{deliv}', DELIV)
+    text = SRC[k].replace('{deliv}', DELIV)
     lines = text.split('\n')
     title, body = ('Как заказать', lines[1:]) if k == 'zakaz' else (names[k], lines[1:] if lines[0].startswith('Лампы Qabat') else lines)
     ico = base64.b64encode(open(os.path.join(HERE, 'hl', f'A-{k}.png'), 'rb').read()).decode()
@@ -28,5 +32,5 @@ h1{{margin:20px 0 0;font:700 104px/1.05 Montserrat;text-align:center;letter-spac
 <img class="ico" src="data:image/png;base64,{ico}"><div class="tag">Qabat · 3D-печать</div>
 <h1>{html.escape(title)}</h1><div class="rule"></div><div class="body">{rows}</div>
 <div class="foot"><b>Заказ — в Direct</b><span>Qabat · 3D-печать Душанбе</span></div>'''
-    open(os.path.join(HERE, 'stories', f'{k}.html'), 'w').write(page)
+    open(os.path.join(OUT, f'{k}.html'), 'w').write(page)
 print('ok', len(data.HIGHLIGHT_ORDER))
