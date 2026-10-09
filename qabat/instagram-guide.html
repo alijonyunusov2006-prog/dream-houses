@@ -1,0 +1,711 @@
+<title>Qabat Print Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Лист мастерской: одна колонка, разделы ложатся «слоями» сверху вниз в порядке запуска; фирменные цвета и шрифты из брендбука Qabat */
+:root{
+  --paper:#FAFAF8; --card:#FFFFFF; --ink:#1F2523; --muted:#5E6965; --line:#DDE3E0;
+  --mint:#74DCC4; --mint-deep:#1F7F69; --mint-soft:#E2F6EF; --warn:#9A5B12; --warn-soft:#FBF0DF;
+  --display:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --body:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#121816; --card:#19211E; --ink:#EAF1EE; --muted:#9AA7A2; --line:#2A3632;
+  --mint:#74DCC4; --mint-deep:#86E3CC; --mint-soft:#1C2B27; --warn:#F0B868; --warn-soft:#2E2414; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121816; --card:#19211E; --ink:#EAF1EE; --muted:#9AA7A2; --line:#2A3632;
+  --mint:#74DCC4; --mint-deep:#86E3CC; --mint-soft:#1C2B27; --warn:#F0B868; --warn-soft:#2E2414; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:16px/1.55 var(--body);margin:0}
+.wrap{max-width:780px;margin:0 auto;padding-inline:16px;padding-block:20px 64px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:clamp(26px,6vw,36px);font-weight:700;letter-spacing:-.01em;line-height:1.15}
+h2{font-size:clamp(21px,4.6vw,26px);font-weight:600;line-height:1.2}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+a{color:var(--mint-deep)}
+:focus-visible{outline:3px solid var(--mint);outline-offset:2px;border-radius:6px}
+
+/* шапка */
+.hero{display:grid;grid-template-columns:96px minmax(0,1fr);gap:18px;align-items:center;padding-block:8px 20px}
+.ava{width:96px;height:96px;border-radius:50%;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+.ava svg{width:100%;height:100%;display:block}
+.eyebrow{font:600 12px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--mint-deep);margin-bottom:8px}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:6px}
+.fact{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.fact b{display:block;font:600 20px/1.2 var(--display);font-variant-numeric:tabular-nums}
+.fact span{font-size:13px;color:var(--muted)}
+
+.setup-link{display:flex;flex-direction:column;gap:3px;margin-top:12px;padding:14px 16px;border-radius:14px;background:var(--mint);color:#10201B;text-decoration:none}
+.setup-link b{font:600 16px var(--display)} .setup-link span{font-size:14px}
+/* навигация */
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);margin-inline:-16px;padding:10px 16px;border-bottom:1px solid var(--line);overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs a{display:inline-block;margin-right:6px;padding:7px 12px;border-radius:999px;border:1px solid var(--line);color:var(--ink);text-decoration:none;font-size:14px;font-weight:500;background:var(--card)}
+nav.tabs a:hover{border-color:var(--mint)}
+
+/* раздел — «слой» */
+section{padding-block:34px 6px;scroll-margin-top:64px}
+.sec-head{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.layer{display:flex;flex-direction:column;gap:3px;width:56px;margin-bottom:6px}
+.layer i{display:block;height:5px;border-radius:3px;background:var(--ink)}
+.layer i:first-child{background:var(--mint)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.note{background:var(--mint-soft);border-radius:12px;padding:12px 14px;font-size:14px}
+.warn{background:var(--warn-soft);color:var(--ink);border-radius:12px;padding:12px 14px;font-size:14px}
+.warn b{color:var(--warn)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:560px){.grid2,.facts{grid-template-columns:minmax(0,1fr)}.hero{grid-template-columns:minmax(0,1fr);gap:12px}.ava{width:72px;height:72px}}
+
+/* поля */
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.fields{grid-template-columns:minmax(0,1fr)}}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted);font-weight:500;min-width:0}
+input[type=text],input[type=number],input[type=tel],select{font:inherit;font-size:16px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 11px;width:100%;min-width:0}
+input:focus,select:focus{border-color:var(--mint);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--mint) 35%,transparent)}
+.out{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:start;padding-block:12px;border-top:1px solid var(--line)}
+.out:first-child{border-top:0;padding-top:0}
+@media (max-width:560px){.out{grid-template-columns:minmax(0,1fr)}.out .btn{justify-self:start}}
+.out .k{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;grid-column:1/-1}
+.out pre{margin:0;font:15px/1.5 var(--body);white-space:pre-wrap;word-break:break-word;min-width:0}
+.count{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.count.bad{color:var(--warn);font-weight:600}
+button{font:inherit;cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:7px 12px;font-size:14px;font-weight:500;white-space:nowrap}
+.btn:hover{border-color:var(--mint)}
+.btn.main{background:var(--mint);border-color:var(--mint);color:#10201B;font-weight:600}
+.btn.done{background:var(--mint-soft)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--card);color:var(--ink);padding:8px 12px;font-size:14px}
+.seg button[aria-pressed=true]{background:var(--mint);color:#10201B;font-weight:600}
+
+/* обложки */
+.hl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 12px}
+.hl figure{margin:0;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;min-width:0}
+.hl img{width:76px;height:76px;border-radius:50%;box-shadow:0 0 0 1px var(--line),0 0 0 4px var(--paper),0 0 0 5px var(--line)}
+.hl b{font-size:14px;font-weight:600}
+.hl span{font-size:12.5px;color:var(--muted);line-height:1.4}
+
+/* посты */
+.feed{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;border-radius:12px;overflow:hidden;max-width:420px}
+.tile{aspect-ratio:4/5;max-width:100%;background:var(--mint-soft);display:flex;flex-direction:column;justify-content:space-between;padding:8px;color:var(--ink);min-width:0}
+.tile:nth-child(3n+2){background:var(--card)}
+.tile:nth-child(4n){background:color-mix(in srgb,var(--mint) 45%,var(--card))}
+.tile small{font:600 10px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--mint-deep)}
+.tile strong{font:600 12px/1.25 var(--display)}
+.post{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;padding-block:14px;border-top:1px solid var(--line)}
+.post .n{width:34px;height:34px;border-radius:50%;background:var(--mint-soft);display:flex;align-items:center;justify-content:center;font:600 14px var(--display);color:var(--mint-deep)}
+.post .body{display:flex;flex-direction:column;gap:6px;min-width:0}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--mint-soft);color:var(--mint-deep);margin-right:6px}
+.tags{font-size:13px;color:var(--mint-deep);word-break:break-word}
+
+/* таблицы */
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;background:var(--paper)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.grp td{background:var(--mint-soft);font-weight:600;font-family:var(--display);font-size:13px}
+td input[type=number]{width:76px;padding:5px 7px;font-size:15px;text-align:right}
+.tname{min-width:200px}
+.tname small{display:block;color:var(--muted);font-size:12.5px;line-height:1.4;margin-top:2px}
+.pill{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.pill.stock{background:var(--mint-soft);color:var(--mint-deep)}
+.pill.custom{background:var(--warn-soft);color:var(--warn)}
+.x-low{color:var(--warn);font-weight:600}
+.totals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.totals{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tot{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.tot b{display:block;font:600 19px/1.2 var(--display);font-variant-numeric:tabular-nums}
+.tot span{font-size:12.5px;color:var(--muted)}
+.set{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.set{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* списки товаров и закупки */
+.list{border:1px solid var(--line);border-radius:14px;background:var(--card);overflow:hidden}
+.lg{background:var(--mint-soft);font:600 13px/1.2 var(--display);padding:9px 14px;color:var(--ink)}
+.row{padding:12px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;min-width:0}
+.lg + .row{border-top:0}
+.row .top{display:flex;gap:8px;align-items:baseline;justify-content:space-between;flex-wrap:wrap}
+.row .top b{font-weight:600}
+.row small{color:var(--muted);font-size:13px;line-height:1.45}
+.stats{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:13.5px;font-variant-numeric:tabular-nums}
+.stats span{color:var(--muted)} .stats strong{color:var(--ink);font-weight:600}
+.stats input[type=number]{width:84px;padding:5px 8px;font-size:16px;text-align:right}
+.brow{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start}
+.brow input{width:20px;height:20px;accent-color:var(--mint-deep);margin-top:2px}
+.brow.got .top b{text-decoration:line-through;color:var(--muted)}
+/* брендбук и логотипы */
+.aud{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.aud{grid-template-columns:minmax(0,1fr)}}
+.aud .card p{font-size:14px;margin-bottom:4px}
+.sw2{display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center}
+.sw2 span.c{width:52px;height:36px;border-radius:9px;box-shadow:0 0 0 1px var(--line)}
+.quote{border-left:4px solid var(--mint);padding:2px 0 2px 12px;font-size:15px}
+.vals{display:flex;flex-direction:column;gap:10px}
+.vals div{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start;font-size:15px}
+.vals span{width:28px;height:28px;border-radius:50%;background:var(--mint);color:#10201B;font:600 13px var(--display);display:flex;align-items:center;justify-content:center}
+.ctable{width:100%;border-collapse:collapse;font-size:14px}.ctable td{padding:8px 4px;border-bottom:1px solid var(--line);vertical-align:top}.ctable td:first-child{font-weight:600;width:38%}
+.logos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.logos figure:first-child{grid-column:1/-1;align-items:center}
+.logos figure:first-child img{max-width:280px;border-radius:50%}
+.logos figure{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.logos img{width:100%;height:auto;max-width:100%;aspect-ratio:1;border-radius:12px;box-shadow:0 0 0 1px var(--line);background:var(--card)}
+.logos img.checker{background:repeating-conic-gradient(var(--line) 0 25%,var(--card) 0 50%) 0 0/16px 16px}
+.logos figcaption{font-size:13px;color:var(--muted)}
+.dec{display:grid;grid-template-columns:86px minmax(0,1fr);gap:10px;font-size:14px;padding-top:10px;border-top:1px solid var(--line)}
+.dec:first-child{border-top:0;padding-top:0}
+.dec time{color:var(--muted);font-variant-numeric:tabular-nums;font-size:13px}
+.dec div,.card li,.card p{min-width:0;overflow-wrap:anywhere}
+code{font-size:.92em;background:var(--mint-soft);padding:0 4px;border-radius:4px;word-break:break-word}
+/* чат */
+.chat{display:flex;flex-direction:column;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px}
+.msg{max-width:85%;padding:9px 12px;border-radius:16px;font-size:14.5px;line-height:1.45}
+.msg.c{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg.b{align-self:flex-end;background:var(--mint-soft);border-bottom-right-radius:4px}
+.msg.j{align-self:center;max-width:100%;background:transparent;color:var(--muted);font-size:12.5px;text-align:center}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.flow span{font-size:13px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card)}
+.flow span.owner{border-color:var(--mint);background:var(--mint-soft);font-weight:600}
+.flow em{font-style:normal;color:var(--muted)}
+ul.clean{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+ul.no li::marker{content:"✕  ";color:var(--warn)}
+.time{display:grid;grid-template-columns:64px minmax(0,1fr);gap:4px 14px}
+.time .t{font:600 15px var(--display);font-variant-numeric:tabular-nums;color:var(--mint-deep);padding-top:1px}
+.time .d{padding-bottom:12px;border-left:2px solid var(--line);padding-left:14px;margin-left:-8px}
+.tg{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14.5px;white-space:pre-wrap}
+
+/* чек-лист */
+.check{display:flex;flex-direction:column;gap:2px}
+.check label{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start;padding:9px 4px;border-radius:8px;cursor:pointer}
+.check label:hover{background:var(--mint-soft)}
+.check input{width:20px;height:20px;accent-color:var(--mint-deep);margin-top:2px}
+.check input:checked + span{color:var(--muted);text-decoration:line-through}
+.progress{height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.progress i{display:block;height:100%;background:var(--mint);width:0;transition:width .3s}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:999px;font-size:14px;z-index:9}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+</style>
+
+<div class="wrap">
+<header class="hero">
+  <div class="ava" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="100%" height="100%">
+<rect width="1080" height="1080" fill="#FAFAF8"/>
+<g transform="translate(544.6 540.7) scale(1.319) translate(-540 -540)"><g transform="translate(312 177.6) scale(0.95)"><path d="M150 70 H200 A40 40 0 0 1 240 110 V128" fill="none" stroke="#74DCC4" stroke-width="34" stroke-linecap="round"/>
+<rect x="222" y="124" width="36" height="20" rx="3" fill="#1F2523"/>
+<path d="M214 146 H266 V182 Q266 189 259 189 H221 Q214 189 214 182 Z" fill="#1F2523"/>
+<path d="M226 189 H254 L246 209 H234 Z" fill="#1F2523"/>
+<path d="M240 208 C 239 228, 256 236, 300 241" fill="none" stroke="#1F2523" stroke-width="5" stroke-linecap="round"/>
+<rect x="90" y="238" width="300" height="56" rx="28" fill="#74DCC4"/>
+<g fill="#1F2523"><rect x="90" y="300" width="300" height="42" rx="21"/><rect x="90" y="348" width="300" height="42" rx="21"/>
+<rect x="90" y="396" width="300" height="42" rx="21"/></g></g>
+<text x="540" y="770.1" text-anchor="middle" font-family="Montserrat" font-weight="500" font-size="168" letter-spacing="14" fill="#1F2523">QABAT</text>
+<text x="548" y="852.1" text-anchor="middle" font-family="Montserrat" font-weight="500" font-size="44" letter-spacing="22" fill="#1F2523">PRINT LAB</text></g>
+</svg></div>
+  <div>
+    <div class="eyebrow">Qabat Print Lab · слой за слоем</div>
+    <h1>Всё по Qabat — на одной странице</h1>
+    <p class="muted" style="margin-top:6px">Instagram, брендбук, логотип и файлы, товары с ценами, закупка, чат-бот, ночная печать, решения и вопросы. Новое по Qabat появляется здесь, по этой же ссылке. Меняйте поля — тексты и цены пересчитаются сами.</p>
+  </div>
+</header>
+<div class="facts">
+  <div class="fact"><b id="f-products">20</b><span>товаров и 3 услуги</span></div>
+  <div class="fact"><b id="f-days">≈7 дней</b><span>напечатать склад на двух принтерах</span></div>
+  <div class="fact"><b id="f-buy">$352</b><span>закупка в первую очередь (оценка)</span></div>
+</div>
+
+<a class="setup-link" href="https://claude.ai/artifact/TYxaDRmmtiauBLB3zPXVGF" target="_blank" rel="noopener"><b>Настройка Instagram по шагам →</b><span>14 шагов: бизнес-аккаунт, имя, описание, ссылки, автоответы, «Актуальное». Тексты готовы, только копировать.</span></a>
+<nav class="tabs" aria-label="Разделы">
+  <a href="#profile">Профиль</a><a href="#stories">Актуальное</a><a href="#posts">Посты</a><a href="#catalog">Товары и цены</a><a href="#buy">Закупка</a><a href="#bot">Чат-бот</a><a href="#night">Печать в 20:00</a><a href="#brand">Брендбук</a><a href="#files">Логотип и файлы</a><a href="#decisions">Решения</a><a href="#site">Сайт</a><a href="#check">Чек-лист</a>
+</nav>
+
+<!-- ПРОФИЛЬ -->
+<section id="profile">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Профиль</h2>
+  <p class="muted">Заполните поля — ниже появятся готовые тексты с кнопкой «Копировать». На аватарку — файл «Аватарка Instagram» из раздела «Логотип и файлы». Куда что вставлять — <a href="https://claude.ai/artifact/TYxaDRmmtiauBLB3zPXVGF" target="_blank" rel="noopener">настройка по шагам</a>.</p></div>
+  <div class="stack">
+    <div class="card">
+      <div class="fields">
+        <label class="f">Ник в Instagram
+          <select id="nick">
+            <option>qabat</option><option>qabat.tj</option><option>qabat.print</option><option>qabatprintlab</option><option>qabat.lab</option><option>qabat_3d</option>
+          </select></label>
+        <label class="f">WhatsApp или телефон (без +992)
+          <input id="phone" type="tel" inputmode="numeric" placeholder="например 900 00 00 00"></label>
+        <label class="f">Где забрать (район, ориентир)
+          <input id="addr" type="text" placeholder="например Сино, рядом с …"></label>
+        <label class="f">Часы работы
+          <input id="hours" type="text" value="Пн–Сб 10:00–20:00"></label>
+        <label class="f">Доставка по Душанбе, сомони (0 — нет доставки)
+          <input id="deliv" type="number" min="0" step="1" value="15"></label>
+        <label class="f">Вариант описания
+          <select id="hook">
+            <option value="0">1 — «Напечатаем то, чего нет в магазинах» (советую)</option>
+            <option value="1">2 — Спокойный, без значков</option>
+            <option value="2">3 — Про подарки</option>
+          </select></label>
+      </div>
+      <p class="small muted" style="margin-top:10px">Свободен ли ник, проверьте в приложении: Instagram закрыт для моей облачной сессии. Если «qabat» занят, берите следующий по списку.</p>
+    </div>
+    <div class="card" id="outs"></div>
+  </div>
+</section>
+
+<!-- АКТУАЛЬНОЕ -->
+<section id="stories">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Обложки «Актуального»</h2>
+  <p class="muted">Девять кружков в цветах логотипа. Сначала выложите в каждый раздел хотя бы одну историю, потом поставьте обложку: «Актуальное» → «Редактировать» → «Изменить обложку».</p></div>
+  <div class="stack">
+    <div class="seg" role="group" aria-label="Стиль обложек">
+      <button type="button" id="st-A" aria-pressed="true">Светлые (советую)</button><button type="button" id="st-B" aria-pressed="false">Мятные</button>
+    </div>
+    <div class="hl" id="hl"></div>
+    <div class="note">Картинки 1080×1080 в двух стилях я прислал в чат одним архивом. На телефоне: откройте архив → сохраните картинки в галерею.</div>
+  </div>
+</section>
+
+<!-- ПОСТЫ -->
+<section id="posts">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Первые 9 публикаций</h2>
+  <p class="muted">Так будет выглядеть сетка. Выкладывайте снизу вверх: первая публикация окажется внизу справа. Три сразу, остальные через день.</p></div>
+  <div class="feed" id="feed" aria-hidden="true"></div>
+  <div id="postlist" style="margin-top:14px"></div>
+  <p class="small muted" style="margin-top:10px">Время публикаций для начала: 12:00–14:00 и 19:00–22:00 по Душанбе. Через 2–3 недели JARVIS посмотрит статистику и поправит.</p>
+</section>
+
+<!-- ТОВАРЫ -->
+<section id="catalog">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Товары и цены</h2>
+  <p class="muted">20 товаров, каждый печатается меньше чем за 8 часов. Себестоимость считается по формуле: пластик с запасом на брак + машино-час + ваша работа + электроника + упаковка.</p></div>
+  <div class="stack">
+    <div class="warn"><b>Цены — оценка JARVIS.</b> Цен 3D-печати в Душанбе в интернете почти нет, курс и цену пластика тоже не удалось проверить. Впишите свои цифры — всё пересчитается. Меняйте и цену продажи прямо в таблице.</div>
+    <div class="card">
+      <h3 style="margin-bottom:10px">Ваши цифры</h3>
+      <div class="set">
+        <label class="f">PLA, сом/кг<input id="s-pla" type="number" min="0" step="5"></label>
+        <label class="f">PETG, сом/кг<input id="s-petg" type="number" min="0" step="5"></label>
+        <label class="f">Silk PLA, сом/кг<input id="s-silk" type="number" min="0" step="5"></label>
+        <label class="f">Брак, %<input id="s-waste" type="number" min="0" step="1"></label>
+        <label class="f">Машино-час, сом<input id="s-machine" type="number" min="0" step="0.5"></label>
+        <label class="f">Ваш час работы, сом<input id="s-labour" type="number" min="0" step="1"></label>
+        <label class="f">Курс, сом за $1<input id="s-rate" type="number" min="0" step="0.05"></label>
+        <label class="f">Минимальная наценка, ×<input id="s-min" type="number" min="1" step="0.1" value="2"></label>
+      </div>
+      <p class="small muted" style="margin-top:10px">Машино-час 4 сомони: износ принтера, сопла и стола плюс свет по тарифу для бизнеса 0,9465 сом/кВт·ч (принтер берёт около 0,12 кВт).</p>
+    </div>
+    <div class="totals" id="totals"></div>
+    <div class="list" id="plist"></div>
+    <div class="card"><h3 style="margin-bottom:8px">Услуги</h3><div id="services" class="stack"></div></div>
+    <p class="small muted">«Под заказ» — вещь с текстом или фото клиента: на складе лежат только заготовки, кольца и электроника. Наценка ниже минимальной подсвечивается оранжевым.</p>
+  </div>
+</section>
+
+<!-- ЗАКУПКА -->
+<section id="buy">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Что купить для старта</h2>
+  <p class="muted">Чёрный PETG и сушилки у вас есть. Отмечайте купленное — галочки остаются в этом телефоне. Покупаете вы; JARVIS ничего не заказывает без вашего «да».</p></div>
+  <div class="stack">
+    <div class="seg" role="group" aria-label="Фильтр закупки">
+      <button type="button" id="b-1" aria-pressed="true">Сначала нужное</button><button type="button" id="b-all" aria-pressed="false">Весь список</button>
+    </div>
+    <div class="totals" id="btotals"></div>
+    <div class="list" id="blist"></div>
+    <p class="small muted">Цены в долларах — ориентир по AliExpress и местным магазинам на 2026 год, без доставки. Пластика хватит на первый склад (≈2,8 кг PLA, 2,2 кг Silk, 0,5 кг PETG) и на заказы первого месяца.</p>
+  </div>
+</section>
+
+<!-- ЧАТ-БОТ -->
+<section id="bot">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Чат-бот для Instagram и Facebook</h2>
+  <p class="muted">Отвечает клиентам в Direct и Messenger днём и ночью, знает, что лежит на складе, принимает именные заказы и передаёт их JARVIS.</p></div>
+  <div class="stack">
+    <div class="grid2">
+      <div class="card"><h3 style="margin-bottom:8px">Что бот делает</h3><ul class="clean small">
+        <li>Показывает товары, цены и сколько есть на складе — из одной таблицы, которую ведёт JARVIS.</li>
+        <li>Принимает именные заказы: номер машины, телефон, имя, фото для литофана.</li>
+        <li>Повторяет заказ целиком и ждёт «да» клиента.</li>
+        <li>Отвечает на языке клиента: русский или тоҷикӣ.</li>
+        <li>Передаёт мастеру всё непонятное: жалобы, опт, детали, макеты.</li>
+      </ul></div>
+      <div class="card"><h3 style="margin-bottom:8px">Чего бот не делает никогда</h3><ul class="clean small no">
+        <li>Не пишет «готово», пока вы не отметили «проверено».</li>
+        <li>Не придумывает цену, срок и наличие.</li>
+        <li>Не просит предоплату, пока вы её не включили.</li>
+        <li>Не пишет «оплата получена» — это подтверждаете только вы.</li>
+        <li>Не спорит с клиентом и не обещает скидки.</li>
+      </ul></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:6px">Предоплата — решаете вы</h3>
+      <p class="small muted" style="margin-bottom:10px">Бот работает по тому правилу, которое выбрано. Поменять можно в любой момент голосом: «Джарвис, включи предоплату 50% на заказы».</p>
+      <div class="seg" role="group" aria-label="Правило предоплаты" id="prepay">
+        <button type="button" data-v="off" aria-pressed="true">Выключена</button><button type="button" data-v="custom50" aria-pressed="false">50% на именные заказы</button><button type="button" data-v="over200" aria-pressed="false">100% от 200 сомони</button>
+      </div>
+      <p class="small" id="prepay-text" style="margin-top:10px"></p>
+    </div>
+
+    <div>
+      <h3 style="margin-bottom:8px">Пример: брелок с номером машины</h3>
+      <div class="chat" id="chat"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:8px">Путь заказа</h3>
+      <div class="flow"><span>Новый</span><em>→</em><span class="owner">Подтверждён мастером</span><em>→</em><span>В очереди</span><em>→</em><span>Печатается</span><em>→</em><span class="owner">Проверено</span><em>→</em><span>Готов</span><em>→</em><span>Выдан</span></div>
+      <p class="small muted" style="margin-top:10px">Мятные шаги ставите только вы. Без них бот не скажет клиенту ни срок, ни «готово».</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:8px">Как подключить</h3>
+      <ol class="small" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+        <li>Instagram в режиме «Бизнес» и связан со страницей Facebook (чек-лист, сегодня).</li>
+        <li>Приложение Meta for Developers: Messenger и Instagram, доступ к сообщениям страницы.</li>
+        <li>Ключ ИИ для ответов — один аккаунт, два ключа: для Qabat и для Dream House. Около $5–15 в месяц при 2–3 тысячах сообщений.</li>
+        <li>Где живёт бот: внутри DH OS рядом с ботом студии или бесплатно на Cloudflare Workers. Выбор за вами.</li>
+        <li>Неделя теста: бот пишет черновики, вы отправляете. Потом — сам.</li>
+      </ol>
+      <p class="small muted" style="margin-top:10px">Правило Meta: бот сам пишет клиенту только в течение 24 часов после его последнего сообщения. Если заказ готов позже, JARVIS готовит текст, а вы отправляете одним нажатием.</p>
+    </div>
+    <div class="warn"><b>Нужно ваше «да»:</b> ключ ИИ и приложение Meta — это аккаунты и расходы. Без вашего подтверждения JARVIS их не подключает.</div>
+    <div class="card">
+      <h3 style="margin-bottom:8px">Что перенесём в бот Dream House</h3>
+      <ul class="clean small">
+        <li>Честные статусы: «готово» — только после отметки человека.</li>
+        <li>Правило предоплаты, которое задаёт владелец.</li>
+        <li>Передача мастеру с уведомлением в Telegram.</li>
+        <li>Ответы на тоҷикӣ.</li>
+        <li>Цены и сроки только из базы, без выдумок.</li>
+      </ul>
+      <p class="small muted" style="margin-top:8px">Для этого нужен код DH OS: подключите его репозиторий к сессии или откроем его на ПК в студии.</p>
+    </div>
+  </div>
+</section>
+
+<!-- НОЧНАЯ ПЕЧАТЬ -->
+<section id="night">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Вечерняя партия в 20:00</h2>
+  <p class="muted">JARVIS сам собирает заказы и пополнение склада, а печать запускается только после вашего «ок».</p></div>
+  <div class="stack">
+    <div class="time">
+      <div class="t">19:30</div><div class="d">Собирает подтверждённые заказы и товары, которых на складе меньше 5. Группирует по пластику и цвету, раскладывает на столы P1S и K1, режет в слайсере, проверяет, хватит ли пластика на катушке.</div>
+      <div class="t">20:00</div><div class="d">Пишет вам в Telegram, что поставить и что напечатается.</div>
+      <div class="t">«ок»</div><div class="d">Вы ставите катушку, протираете стол, для PETG — клей. Отвечаете «ок», «ок P1S» или «отложи». Только после этого JARVIS отправляет файл на принтер по Wi-Fi.</div>
+      <div class="t">+20 мин</div><div class="d">Фото первого слоя с камеры. Если слой плохой — спросит «остановить?» и сам ничего не перезапустит.</div>
+      <div class="t">08:00</div><div class="d">Утренний отчёт: что напечатано, сколько ушло пластика. Склад и статусы обновятся после вашего «проверено».</div>
+    </div>
+    <div class="tg" id="tgmsg"></div>
+    <div class="grid2">
+      <div class="card"><h3 style="margin-bottom:6px">P1S — вариант А (на старт)</h3><p class="small">JARVIS готовит файл, вы нажимаете «Печать» в приложении Bambu Handy. Облако и приложение работают как раньше.</p></div>
+      <div class="card"><h3 style="margin-bottom:6px">P1S — вариант Б (полный автомат)</h3><p class="small">Режим «Только LAN» и «Режим разработчика» в настройках принтера. JARVIS сам запускает печать после «ок». Минус: Bambu Handy на этом принтере перестанет работать.</p></div>
+    </div>
+    <div class="card"><h3 style="margin-bottom:6px">Creality K1</h3><p class="small">Управление по локальной сети через Klipper (Moonraker). Нужно включить root в настройках принтера. Это официальная функция, но Creality может не дать гарантию после неё — уточним перед включением.</p></div>
+    <div class="note">Безопасность: датчик дыма возле принтеров, рядом ничего горючего. Ночью принтер ставит паузу при «спагетти» и пишет вам.</div>
+  </div>
+</section>
+
+<!-- БРЕНДБУК -->
+<section id="brand">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Брендбук</h2>
+  <p class="muted">Полный текст брендбука. Тот же текст — в PDF на 9 страниц. Голос и ценности — моё предложение: поправьте голосом, и я обновлю обе версии.</p></div>
+  <div class="stack" id="bb"></div>
+</section>
+
+<!-- ЛОГОТИП И ФАЙЛЫ -->
+<section id="files">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Логотип и файлы</h2>
+  <p class="muted">На аватарку — полный логотип, увеличенный под круг (первая картинка). Остальные — для наклеек, упаковки и тёмного фона. Чтобы сохранить: нажмите на картинку и удерживайте.</p></div>
+  <div class="stack">
+    <div class="logos" id="logos"></div>
+    <div class="card"><h3 style="margin-bottom:8px">Где что лежит</h3><ul class="clean small" id="where"></ul></div>
+  </div>
+</section>
+
+<!-- РЕШЕНИЯ -->
+<section id="decisions">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Решения и вопросы</h2>
+  <p class="muted">Что уже решено по Qabat и что ждёт вашего ответа. Берётся из памяти JARVIS, при каждом обновлении страницы список свежий.</p></div>
+  <div class="stack">
+    <div class="card"><h3 style="margin-bottom:8px">Ждёт вашего ответа</h3><ul class="clean small" id="questions"></ul></div>
+    <div class="card"><h3 style="margin-bottom:8px">Решено</h3><div id="decided" class="stack" style="gap:10px"></div></div>
+  </div>
+</section>
+
+<!-- САЙТ -->
+<section id="site">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Сайт — потом</h2>
+  <p class="muted">Сейчас главный канал — Instagram: местные клиенты на сайты почти не заходят. Когда сайт понадобится, он соберётся из этих же товаров, цен и брендбука.</p></div>
+  <div class="card stack" style="gap:8px">
+    <p class="small"><b>Домены свободны</b> (проверено 4 октября через Vercel), <b>не куплены</b>: qabat.com — 11,25 $ в год, qabat.store, qabat.studio, qabat.shop, qabatprint.com, qabatprintlab.com. Покупка — только после вашего «да».</p>
+    <p class="small">Ранний черновик сайта лежит на старой отдельной странице: <a href="https://claude.ai/artifact/JWt1hmD3KGGH6LbaihTjMQ" target="_blank" rel="noopener">Qabat — черновик сайта</a>. Всё нужное из него уже здесь. Скажете — удалю её, чтобы осталась одна страница.</p>
+  </div>
+</section>
+
+<!-- ЧЕК-ЛИСТ -->
+<section id="check">
+  <div class="sec-head"><div class="layer"><i></i><i></i><i></i></div><h2>Чек-лист запуска</h2>
+  <p class="muted" id="ck-text">Отмечайте сделанное — галочки сохраняются в этом телефоне.</p>
+  <div class="progress" aria-hidden="true"><i id="ck-bar"></i></div></div>
+  <div class="stack" id="checklist"></div>
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-bottom:6px">Отправить ответы Джарвису</h3>
+    <p class="small muted" style="margin-bottom:10px">Ник, телефон, адрес, доставка, предоплата, ваши цены и что уже сделано — одним текстом. Скопируйте и пришлите в чат.</p>
+    <button type="button" class="btn main" id="copy-all">Скопировать ответы</button>
+    <pre id="all-text" class="small" style="white-space:pre-wrap;margin-top:10px;display:none"></pre>
+  </div>
+</section>
+
+<footer>Qabat Print Lab · единая страница Qabat, ведёт JARVIS. Обновлено: 05.10.2026. Цены и сроки — оценка, решения — за владельцем.</footer>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const D = {"bio": {"ru": [[["Напечатаем то, чего нет в магазинах", "🎁 Подарки, декор, игрушки и многое другое", "🔧 Сломалась деталь — сделаем новую"], "📍 Душанбе · заказ в Direct ↓", "📍 Душанбе, доставка · Direct ↓"], [["3D-печать слой за слоем", "Подарки, декор, игрушки и детали на заказ", "Печатаем то, чего нет в магазинах"], "Душанбе · цена и срок — в Direct", "Душанбе, доставка · цена и срок — в Direct"], [["Подарок, которого нет ни у кого 🎁", "Ночник с вашим фото · брелок с номером машины", "Декор, игрушки и не только"], "📍 Душанбе · заказ в Direct ↓", "📍 Душанбе, доставка · заказ в Direct ↓"]], "tj": [[["Чизе, ки дар мағоза нест, чоп мекунем", "🎁 Тӯҳфа, ороиш, бозича ва бисёр чизҳои дигар", "🔧 Қисм шикаст? Навашро месозем"], "📍 Душанбе · фармоиш дар Direct ↓", "📍 Душанбе, расондан · Direct ↓"], [["Чопи 3D қабат ба қабат", "Тӯҳфа, ороиш, бозича ва қисмҳо бо фармоиш", "Чизе, ки дар мағоза нест, чоп мекунем"], "Душанбе · нарх ва мӯҳлат — дар Direct", "Душанбе, расондан · нарх — дар Direct"], [["Тӯҳфае, ки дигар ҳеҷ кас надорад 🎁", "Шабчароғ бо акси шумо · брелок бо рақами мошин", "Ороиш, бозича ва ғайра"], "📍 Душанбе · фармоиш дар Direct ↓", "📍 Душанбе, расондан · фармоиш дар Direct ↓"]]}, "brand": {"about": {"lead": "Qabat — небольшая мастерская 3D-печати в Душанбе. Мы печатаем вещи, которые нужны людям дома, в подарок и в работе. Печатаем слой за слоем — поэтому и название: «қабат» по-таджикски значит «слой».", "what": ["лампы и ночники со светом внутри;", "подарки и сувениры, именные брелоки;", "игрушки и фиджеты;", "декор: вазы, подставки, органайзеры;", "восстановление деталей: нет детали или сломалась — смоделируем и напечатаем;", "архитектурные макеты и печать по идее клиента."], "mission": "Делать полезные и красивые вещи быстро и честно: понятная цена, реальный срок, аккуратная работа.", "slogan": "Слой за слоем", "character": "Минималистичный, светлый, спокойный. Уют и доверие вместо крика и скидок.", "note": "Qabat — отдельный бренд. Его стиль и тексты не смешиваем с другими проектами владельца."}, "audience": [["Для себя и дома", "красивая и полезная вещь — лампа, ваза, органайзер.", "заплатить и получить кривую пластмассу.", "фото и видео реальных изделий, честный срок."], ["На подарок", "необычный подарок с именем, фото или номером машины.", "не успеть к празднику.", "срок называем сразу и держим, упаковка готова к вручению."], ["Компании и мероприятия", "сувениры с логотипом, подарки гостям на той, корпоративы.", "срыва партии и разного качества.", "образец до партии, график печати."], ["Мастера и архитекторы", "деталь, которую нигде не купить, или макет.", "что деталь не подойдёт по размеру.", "замер, модель, примерка — потом печать."]], "audience_common": "Им нужна конкретная вещь, сделанная аккуратно и в срок. Они пишут в Instagram и хотят понятного ответа: цена, срок, как забрать.", "logo": {"full": "Полный логотип — знак и надпись QABAT / PRINT LAB. Для упаковки, наклеек, визиток, обложек видео.", "avatar": "Аватарка Instagram и Facebook — полный логотип, увеличенный под круг: ровно по центру, по краям ровный запас.", "mark": "Знак без надписи — иконка, печать на изделиях, водяной знак на фото и видео.", "rules": ["Вокруг логотипа — свободное поле не меньше высоты одного слоя стопки.", "Полный логотип — не мельче 30 мм в печати и 240 пикселей на экране.", "Фон — светлый или графитовый. На тёмном слои становятся белыми, мята остаётся."], "no": ["растягивать и сжимать;", "менять цвета и добавлять тени, обводки, градиенты;", "ставить на пёстрое фото без плашки;", "переставлять надпись и знак."], "note": "Знак перерисован вектором по выбранному варианту. Основной файл логотипа — у владельца."}, "colors_lead": "Белый и мята: светло, свежо, современно. Мята — только акцент, не заливаем ею всё подряд.", "colors": [["Мята", "#74DCC4", "Главный акцент: трубка и верхний слой знака, кнопки, обложки «Актуального», плашки с ценой."], ["Графит", "#1F2523", "Текст, знак, тёмный фон для контраста. Вместо чисто чёрного."], ["Тёплый белый", "#FAFAF8", "Фон страниц, постов и фото. Вместо чисто белого."], ["Светлая мята", "#E2F6EF", "Подложки, кружки на обложках, фон карточек товара."], ["Тёмная мята", "#1F7F69", "Ссылки и мелкий текст-акцент на белом — читается лучше, чем светлая мята."], ["Серый", "#6B7471", "Подписи, второстепенный текст."]], "colors_note": "Мята логотипа снята с файла на глаз. Если в исходнике другой оттенок — сверим пипеткой и поправим код.", "fonts": {"display": ["Montserrat", "Заголовки, цены, надписи на обложках. Близок к надписи QABAT. Начертания: Medium 500, SemiBold 600."], "body": ["Inter", "Основной текст: описания, ответы, условия. Начертания: Regular 400, SemiBold 600."], "sample_title": "Лампа «Луна» — 250 сомони", "sample_caps": "ҚАБАТ · СЛОЙ ЗА СЛОЕМ", "sample_text": "Напечатаем ваш номер машины на брелоке. Обычно — за один день. Забрать можно в студии или заказать доставку по Душанбе.", "sample_tj": "Ҳарфҳои тоҷикӣ: ғ ӣ қ ӯ ҳ ҷ — Ғ Ӣ Қ Ӯ Ҳ Ҷ", "where": "Оба шрифта бесплатные (лицензия OFL), с кириллицей и таджикскими буквами. Есть в Canva, CapCut и Google Fonts.", "rule": "Не больше двух шрифтов. Заголовок — Montserrat, текст — Inter. Капслок — только для коротких надписей."}, "voice": {"propose": "Предложение JARVIS — поправьте голосом, пересоберу.", "do": ["На «вы», тепло и просто, коротко.", "Сначала главное: цена, срок, как получить.", "Пишем на языке клиента: русский или тоҷикӣ.", "Только правду о сроке и наличии. Не уверены — говорим «уточню у мастера»."], "dont": ["«Лучшие цены в городе!!!», «Срочно! Только сегодня!»", "«Готово» — пока вещь не напечатана и не проверена.", "«Будет через час» без проверки очереди.", "Канцелярит и споры с клиентом."], "examples": ["Напечатаем ваш номер на брелоке. Обычно за день — точный срок скажу после проверки очереди.", "Сломалась деталь? Пришлите фото и размеры — смоделируем и напечатаем.", "Лампа «Луна» есть в наличии: 3 штуки, 250 сомони. Забрать можно сегодня до 19:00.", "Салом! Брелок бо рақами мошин — 40 сомонӣ. Одатан дар як рӯз тайёр мекунем."], "note": "Таджикские фразы проверяет владелец, прежде чем бот начнёт их писать."}, "values_propose": "Ценности — предложение JARVIS. Контакты впишите сами.", "values": [["Честность", "Цена и срок — как есть. Не обещаем то, чего не проверили."], ["Аккуратность", "Каждый слой и каждая упаковка — чтобы не стыдно было подарить."], ["Польза", "Печатаем вещи, которыми пользуются, а не пылесборники."], ["Уют", "Тёплый свет, мягкие формы, спокойные цвета."], ["Решаем задачу", "Нет нужной детали — придумаем и сделаем."]], "contacts": [["Instagram", "@______________ (варианты: @qabat, @qabat.tj, @qabat.print, @qabatprintlab)"], ["Facebook", "Qabat — 3D-печать"], ["WhatsApp / Telegram", "+992 ___ __ __ __"], ["Адрес", "Душанбе, ____________________"], ["Часы работы", "____________________"]], "insta": {"photo": ["Светлый фон, дневной свет или лайтбокс.", "Одна вещь в кадре, рядом — рука или предмет для масштаба.", "Мятный акцент в кадре: подставка, бумага, лента.", "Reels: таймлапс печати, «до и после», как вещь работает.", "Обложки Reels: название товара шрифтом Montserrat на тёплом белом."], "grid": "Чередуем: товар крупно → процесс печати → вещь в интерьере. Каждый третий пост — видео.", "captions": "Первая строка — что это и цена. Дальше: срок, цвета, как заказать. 3–5 хештегов."}}, "logos": [["avatar-instagram.png", "Аватарка Instagram — ставьте этот файл"], ["znak-avatarka.png", "Знак без надписи — иконка и водяной знак"], ["logo-svetlyj.png", "Полный логотип на светлом"], ["logo-tyomnyj.png", "Полный логотип на тёмном"], ["logo-prozrachnyj.png", "Без фона — для наклеек и упаковки"]], "where": ["<b>Эта страница</b> — главная по Qabat. Ссылка не меняется, всё новое JARVIS добавляет сюда.", "<b>Настройка Instagram по шагам</b> — отдельная страница по вашей просьбе: <a href=\"https://claude.ai/artifact/TYxaDRmmtiauBLB3zPXVGF\" target=\"_blank\" rel=\"noopener\">открыть</a>. Тексты в ней берутся из тех же данных.", "<b>Брендбук PDF и архив картинок</b> — в нашем чате от 4 октября и в GitHub (репозиторий <code>dream-houses</code>, папка <code>qabat/</code>): <code>brandbook/Qabat-brandbook.pdf</code>, обложки <code>kit/hl/</code>, логотипы <code>kit/logo/</code>.", "<b>Память JARVIS</b> — <code>jarvis/brain/30-projects/3d-print-biznes/</code>: статус, каталог и цены, закупка, чат-бот, вечерняя печать, варианты логотипа.", "<b>Исходники логотипа из Higgsfield</b>, на случай если захотите вернуться: <a href=\"https://d8j0ntlcm91z4.cloudfront.net/user_3ElkwKvj3PbkMSEZvzI8hrexIy2/hf_20261004_191046_3b721a0e-5ecd-4b13-b33d-d0754c2ac4de.svg\" target=\"_blank\" rel=\"noopener\">знак для аватарки (SVG)</a>, <a href=\"https://d8j0ntlcm91z4.cloudfront.net/user_3ElkwKvj3PbkMSEZvzI8hrexIy2/hf_20261004_200536_4855ebfd-81ad-4521-84b6-153e243e6b70.svg\" target=\"_blank\" rel=\"noopener\">полный логотип L1 (SVG)</a>, <a href=\"https://d2ol7oe51mr4n9.cloudfront.net/user_3ElkwKvj3PbkMSEZvzI8hrexIy2/b9f871a8-1eaf-4ed9-9395-6d04330390c3.zip\" target=\"_blank\" rel=\"noopener\">12 первых вариантов (ZIP)</a>, <a href=\"https://d2ol7oe51mr4n9.cloudfront.net/user_3ElkwKvj3PbkMSEZvzI8hrexIy2/5f50e104-f13e-46ce-878f-b8b1c6f1075a.zip\" target=\"_blank\" rel=\"noopener\">6 доработок (ZIP)</a>.", "После переноса JARVIS на ПК всё это будет и в папке проекта на компьютере."], "decisions": [["2026-10-04", "Qabat: <b>отдельная страница «Настройка Instagram Qabat»</b> по просьбе владельца — https://claude.ai/artifact/TYxaDRmmtiauBLB3zPXVGF: 14 шагов от аккаунта до первых публикаций, тексты из <code>qabat/kit/data.py</code>. Ссылка на неё — на главной странице Qabat. JARVIS в Instagram не входит: аккаунт и настройки делает владелец"], ["2026-10-04", "<b>Аватарка Qabat — полный логотип с надписью</b> (знак + QABAT / PRINT LAB), увеличенный под круг ×1,32: ровно по центру, запас 8% радиуса. Файл <code>qabat/kit/logo/avatar-instagram.png</code> (1080×1080), расчёт <code>qabat/brandbook/fit_avatar.py</code>. Заменяет прежнее «на аватарке — знак»: знак без надписи теперь для иконки и водяного знака"], ["2026-10-04", "<b>Qabat — одна страница:</b> https://claude.ai/artifact/Rmkaok9Bj3GAFeVXqsMzNy («Qabat Print Lab»). Туда же — полный брендбук, логотипы и файлы, решения и вопросы (подтягиваются из <code>brain/</code> при сборке), сайт. Старый черновик сайта (JWt1hmD3KGGH6LbaihTjMQ) — удалить только по просьбе владельца, по правилу удаления"], ["2026-10-04", "Qabat: <b>печать ночной партии — только после «ок» на каждую партию</b> (20:00, <code>30-projects/3d-print-biznes/вечерняя-печать.md</code>). Бот не пишет «готово» без «проверено» владельца, предоплату не просит, пока владелец её не включил"], ["2026-10-04", "Логотип Qabat: <b>на аватарке — знак в круге</b> (стопка слоёв, трубка уходит влево, вариант 3), <b>полный логотип — L1</b> (короткая трубка-крючок, QABAT / PRINT LAB). Основной файл ставит владелец сам; у JARVIS — векторная перерисовка в <code>qabat/brandbook/marks.py</code> для наклеек и упаковки"], ["2026-10-04", "<b>Higgsfield больше не тратить.</b> Использовано 77,5 кредита из разрешённых 100 — дальше всё делать самому и бесплатно: иконки Lucide (ISC), шрифты Montserrat и Inter (OFL), Chromium для PNG и PDF. Новые траты — только после нового «да»"], ["2026-10-04", "Qabat: <b>главный канал — Instagram</b>, сайт не в приоритете. Домен не покупаем, пока не нужен"], ["2026-10-04", "Имя 3D-бизнеса — <b>Qabat</b> («қабат» — слой); если ник или домен заняты — <b>Qabat Print Lab</b>. Сайт ведёт JARVIS"]], "questions": ["Публикации в Instagram: одно «да» на недельный план, дальше JARVIS выкладывает сам и шлёт отчёт? (сейчас по правилу — «да» на каждую). Обычные комментарии — отвечает сам, жалобы — вам? <span class=\"muted\" style=\"white-space:nowrap\">(2026-10-05)</span>", "Подключить Instagram Qabat к Windsor.ai (ссылка в <code>30-projects/3d-print-biznes/ведение-instagram.md</code>) — после шагов 3 и 9 настройки <span class=\"muted\" style=\"white-space:nowrap\">(2026-10-05)</span>", "Какой ник свободен в Instagram: @qabat, @qabat.tj, @qabat.print, @qabatprintlab? (проверить в приложении) <span class=\"muted\" style=\"white-space:nowrap\">(2026-10-04)</span>", "Цены: сверить с рынком Душанбе и вписать свои на странице комплекта (там же цена пластика за кг и курс). Сейчас — оценка JARVIS <span class=\"muted\" style=\"white-space:nowrap\">(2026-10-04)</span>", "Предоплата для бота: выключена (сейчас), 50% на именные заказы или 100% от 200 сомони? <span class=\"muted\" style=\"white-space:nowrap\">(2026-10-04)</span>", "Брендбук блоки 4–6 (голос, ценности, контакты) — JARVIS предложил; утвердить или поправить. Таджикские фразы и описание — проверить <span class=\"muted\" style=\"white-space:nowrap\">(2026-10-04)</span>", "Закупка: «да» на список «сразу» (≈ 352 $) или вычеркнуть лишнее <span class=\"muted\" style=\"white-space:nowrap\">(2026-10-04)</span>", "Где жить боту: внутри DH OS или Cloudflare Workers? P1S: вариант А (вы жмёте «Печать» в Bambu Handy) или Б (режим разработчика, полный автомат)? Root на K1 включать? <span class=\"muted\" style=\"white-space:nowrap\">(2026-10-04)</span>", "Доставка по Душанбе: есть ли и сколько стоит? Где забирать (адрес) и часы работы? <span class=\"muted\" style=\"white-space:nowrap\">(2026-10-04)</span>", "3D-бизнес · Принтер брата: аренда или оплата за машино-час? CRM: направление в DH OS или отдельная? <span class=\"muted\" style=\"white-space:nowrap\">(2026-10-04)</span>", "3D-печать · Есть ли AMS у P1S? K1 уже с root/Moonraker или стоковый? Оба принтера в одной Wi‑Fi с ПК? <span class=\"muted\" style=\"white-space:nowrap\">(2026-09-27)</span>", "3D-печать · Заказ «трактор на два цвета» для K1 (30 шт., 35 мин) — завершён? Годится как первый тест агента <code>3d</code>? <span class=\"muted\" style=\"white-space:nowrap\">(2026-10-03)</span>"], "defaults": {"rate": 9.5, "pla": 230, "petg": 250, "silk": 280, "waste": 10, "machine": 4, "labour": 25}, "pack": {"s": 3, "b": 8, "g": 15}, "products": [["QB-01", "Брелок «Номер машины»", "Брелоки", "custom", "petg", 9, 0.5, 5, 1.5, "s", 40, 0, "Как на машине: 1234 AB 01. Белая основа, чёрные буквы — смена пластика на слое. PETG: не мягчеет в машине на жаре. На одном столе — 12 штук"], ["QB-02", "Брелок с номером телефона или именем", "Брелоки", "custom", "pla", 6, 0.4, 4, 1.5, "s", 30, 0, "Текст пишет клиент, бот повторяет его дословно. Сопло 0,2 — для мелких букв"], ["QB-03", "Брелок-фигурка: сердце, кот, мини-флекси", "Брелоки", "stock", "silk", 5, 0.35, 2, 1.5, "s", 20, 10, "Недорогой подарок «на кассе». Держим 10 штук разных цветов"], ["QB-04", "Ночник-литофан с вашим фото", "Лампы", "custom", "pla", 80, 4.5, 15, 15, "g", 220, 0, "Фото проявляется, когда включают свет. Белый матовый PLA. Подставка с тёплым светом 5 В, USB-C"], ["QB-05", "Лампа «Луна» 12 см, сенсор, 3 цвета", "Лампы", "stock", "pla", 100, 7, 15, 30, "g", 250, 5, "Литофан Луны. Слой 0,12 — печать на ночь. Модуль: сенсор, 3 цвета, USB"], ["QB-06", "Настольная лампа «Чароғ»", "Лампы", "stock", "silk", 180, 7, 20, 30, "g", 350, 5, "Спиральный абажур из шёлкового PLA и основание. Тёплый свет 3000K, USB-C, сенсор. Внутри только 5 В — безопасно"], ["QB-07", "Ночник «Гриб»", "Лампы", "stock", "pla", 90, 4, 10, 15, "g", 190, 5, "Модный ночник: полупрозрачная шляпка и ножка. Тёплый свет, USB-C"], ["QB-08", "Умная лампа «Чароғ Smart»", "Лампы", "custom", "petg", 200, 8, 40, 60, "g", 450, 0, "ESP32 и адресные светодиоды: цвета и яркость с телефона. Сборка 2–3 дня. Такого в городе почти нет"], ["QB-09", "Флекси-дракон большой, 30–40 см", "Игрушки", "stock", "silk", 70, 4.5, 10, 0, "b", 150, 5, "Главная модная игрушка: гнётся, блестит. Шёлковый PLA, переливы цветов"], ["QB-10", "Флекси-мини: ящерица, акула, осьминог", "Игрушки", "stock", "pla", 18, 1.2, 3, 0, "s", 45, 10, "Печать в сборе, без клея. Детям нравятся яркие цвета"], ["QB-11", "Яйцо дракона с драконом внутри", "Игрушки", "stock", "silk", 60, 4, 10, 0, "b", 140, 5, "Подарок-сюрприз: яйцо открывается, внутри флекси-дракончик"], ["QB-12", "Фиджеты: слизень, шестерёнка, бесконечный куб", "Игрушки", "stock", "pla", 20, 1.3, 3, 0, "s", 45, 10, "Антистресс для школьников и офиса"], ["QB-13", "Подставка для телефона складная", "Для дома и офиса", "stock", "petg", 35, 1.6, 3, 0, "s", 60, 5, "Можно с именем или логотипом — тогда +10 сомони"], ["QB-14", "Органайзер для стола с именем", "Для дома и офиса", "stock", "pla", 90, 4, 5, 0, "b", 120, 5, "На склад — без имени. Имя печатаем под заказ за 1 день"], ["QB-15", "Спиральная ваза для сухоцветов", "Декор", "stock", "silk", 70, 2.5, 3, 0, "b", 120, 5, "Режим «ваза»: одна стенка, блеск шёлка. Только для сухих цветов — воду PLA не держит"], ["QB-19", "Подставка для Корана (рахл), складная", "Декор", "stock", "pla", 160, 6.5, 10, 0, "g", 180, 5, "Печать в сборе, тёплый древесный или белый цвет. Подарок на Рамазан"], ["QB-16", "Топпер для торта: имя, «Табрик», «С днём рождения»", "Подарки", "custom", "pla", 10, 0.7, 5, 0, "s", 50, 0, "Для кондитеров — 35 сомони от 5 штук. Ищем 2–3 кондитерские для постоянных заказов"], ["QB-17", "Сувениры гостям на той: магнит или брелок с именами", "Подарки", "custom", "pla", 6, 0.25, 2, 1, "s", 15, 0, "Цена за штуку, от 30 штук. Сначала образец, потом партия. Сезон тоев — главный объём"], ["QB-18", "Формочки для печенья: Навруз, имена, логотип", "Для кухни", "stock", "petg", 15, 0.8, 3, 0, "s", 35, 5, "PETG. Для короткого контакта с тестом, мыть руками, не в посудомойке. С логотипом кондитерской — 60 сомони"], ["QB-20", "Для машины: держатель телефона, ароматизатор в дефлектор", "Для машины", "stock", "petg", 20, 1.2, 3, 1, "s", 50, 10, "Только PETG: летом в машине до 70 °C, PLA там гнётся"]], "services": [["Восстановление деталей", "Пришлите фото и размеры. Моделирование — 50–150 сомони по сложности, печать — по формуле. Сначала примерка."], ["Печать по вашей модели", "Файл STL или 3MF. Цена по формуле: граммы, часы, работа. От 30 сомони."], ["Архитектурные макеты", "Смету считает мастер по проекту. В Instagram показываем видео готовых макетов."]], "purchases": [["Пластик", "PETG белый, 1 кг", "2 катушки", 36, "Брелоки с номером (белая основа), вещи для машины, подставки. Чёрный PETG у вас уже есть — для букв", 1], ["Пластик", "PLA белый матовый, 1 кг", "3 катушки", 51, "Литофаны, «Луна», «Гриб» — белый матовый лучше всего пропускает свет", 1], ["Пластик", "Silk PLA: золото, серебро, переливы, 1 кг", "3 катушки", 60, "Драконы, яйца, вазы, «Чароғ» — блеск, который продаёт", 1], ["Пластик", "PLA мятный (фирменный), 1 кг", "1 катушка", 17, "Фирменные вещи, образцы, сувениры с логотипом", 2], ["Пластик", "PLA древесный или бежевый, 1 кг", "1 катушка", 18, "Подставки для Корана, органайзеры — тёплый вид", 2], ["Инструмент", "Электронный штангенциркуль 150 мм, металлический", "1", 15, "Замеры деталей для восстановления и примерки", 1], ["Инструмент", "Бокорезы для пластика", "1", 4, "Снять поддержки и облой", 1], ["Инструмент", "Гратосниматель и набор надфилей", "1 набор", 8, "Чистые края у ламп и подарков", 1], ["Инструмент", "Клей-карандаш PVA", "2", 3, "PETG слишком сильно липнет к гладкому столу — клей работает как разделитель", 1], ["Инструмент", "Изопропиловый спирт 99%, 1 л", "1", 7, "Протирать стол перед каждой партией — меньше брака", 1], ["Инструмент", "Весы 0,1 г", "1", 8, "Взвешивать изделия и остаток пластика на катушке — JARVIS считает, хватит ли на партию", 1], ["Инструмент", "Сопло 0,2 мм для P1S", "1", 18, "Мелкий текст: брелоки с телефоном, топперы", 2], ["Инструмент", "Запасное сопло 0,4 закалённое для P1S и 0,4 для K1", "по 1", 25, "Чтобы не стоять, если сопло засорится", 2], ["Инструмент", "Второй текстурный стол PEI для P1S", "1", 25, "Пока снимаете готовое, второй стол уже печатает", 2], ["Инструмент", "Паяльник с насадками для вплавляемых гаек и набор гаек M2–M5", "1", 20, "Сборка ламп и креплений. Если паяльник уже есть — только гайки", 2], ["Инструмент", "Датчик дыма", "1", 10, "Принтеры работают ночью — это обязательно для безопасности", 1], ["Электроника", "Модули для «Луны»: сенсор, 3 цвета, USB", "10", 25, "На 2 партии ламп «Луна»", 1], ["Электроника", "Тёплые LED-модули 5 В, 3000K", "20", 15, "«Чароғ», «Гриб», литофаны", 1], ["Электроника", "Сенсорные кнопки TTP223", "20", 4, "Включение касанием", 1], ["Электроника", "Гнёзда USB-C (только питание)", "30", 5, "Питание ламп от зарядки телефона", 1], ["Электроника", "Кабели USB-C белые, 1–1,5 м", "20", 20, "Кабель в комплекте с лампой", 1], ["Электроника", "ESP32-C3 SuperMini", "5", 14, "Умная лампа «Чароғ Smart»", 2], ["Электроника", "Кольца WS2812B на 16–24 светодиода", "5", 8, "Адресная подсветка для Smart", 2], ["Электроника", "Провод 24 AWG, термоусадка, припой", "1 набор", 8, "Пайка ламп", 1], ["Фурнитура", "Кольца для брелоков 25 мм с цепочкой", "200", 6, "Брелоки, сувениры на той", 1], ["Фурнитура", "Неодимовые магниты 6×3 и 10×3 мм", "200", 7, "Магниты на холодильник, крышки органайзеров", 2], ["Упаковка", "Крафт-коробки трёх размеров", "30", 20, "Лампы и подарки", 1], ["Упаковка", "Пакеты zip-lock", "200", 4, "Брелоки, мелочь", 1], ["Упаковка", "Наклейки с логотипом, круг 40 мм", "500", 15, "На каждую упаковку — это реклама", 1], ["Упаковка", "Визитки с QR на Instagram", "300", 10, "Кладём в каждый заказ", 2], ["Съёмка", "Лайтбокс 40 см со светом и штатив для телефона", "1", 28, "Фото и Reels на светлом фоне, как в брендбуке", 1], ["Хранение", "Боксы для пластика с силикагелем", "2", 12, "Сушилка в принтере сушит, а хранить сухим нужно отдельно", 2]], "highlights": [["lampy", "Лампы", "«Чароғ», «Луна», «Гриб», Smart. Видео со светом в темноте и цены."], ["igrushki", "Игрушки", "Драконы, флекси, фиджеты, яйцо дракона. Видео, как гнутся."], ["breloki", "Брелоки", "Номер машины, телефон, имя. Примеры, цена, «пришлите текст в Direct»."], ["podarki", "Подарки", "Подборки по цене: до 50, до 150, до 300 сомони. Упаковка."], ["dekor", "Декор", "Вазы, органайзеры, подставка для Корана."], ["process", "Процесс", "Таймлапсы печати, принтеры, как выбираем пластик."], ["detali", "Детали", "До и после: сломанная деталь → новая. «Пришлите фото и размеры»."], ["otzyvy", "Отзывы", "Отзывы и фото у клиентов — только с их разрешения."], ["zakaz", "Заказ", "Как заказать, сроки, оплата, доставка, самовывоз."]], "posts": [["Карусель", "Знакомство", "Принтеры P1S и K1, руки за работой, 5–6 первых изделий на светлом фоне.", "Qabat — 3D-печать в Душанбе. Слой за слоем делаем лампы, подарки, игрушки и детали, которых нет в магазинах.\nПишите в Direct — подскажем, что можно напечатать для вас.", "#душанбе #3dпечать #3dпечатьдушанбе #подаркидушанбе #qabat"], ["Reels", "Лампа «Чароғ» от первого слоя до света", "Таймлапс печати абажура 15 секунд → сборка → лампа включается в темноте.", "Лампа «Чароғ» — от первого слоя до тёплого света. Шёлковый пластик, свет 5 В от USB-C, включение касанием.\n350 сомони. Есть в наличии — пишите в Direct.", "#душанбе #лампа #ночник #3dпечать #интерьердушанбе"], ["Карусель", "Лампа «Луна»", "3 кадра в темноте: тёплый, белый, смешанный свет. Последний кадр — лампа днём на полке.", "Луна на вашем столе. Рельеф кратеров напечатан слоями 0,12 мм, включается касанием, три цвета света.\n250 сомони. Отличный подарок.", "#душанбе #подарок #ночник #луна #3dпечать"], ["Reels", "Брелок с номером вашей машины", "Экран переписки → печать 12 брелоков на одном столе → брелок на ключах у машины.", "Брелок с номером вашей машины. Пишете номер в Direct — печатаем, обычно за один день.\n40 сомони. Подарок водителю, который точно пригодится.", "#душанбе #авто #брелок #подаркидушанбе #3dпечать"], ["Reels", "Флекси-дракон", "Дракона берут в руки и гнут, крупно блеск шёлка. Музыка из трендов.", "Этот дракон гнётся каждым позвонком. Печатается сразу в сборе, без клея. 30–40 см, переливается на свету.\n150 сомони. Цвета — в Direct.", "#душанбе #игрушки #дракон #подарокребёнку #3dпечать"], ["Карусель", "Как заказать", "4 слайда в фирменном стиле: 1. Напишите в Direct. 2. Уточним цвет и срок. 3. Печатаем. 4. Самовывоз или доставка.", "Как заказать в Qabat: пишете в Direct, что нужно, — мы называем цену и срок. Печатаем, проверяем, упаковываем. Забрать можно сами или с доставкой по Душанбе.", "#душанбе #3dпечать #назаказ #qabat #подаркидушанбе"], ["Reels", "Восстановили сломанную деталь", "До: сломанная ручка или крепление. Замер штангенциркулем → модель на экране → новая деталь на месте.", "Сломалась деталь, а новой нигде нет? Пришлите фото и размеры. Мы смоделируем и напечатаем её заново — сначала примерка, потом готовая деталь.", "#душанбе #ремонт #запчасти #3dмоделирование #3dпечать"], ["Карусель", "Подарки до 100 сомони", "Брелоки, фиджеты, подставки, флекси-мини — каждый кадр с ценой.", "Подарки до 100 сомони: брелоки от 20, фиджеты и флекси от 45, подставка для телефона 60. Есть в наличии — заберёте сегодня.", "#душанбе #подарки #подаркидушанбе #недорогиеподарки #3dпечать"], ["Reels", "Литофан: фото проявляется на свету", "Белая пластина без света → включаем → появляется фото семьи (с разрешения людей на фото).", "Белая пластина. Включаем свет — и появляется ваше фото. Это литофан: рисунок из слоёв разной толщины.\nНочник с вашим фото — 220 сомони, 1–2 дня.", "#душанбе #подарок #фото #ночник #3dпечать"]], "checklist": [["Сегодня", ["Проверить, какой ник свободен, и создать аккаунт Instagram на отдельную почту или номер", "Переключить на профессиональный аккаунт → «Бизнес» → категория «Товары/услуги»", "Поставить знак на аватарку, вписать имя и описание из раздела «Профиль»", "Создать страницу Facebook «Qabat — 3D-печать» в Meta Business Suite и связать её с Instagram", "Включить бесплатные автоответы в Meta Business Suite: мгновенный ответ, частые вопросы, «нет на месте»", "Выложить по одной истории в каждую обложку «Актуального» и поставить обложки"]], ["На этой неделе", ["Сказать «да» на закупку или вычеркнуть лишнее из списка", "Напечатать склад: по 5–10 штук каждого товара (план по часам — в разделе «Товары»)", "Снять 9 первых публикаций в лайтбоксе, выложить 3 сразу, остальные — через день", "Проверить цены в Душанбе и вписать свои в раздел «Товары»", "Решить правило предоплаты для чат-бота", "Проверить таджикские тексты описания и ответов"]], ["Перед рекламой", ["Подключить чат-бота: приложение Meta и ключ ИИ — после вашего «да» на расходы", "Набрать 10+ публикаций и 3+ отзыва в «Актуальном»", "Включить вечернюю печать в 20:00"]]], "colors": [["Мята", "#74DCC4", "акцент: трубка, верхний слой, кнопки"], ["Графит", "#1F2523", "текст и знак"], ["Тёплый белый", "#FAFAF8", "фон"], ["Светлая мята", "#E2F6EF", "подложки, обложки"], ["Тёмная мята", "#1F7F69", "ссылки и мелкий акцент"], ["Серый", "#6B7471", "подписи"]]};
+const $ = s => document.querySelector(s);
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('qabat.' + k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('qabat.' + k, JSON.stringify(v)); }catch(e){} }
+};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = (n, d=0) => Number(n).toLocaleString('ru-RU', {minimumFractionDigits:d, maximumFractionDigits:d});
+function toast(t){ const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1800); }
+async function copy(text, btn){
+  try{ await navigator.clipboard.writeText(text); toast('Скопировано'); if(btn){ btn.classList.add('done'); btn.textContent = 'Скопировано'; setTimeout(() => { btn.classList.remove('done'); btn.textContent = 'Копировать'; }, 1600); } }
+  catch(e){ const pre = btn && btn.closest('.out') ? btn.closest('.out').querySelector('pre') : null;
+    if(pre){ const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+    toast('Выделил текст — нажмите «Копировать» в меню'); }
+}
+
+/* ---------- профиль ---------- */
+const BIO = D.bio; // варианты описания — qabat/kit/data.py (BIO)
+const pf = ['nick','phone','addr','hours','deliv','hook'];
+pf.forEach(id => { const el = $('#' + id); const v = store.get('f.' + id, null); if(v !== null) el.value = v; el.addEventListener('input', () => { store.set('f.' + id, el.value); renderProfile(); renderChat(); renderContacts(); renderAll(); }); });
+function digits(){ return ($('#phone').value || '').replace(/\D/g,''); }
+function bio(lang){
+  const v = BIO[lang][+$('#hook').value || 0];
+  return v[0].concat((+$('#deliv').value || 0) > 0 ? v[2] : v[1]).join('\n');
+}
+function bioRu(){ return bio('ru'); }
+function bioTj(){ return bio('tj'); }
+function out(k, text, note){
+  const len = text.length;
+  const cnt = note === 'bio' ? `<span class="count ${len > 150 ? 'bad' : ''}">${len} из 150 знаков</span>` : (note ? `<span class="count">${esc(note)}</span>` : '');
+  return `<div class="out"><div class="k">${esc(k)}</div><pre>${esc(text)}</pre><button type="button" class="btn" data-copy>Копировать</button>${cnt ? '<div style="grid-column:1/-1">' + cnt + '</div>' : ''}</div>`;
+}
+function renderProfile(){
+  const ph = digits();
+  const wa = ph ? 'https://wa.me/992' + ph : 'впишите номер — появится ссылка';
+  const dv = +$('#deliv').value || 0;
+  const addr = $('#addr').value.trim();
+  $('#outs').innerHTML =
+    out('Имя профиля — по нему ищут', 'Qabat · 3D-печать Душанбе', 'Поле «Имя» участвует в поиске Instagram') +
+    out('Ник', '@' + $('#nick').value) +
+    out('Категория', 'Товары/услуги') +
+    out('Описание по-русски', bioRu(), 'bio') +
+    out('Описание на тоҷикӣ — проверьте перевод', bioTj(), 'bio') +
+    out('Ссылка WhatsApp для кнопки и описания', wa) +
+    out('Кнопки контактов', 'Сообщение в Direct · WhatsApp' + (ph ? ' +992 ' + ph : '') + (addr ? '\nАдрес: Душанбе, ' + addr : '') + '\nЧасы: ' + ($('#hours').value || '—') + (dv > 0 ? '\nДоставка по Душанбе: ' + dv + ' сомони' : '\nТолько самовывоз')) +
+    out('Первая история — закрепить в «Заказ»', 'Как заказать в Qabat:\n1. Напишите в Direct, что нужно.\n2. Мы назовём цену и срок.\n3. Печатаем, проверяем, упаковываем.\n4. ' + (dv > 0 ? 'Самовывоз или доставка по Душанбе — ' + dv + ' сомони.' : 'Забираете в мастерской.'));
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-copy]'); if(b) copy(b.closest('.out').querySelector('pre').textContent, b); });
+
+/* ---------- обложки ---------- */
+let hlStyle = store.get('hlStyle', 'A');
+function renderHL(){
+  $('#hl').innerHTML = D.highlights.map(([k, n, t]) => `<figure><img src="kit/hl/${hlStyle}-${k}.png" alt="Обложка «${esc(n)}»" width="76" height="76"><b>${esc(n)}</b><span>${esc(t)}</span></figure>`).join('');
+  ['A','B'].forEach(s => $('#st-' + s).setAttribute('aria-pressed', String(s === hlStyle)));
+}
+['A','B'].forEach(s => $('#st-' + s).addEventListener('click', () => { hlStyle = s; store.set('hlStyle', s); renderHL(); }));
+
+/* ---------- посты ---------- */
+function renderPosts(){
+  const order = [...D.posts.keys()].reverse();
+  $('#feed').innerHTML = order.map(i => { const p = D.posts[i]; return `<div class="tile"><small>${i + 1} · ${esc(p[0])}</small><strong>${esc(p[1])}</strong></div>`; }).join('');
+  $('#postlist').innerHTML = D.posts.map((p, i) => `<div class="post"><div class="n">${i + 1}</div><div class="body">
+    <div><span class="chip">${esc(p[0])}</span><b>${esc(p[1])}</b></div>
+    <p class="small muted">Снять: ${esc(p[2])}</p>
+    <div class="out" style="border:0;padding:4px 0 0"><div class="k">Подпись</div><pre>${esc(p[3] + '\n\n' + p[4])}</pre><button type="button" class="btn" data-copy>Копировать</button></div>
+  </div></div>`).join('');
+}
+
+/* ---------- товары ---------- */
+const S = Object.assign({}, D.defaults, store.get('settings', {}));
+const prices = store.get('prices', {});
+const keys = ['pla','petg','silk','waste','machine','labour','rate'];
+keys.forEach(k => { const el = $('#s-' + k); el.value = S[k]; el.addEventListener('input', () => { S[k] = +el.value || 0; store.set('settings', S); renderCatalog(); renderBuy(); renderAll(); }); });
+const minEl = $('#s-min'); minEl.value = store.get('minMul', 2); minEl.addEventListener('input', () => { store.set('minMul', +minEl.value || 1); renderCatalog(); });
+const MAT = {pla:'PLA', petg:'PETG', silk:'Silk PLA'};
+function costOf(p){
+  const [, , , , mat, gr, h, mins, el, pk] = p;
+  return gr * (1 + S.waste / 100) * S[mat] / 1000 + h * S.machine + mins / 60 * S.labour + el + D.pack[pk];
+}
+function renderCatalog(){
+  const minMul = +minEl.value || 1;
+  let rows = '', group = '', hours = 0, mat = {pla:0, petg:0, silk:0}, value = 0, scost = 0;
+  D.products.forEach(p => {
+    const [id, name, grp, type, m, gr, h, , , , rec, stock, note] = p;
+    if(grp !== group){ group = grp; rows += `<div class="lg">${esc(grp)}</div>`; }
+    const c = costOf(p), price = prices[id] ?? rec, mul = c ? price / c : 0;
+    if(stock){ hours += h * stock; mat[m] += gr * stock * (1 + S.waste / 100); value += price * stock; scost += c * stock; }
+    rows += `<div class="row"><div class="top"><b>${esc(name)}</b><span class="pill ${type}">${type === 'stock' ? 'склад: ' + stock + ' шт.' : 'под заказ'}</span></div>
+      <small>${esc(id)} · ${MAT[m]} · ${esc(note)}</small>
+      <div class="stats"><span>${gr} г · ${fmt(h, 1)} ч</span><span>себест. <strong>${fmt(c, 1)}</strong></span>
+      <label>цена <input type="number" min="0" step="5" value="${price}" data-price="${id}" aria-label="Цена ${esc(name)}"></label>
+      <span class="${mul < minMul ? 'x-low' : ''}">наценка ×${fmt(mul, 1)}</span></div></div>`;
+  });
+  $('#plist').innerHTML = rows;
+  const days = hours / 36;
+  $('#totals').innerHTML = [
+    [fmt(hours) + ' ч', 'печати на первый склад'],
+    ['≈' + fmt(Math.ceil(days)) + ' дн.', 'на P1S и K1 по 18 ч в сутки'],
+    [fmt((mat.pla + mat.silk + mat.petg) / 1000, 1) + ' кг', `пластика: PLA ${fmt(mat.pla/1000,1)}, Silk ${fmt(mat.silk/1000,1)}, PETG ${fmt(mat.petg/1000,1)}`],
+    [fmt(value) + ' сом', 'склад по ценам продажи, себестоимость ' + fmt(scost) + ' сом']
+  ].map(([b, s]) => `<div class="tot"><b>${b}</b><span>${s}</span></div>`).join('');
+  $('#f-days').textContent = '≈' + Math.ceil(days) + ' дней';
+}
+document.addEventListener('change', e => { const id = e.target.dataset && e.target.dataset.price; if(id){ prices[id] = +e.target.value || 0; store.set('prices', prices); renderCatalog(); renderAll(); } });
+function renderServices(){ $('#services').innerHTML = D.services.map(([n, t]) => `<div><b>${esc(n)}</b><p class="small muted">${esc(t)}</p></div>`).join(''); }
+
+/* ---------- закупка ---------- */
+let buyAll = store.get('buyAll', false);
+const bought = store.get('bought', {});
+function renderBuy(){
+  let rows = '', group = '', sum = 0, sum1 = 0, left = 0;
+  D.purchases.forEach((x, i) => {
+    const [grp, what, qty, usd, why, pr] = x;
+    sum += usd; if(pr === 1) sum1 += usd;
+    if(!buyAll && pr !== 1) return;
+    if(!bought[i]) left += usd;
+    if(grp !== group){ group = grp; rows += `<div class="lg">${esc(grp)}</div>`; }
+    rows += `<label class="row brow ${bought[i] ? 'got' : ''}"><input type="checkbox" data-buy="${i}" ${bought[i] ? 'checked' : ''}>
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:0"><div class="top"><b>${esc(what)}</b></div><small>${esc(why)}</small>
+      <div class="stats"><span>${esc(qty)}</span><span>≈ <strong>$${usd}</strong></span><span>≈ <strong>${fmt(usd * S.rate)} сом</strong></span>${pr === 1 ? '' : '<span class="pill stock">можно позже</span>'}</div></div></label>`;
+  });
+  $('#blist').innerHTML = rows;
+  $('#btotals').innerHTML = [
+    ['$' + fmt(sum1), 'в первую очередь ≈ ' + fmt(sum1 * S.rate) + ' сом'],
+    ['$' + fmt(sum), 'весь список ≈ ' + fmt(sum * S.rate) + ' сом'],
+    ['$' + fmt(left), 'осталось купить в этом списке'],
+    [fmt(S.rate, 2), 'сомони за $1 — поменяйте в «Товарах»']
+  ].map(([b, s]) => `<div class="tot"><b>${b}</b><span>${s}</span></div>`).join('');
+  $('#b-1').setAttribute('aria-pressed', String(!buyAll)); $('#b-all').setAttribute('aria-pressed', String(buyAll));
+  $('#f-buy').textContent = '$' + fmt(sum1);
+}
+$('#b-1').addEventListener('click', () => { buyAll = false; store.set('buyAll', false); renderBuy(); });
+$('#b-all').addEventListener('click', () => { buyAll = true; store.set('buyAll', true); renderBuy(); });
+document.addEventListener('change', e => { const i = e.target.dataset && e.target.dataset.buy; if(i !== undefined){ bought[i] = e.target.checked; store.set('bought', bought); renderBuy(); } });
+
+/* ---------- бот ---------- */
+const PREPAY = {
+  off: 'Сейчас: предоплата выключена. Бот не просит денег и не даёт реквизиты.',
+  custom50: 'Сейчас: на именные заказы (номер, имя, фото) — 50% до печати. Реквизиты бот даёт только после подтверждения мастером. «Оплата получена» отмечаете вы.',
+  over200: 'Сейчас: на заказы от 200 сомони — 100% до печати. Остальное — оплата при получении. «Оплата получена» отмечаете вы.'
+};
+let prepay = store.get('prepay', 'off');
+function renderPrepay(){
+  document.querySelectorAll('#prepay button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === prepay)));
+  $('#prepay-text').textContent = PREPAY[prepay];
+  renderChat();
+}
+document.querySelectorAll('#prepay button').forEach(b => b.addEventListener('click', () => { prepay = b.dataset.v; store.set('prepay', prepay); renderPrepay(); renderAll(); }));
+function renderChat(){
+  const dv = +$('#deliv').value || 0;
+  const pr = prices['QB-01'] ?? 40;
+  const m = [
+    ['c', 'Салом! Брелок с номером машины можно?'],
+    ['b', `Салом! Да, брелок с номером машины — ${pr} сомони, обычно готов за 1 день. Напишите номер как на машине, например 1234 AB 01.`],
+    ['c', '7777 TT 01'],
+    ['b', 'Записал: «7777 TT 01». Цвет: белый с чёрными буквами или чёрный с белыми?'],
+    ['c', 'белый'],
+    ['b', 'Сколько штук и как заберёте: сами' + (dv > 0 ? ` или доставка по Душанбе (${dv} сомони)?` : '?')],
+    ['c', '2, заберу сам'],
+    ['b', `Проверьте заказ: брелок «7777 TT 01», белый с чёрными буквами, 2 шт., ${pr * 2} сомони, самовывоз. Всё верно?`],
+    ['c', 'да'],
+    ['b', prepay === 'custom50' ? `Спасибо! Передал мастеру. Он подтвердит срок, и я пришлю реквизиты для предоплаты ${pr} сомони (50%).` : 'Спасибо! Передал мастеру. Он проверит очередь и подтвердит срок сегодня до 21:00. Напишу сюда.'],
+    ['j', 'JARVIS → вам в Telegram: «Новый заказ: брелок 7777 TT 01 ×2. Модель готова, превью во вложении. Подтвердить?»']
+  ];
+  $('#chat').innerHTML = m.map(([w, t]) => `<div class="msg ${w}">${esc(t)}</div>`).join('');
+}
+$('#tgmsg').textContent = 'JARVIS, 20:00\nПартия на ночь:\n• P1S — белый PETG: брелоки с номером ×12 (заказы 3, 5, 6), 3 ч 10 мин, 96 г.\n• K1 — Silk «переливы»: флекси-дракон ×2 на склад (осталось 3), 9 ч, 140 г.\nПодготовьте: белый PETG в P1S, клей на стол; на K1 протереть стол спиртом.\nОтветьте «ок» — запущу. «Отложи K1» — напечатаю только P1S.';
+
+/* ---------- брендбук ---------- */
+function renderBrand(){
+  const B = D.brand, li = xs => xs.map(x => `<li>${esc(x)}</li>`).join('');
+  $('#bb').innerHTML = `
+  <div class="card"><h3 style="margin-bottom:8px">Кто мы</h3><p style="margin-bottom:10px">${esc(B.about.lead)}</p>
+    <div class="grid2"><div><p class="small muted" style="margin-bottom:4px">Что делаем</p><ul class="clean small">${li(B.about.what)}</ul></div>
+    <div class="small"><p class="muted">Миссия</p><p style="margin-bottom:8px">${esc(B.about.mission)}</p><p class="muted">Слоган</p><p style="font:600 20px var(--display);color:var(--mint-deep);margin-bottom:8px">${esc(B.about.slogan)}</p><p class="muted">Характер</p><p>${esc(B.about.character)}</p></div></div>
+    <p class="small muted" style="margin-top:10px">${esc(B.about.note)}</p></div>
+  <div><h3 style="margin-bottom:8px">Для кого мы</h3><div class="aud">${B.audience.map(([t, n, f, g]) => `<div class="card"><h3 style="font-size:15px;margin-bottom:6px">${esc(t)}</h3><p><b>Нужно:</b> ${esc(n)}</p><p><b>Боится:</b> ${esc(f)}</p><p><b>Даём:</b> ${esc(g)}</p></div>`).join('')}</div>
+    <p class="small" style="margin-top:8px">${esc(B.audience_common)}</p></div>
+  <div class="card"><h3 style="margin-bottom:8px">Логотип</h3><div class="grid2"><div><p class="small muted">Правила</p><ul class="clean small">${li(B.logo.rules)}</ul></div><div><p class="small muted">Нельзя</p><ul class="clean small no">${li(B.logo.no)}</ul></div></div>
+    <p class="small muted" style="margin-top:8px">${esc(B.logo.full)} ${esc(B.logo.mark)}</p></div>
+  <div class="card"><h3 style="margin-bottom:6px">Цвета</h3><p class="small muted" style="margin-bottom:10px">${esc(B.colors_lead)}</p><div class="stack" style="gap:8px">${B.colors.map(([n, h, r]) => `<div class="sw2"><span class="c" style="background:${h}"></span><div class="small"><b>${esc(n)}</b> <span class="muted">${h}</span><br><span class="muted">${esc(r)}</span></div></div>`).join('')}</div>
+    <p class="small muted" style="margin-top:8px">${esc(B.colors_note)}</p></div>
+  <div class="card"><h3 style="margin-bottom:8px">Шрифты</h3>
+    <p style="font:600 26px var(--display)">${esc(B.fonts.display[0])}</p><p class="small muted" style="margin-bottom:6px">${esc(B.fonts.display[1])}</p>
+    <p style="font:600 18px var(--display)">${esc(B.fonts.sample_title)}</p><p style="font:500 13px var(--display);letter-spacing:.18em;margin-bottom:12px">${esc(B.fonts.sample_caps)}</p>
+    <p style="font:600 24px var(--body)">${esc(B.fonts.body[0])}</p><p class="small muted" style="margin-bottom:6px">${esc(B.fonts.body[1])}</p>
+    <p>${esc(B.fonts.sample_text)}</p><p>${esc(B.fonts.sample_tj)}</p>
+    <p class="small muted" style="margin-top:8px">${esc(B.fonts.where)} ${esc(B.fonts.rule)}</p></div>
+  <div class="card"><h3 style="margin-bottom:6px">Голос бренда</h3><p class="chip" style="margin-bottom:10px">${esc(B.voice.propose)}</p>
+    <div class="grid2"><div><p class="small muted">Как говорим</p><ul class="clean small">${li(B.voice.do)}</ul></div><div><p class="small muted">Чего не говорим</p><ul class="clean small no">${li(B.voice.dont)}</ul></div></div>
+    <div class="stack" style="gap:8px;margin-top:12px">${B.voice.examples.map(q => `<p class="quote">${esc(q)}</p>`).join('')}</div>
+    <p class="small muted" style="margin-top:8px">${esc(B.voice.note)}</p></div>
+  <div class="card"><h3 style="margin-bottom:6px">Ценности и контакты</h3><p class="chip" style="margin-bottom:10px">${esc(B.values_propose)}</p>
+    <div class="vals">${B.values.map(([t, w], i) => `<div><span>${i + 1}</span><p><b>${esc(t)}.</b> ${esc(w)}</p></div>`).join('')}</div>
+    <table class="ctable" style="margin-top:12px"><tbody id="ctable"></tbody></table></div>
+  <div class="card"><h3 style="margin-bottom:8px">Стиль в Instagram</h3><ul class="clean small">${li(B.insta.photo)}</ul>
+    <p class="small" style="margin-top:8px"><b>Сетка:</b> ${esc(B.insta.grid)}</p><p class="small"><b>Подписи:</b> ${esc(B.insta.captions)}</p></div>`;
+  renderContacts();
+}
+function renderContacts(){
+  const el = $('#ctable'); if(!el) return;
+  const ph = digits(), addr = $('#addr').value.trim(), hrs = $('#hours').value.trim();
+  const rows = [['Instagram', '@' + $('#nick').value + ' (проверить, свободен ли)'], ['Facebook', 'Qabat — 3D-печать'],
+    ['WhatsApp / Telegram', ph ? '+992 ' + ph : '+992 ___ — впишите в «Профиле»'], ['Адрес', addr ? 'Душанбе, ' + addr : 'Душанбе, ___ — впишите в «Профиле»'], ['Часы работы', hrs || '—']];
+  el.innerHTML = rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('');
+}
+$('#logos').innerHTML = D.logos.map(([f, cap]) => `<figure><img src="kit/logo/${f}" alt="${esc(cap)}" width="512" height="512" class="${f.includes('prozr') ? 'checker' : ''}"><figcaption>${esc(cap)}</figcaption></figure>`).join('');
+$('#where').innerHTML = D.where.map(x => `<li>${x}</li>`).join('');
+$('#questions').innerHTML = D.questions.length ? D.questions.map(x => `<li>${x}</li>`).join('') : '<li>Открытых вопросов нет.</li>';
+$('#decided').innerHTML = D.decisions.map(([d, t]) => `<div class="dec"><time>${esc(d)}</time><div>${t}</div></div>`).join('');
+
+/* ---------- чек-лист ---------- */
+const done = store.get('done', {});
+function renderCheck(){
+  let total = 0, ok = 0;
+  $('#checklist').innerHTML = D.checklist.map(([g, items], gi) => `<div class="card"><h3 style="margin-bottom:6px">${esc(g)}</h3><div class="check">` +
+    items.map((t, ii) => { const k = gi + '.' + ii; total++; if(done[k]) ok++; return `<label><input type="checkbox" data-ck="${k}" ${done[k] ? 'checked' : ''}><span>${esc(t)}</span></label>`; }).join('') + '</div></div>').join('');
+  $('#ck-bar').style.width = (total ? ok / total * 100 : 0) + '%';
+  $('#ck-text').textContent = `Сделано ${ok} из ${total}. Галочки сохраняются в этом телефоне.`;
+}
+document.addEventListener('change', e => { const k = e.target.dataset && e.target.dataset.ck; if(k){ done[k] = e.target.checked; store.set('done', done); renderCheck(); renderAll(); } });
+
+/* ---------- ответы для Джарвиса ---------- */
+function allText(){
+  const changed = D.products.filter(p => prices[p[0]] !== undefined && prices[p[0]] !== p[10]).map(p => `${p[0]} ${p[1]}: ${prices[p[0]]} сом`);
+  const doneList = []; D.checklist.forEach(([g, items], gi) => items.forEach((t, ii) => { if(done[gi + '.' + ii]) doneList.push('✓ ' + t); }));
+  return ['Ответы для JARVIS по Qabat',
+    'Ник: @' + $('#nick').value, 'Телефон/WhatsApp: ' + (digits() ? '+992 ' + digits() : 'не указан'),
+    'Где забрать: ' + ($('#addr').value || 'не указано'), 'Часы: ' + ($('#hours').value || '—'),
+    'Доставка: ' + ((+$('#deliv').value || 0) > 0 ? $('#deliv').value + ' сом' : 'нет'),
+    'Предоплата: ' + PREPAY[prepay].replace('Сейчас: ', ''),
+    'Обложки: ' + (hlStyle === 'A' ? 'светлые' : 'мятные'),
+    `Мои цифры: PLA ${S.pla}, PETG ${S.petg}, Silk ${S.silk} сом/кг, курс ${S.rate}, машино-час ${S.machine}, мой час ${S.labour}`,
+    'Мои цены: ' + (changed.length ? '\n' + changed.join('\n') : 'как предложил JARVIS'),
+    'Сделано: ' + (doneList.length ? '\n' + doneList.join('\n') : 'пока ничего')].join('\n');
+}
+function renderAll(){ const el = $('#all-text'); if(el.style.display !== 'none') el.textContent = allText(); }
+$('#copy-all').addEventListener('click', async () => { const el = $('#all-text'); el.textContent = allText(); el.style.display = 'block';
+  try{ await navigator.clipboard.writeText(el.textContent); toast('Скопировано — пришлите в чат'); }
+  catch(e){ const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Выделил текст — скопируйте из меню'); } });
+
+$('#f-products').textContent = D.products.length;
+renderProfile(); renderBrand(); renderHL(); renderPosts(); renderCatalog(); renderServices(); renderBuy(); renderPrepay(); renderCheck();
+</script>
