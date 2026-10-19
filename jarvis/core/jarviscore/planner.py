@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
@@ -79,9 +80,12 @@ class Scheduler:
 
     # --- хранение -----------------------------------------------------------
     def save(self, path: Path | str) -> None:
-        Path(path).parent.mkdir(parents=True, exist_ok=True)
-        Path(path).write_text(json.dumps([t.to_dict() for t in self.tasks.values()],
-                                         ensure_ascii=False, indent=2), encoding="utf-8")
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(path.suffix + ".tmp")
+        tmp.write_text(json.dumps([t.to_dict() for t in list(self.tasks.values())],
+                                  ensure_ascii=False, indent=2), encoding="utf-8")
+        os.replace(tmp, path)   # атомарно: обрыв посреди записи не портит очередь
 
     @classmethod
     def load(cls, path: Path | str) -> "Scheduler":

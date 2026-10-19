@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
+import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -70,15 +71,18 @@ def build_command(
 
 
 def parse_output(stdout: str) -> dict:
-    """JSON может быть окружён служебным текстом — берём последний JSON-объект."""
+    """JSON может быть окружён служебным текстом до и после — берём последнюю строку-JSON-объект."""
     stdout = stdout.strip()
     try:
         return json.loads(stdout)
     except json.JSONDecodeError:
-        start = stdout.rfind("\n{")
-        if start == -1:
-            raise
-        return json.loads(stdout[start + 1:])
+        for line in reversed(stdout.splitlines()):
+            if line.lstrip().startswith("{"):
+                try:
+                    return json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+        raise
 
 
 def _log_cost(log_path: Path, record: dict) -> None:
@@ -103,6 +107,13 @@ def spent_today(log_path: Path) -> float:
     return total
 
 
+def _kill_tree(proc: subprocess.Popen) -> None:
+    if sys.platform == "win32":
+        subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)], capture_output=True)
+    else:
+        proc.kill()
+
+
 def run(
     prompt: str,
     cwd: Path | str,
@@ -123,12 +134,24 @@ def run(
         raise BudgetExceeded(f"дневной порог {daily_budget_usd} $ уже израсходован")
 
     claude_bin = kwargs.pop("claude_bin", "claude")
-    if shutil.which(claude_bin) is None and not Path(claude_bin).exists():
+    # полный путь: на Windows npm ставит claude.cmd, а CreateProcess по короткому имени его не находит
+    resolved = shutil.which(claude_bin) or (claude_bin if Path(claude_bin).exists() else None)
+    if resolved is None:
         raise FileNotFoundError("claude не найден в PATH — установите Claude Code и выполните `claude login`")
+    claude_bin = resolved
 
+    env = kwargs.pop("env", None)
     cmd = build_command(prompt, claude_bin=claude_bin, **kwargs)
-    proc = subprocess.run(cmd, cwd=str(cwd), capture_output=True, text=True, encoding="utf-8",
-                          timeout=timeout_sec)
+    del cmd[2]  # задание идёт через stdin: обёртка claude.cmd на Windows режет аргумент на первом переводе строки
+    proc = subprocess.Popen(cmd, cwd=str(cwd), env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, text=True, encoding="utf-8")
+    try:
+        stdout, stderr = proc.communicate(prompt, timeout=timeout_sec)
+    except subprocess.TimeoutExpired:
+        _kill_tree(proc)   # иначе на Windows умрёт только claude.cmd, а сам Claude продолжит работать
+        proc.communicate()
+        raise
+    proc = subprocess.CompletedProcess(cmd, proc.returncode, stdout, stderr)
     try:
         data = parse_output(proc.stdout)
     except (json.JSONDecodeError, ValueError):

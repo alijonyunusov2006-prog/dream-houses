@@ -29,6 +29,12 @@ def test_parse_output_tolerates_prefix_noise():
     assert cr.parse_output(json.dumps(payload)) == payload
 
 
+def test_parse_output_tolerates_trailing_noise():
+    payload = {"type": "result", "result": "ok", "session_id": "s"}
+    noisy = json.dumps(payload) + "\nClient.listTools() called but server does not advertise tools capability\n"
+    assert cr.parse_output(noisy) == payload
+
+
 @pytest.fixture
 def fake_claude(tmp_path: Path) -> Path:
     """Поддельный `claude`: печатает JSON как настоящий `claude -p --output-format json`."""
@@ -64,6 +70,19 @@ def test_budget_stop(fake_claude: Path, tmp_path: Path):
     cr.run("раз", tmp_path, claude_bin=str(fake_claude), cost_log=log)
     with pytest.raises(cr.BudgetExceeded):
         cr.run("два", tmp_path, claude_bin=str(fake_claude), cost_log=log, daily_budget_usd=0.20)
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="на Windows claude ставится как claude.cmd (npm)")
+def test_short_name_finds_cmd_wrapper_on_windows(tmp_path: Path, monkeypatch):
+    (tmp_path / "fake.py").write_text(
+        "import json, sys\nsys.stdin.reconfigure(encoding='utf-8'); sys.stdout.reconfigure(encoding='utf-8')\n"
+        "print(json.dumps({'is_error': False, 'result': sys.stdin.read(), 'session_id': 's', 'total_cost_usd': 0}))\n",
+        encoding="utf-8")
+    (tmp_path / "claude.cmd").write_text(f'@"{sys.executable}" "%~dp0fake.py" %*\n', encoding="utf-8")
+    monkeypatch.setenv("PATH", str(tmp_path) + os.pathsep + os.environ["PATH"])
+    prompt = "Первая строка задания\nвторая строка «с кавычками» & знаками"
+    res = cr.run(prompt, tmp_path, cost_log=tmp_path / "c.jsonl")
+    assert res.ok and res.result == prompt   # многострочное задание не обрезается обёрткой cmd
 
 
 def test_missing_binary_is_clear_error(tmp_path: Path):
