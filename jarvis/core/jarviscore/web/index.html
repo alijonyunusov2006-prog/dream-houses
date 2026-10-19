@@ -121,6 +121,7 @@ body.mini #minicore{display:block}
     <div class="spacer"></div>
     <button class="mode main" id="toHud" title="Полноэкранный режим: говоришь — он отвечает голосом">Режим Джарвиса</button>
     <button class="mode" id="toMini" title="Маленькое окно в углу экрана">Уголок</button>
+    <label class="switch" title="Окно слушает микрофон и реагирует, только когда фраза начинается с «Джарвис». Остальное сразу выбрасывается."><input type="checkbox" id="listen"> Слушать «Джарвис»</label>
     <label class="switch"><input type="checkbox" id="speak"> Читать ответы вслух</label>
     <label class="switch"><input type="checkbox" id="sound" checked> Звуки</label>
     <div id="clock"></div>
@@ -331,6 +332,56 @@ document.addEventListener("keyup", e => {
   if (e.code !== "Space" || !spaceHeld) return;
   spaceHeld = false; if (recording) toggleMic(); else releaseEarly = true;
 });
+
+/* слово «Джарвис»: окно само режет речь на фразы и отправляет каждую на проверку зова */
+const ear = {stream: null, ctx: null, node: null, buf: [], pre: [], voiced: false, quiet: 0, len: 0, rate: 48000};
+const EAR = {on: 0.018, off: 0.010, endMs: 700, maxSec: 14, preSec: 0.4};
+async function earStart() {
+  try {
+    ear.stream = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true}});
+    ear.ctx = new AudioContext(); ear.rate = ear.ctx.sampleRate;
+    const src = ear.ctx.createMediaStreamSource(ear.stream);
+    ear.node = ear.ctx.createScriptProcessor(2048, 1, 1);
+    ear.node.onaudioprocess = e => earChunk(new Float32Array(e.inputBuffer.getChannelData(0)));
+    src.connect(ear.node); ear.node.connect(ear.ctx.destination);
+  } catch (e) { $("listen").checked = false; $("err").textContent = "Нет доступа к микрофону: " + e.message; }
+}
+function earStop() { ear.node?.disconnect(); ear.stream?.getTracks().forEach(t => t.stop()); ear.ctx?.close(); Object.assign(ear, {stream: null, ctx: null, node: null, buf: [], pre: [], voiced: false}); }
+function earChunk(x) {
+  if (recording || speaking) return;                       // не слушаем сами себя и ручную запись
+  const rms = Math.sqrt(x.reduce((s, v) => s + v * v, 0) / x.length), ms = x.length / ear.rate * 1000;
+  if (!ear.voiced) {
+    ear.pre.push(x); while (ear.pre.length * x.length > ear.rate * EAR.preSec) ear.pre.shift();
+    if (rms > EAR.on) { ear.voiced = true; ear.buf = [...ear.pre]; ear.len = 0; ear.quiet = 0; }
+    return;
+  }
+  ear.buf.push(x); ear.len += ms; level = Math.max(level, rms * 4);
+  ear.quiet = rms < EAR.off ? ear.quiet + ms : 0;
+  if (ear.quiet > EAR.endMs || ear.len > EAR.maxSec * 1000) {
+    const phrase = ear.buf; ear.voiced = false; ear.buf = []; ear.pre = [];
+    if (ear.len > 400) earSend(phrase);
+  }
+}
+function toWav(chunks, rate) {                               // моно 16 кГц, 16 бит
+  const all = new Float32Array(chunks.reduce((n, c) => n + c.length, 0)); let o = 0;
+  for (const c of chunks) { all.set(c, o); o += c.length; }
+  const k = rate / 16000, n = Math.floor(all.length / k), dv = new DataView(new ArrayBuffer(44 + n * 2));
+  const w = (p, s) => [...s].forEach((ch, i) => dv.setUint8(p + i, ch.charCodeAt(0)));
+  w(0, "RIFF"); dv.setUint32(4, 36 + n * 2, true); w(8, "WAVEfmt "); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true);
+  dv.setUint16(22, 1, true); dv.setUint32(24, 16000, true); dv.setUint32(28, 32000, true); dv.setUint16(32, 2, true);
+  dv.setUint16(34, 16, true); w(36, "data"); dv.setUint32(40, n * 2, true);
+  for (let i = 0; i < n; i++) dv.setInt16(44 + i * 2, Math.max(-1, Math.min(1, all[Math.floor(i * k)])) * 0x7fff, true);
+  return new Blob([dv], {type: "audio/wav"});
+}
+async function earSend(chunks) {
+  try {
+    const r = await (await fetch("/api/hear", {method: "POST", headers: H, body: toWav(chunks, ear.rate)})).json();
+    if (r.heard) { flash = 1; chime(r.armed ? [784, 988] : [660]); if (!r.armed) pending = true; poll(); }
+  } catch (e) { /* связь пропала — следующий опрос покажет ошибку */ }
+}
+try { $("listen").checked = localStorage.getItem("listen") === "1"; } catch (e) {}
+$("listen").onchange = () => { try { localStorage.setItem("listen", $("listen").checked ? "1" : "0"); } catch (e) {} $("listen").checked ? earStart() : earStop(); };
+if ($("listen").checked) earStart();
 
 /* виды окна */
 function setHud(on) {

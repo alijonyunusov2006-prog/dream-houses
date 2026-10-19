@@ -24,6 +24,7 @@ from pathlib import Path
 from .claude_runner import BudgetExceeded
 from .controller import Controller
 from .planner import State, Task
+from .wake import is_greeting
 
 ROOT = Path(__file__).resolve().parents[2]          # .../jarvis
 log = logging.getLogger("jarvis.bot")
@@ -101,6 +102,8 @@ class JarvisBot:
             return self.tg.send(self.owner, self.ctl.summary())
         if text.startswith("/cancel"):
             return self._cancel(text.removeprefix("/cancel").strip())
+        if is_greeting(text):
+            return self.tg.send(self.owner, self.briefing())
         if IDEA.match(text):
             return self._save_idea(IDEA.sub("", text, count=1), source)
         t = self.ctl.new_task(text, source=source)
@@ -123,6 +126,36 @@ class JarvisBot:
             # ответ на вопросы или уточнение вместо «да» — понять заново: ответ может сделать задачу рискованной
             t.checkpoint["ready"] = False
         self.tg.send(self.owner, f"Принял ответ по задаче №{t.id}, продолжаю.")
+
+    def briefing(self, now: datetime | None = None) -> str:
+        """Доклад в манере дворецкого: «я дома», «привет», утренний отчёт. Без Claude — мгновенно и бесплатно."""
+        now = now or datetime.now()
+        h = now.hour
+        hello = ("Доброй ночи, сэр. Снова работаем допоздна?" if h < 5 or h >= 23 else
+                 "Доброе утро, сэр." if h < 12 else "Добрый день, сэр." if h < 18 else "Добрый вечер, сэр.")
+        tasks = list(self.ctl.sched.tasks.values())
+        waiting = [t for t in tasks if t.state is State.WAITING_HUMAN]
+        running = [t for t in tasks if t.state is State.RUNNING]
+        queued = [t for t in tasks if t.state in (State.PENDING, State.PAUSED, State.BLOCKED)]
+        done_today = [t for t in tasks if t.state is State.DONE and t.updated_at.astimezone().date() == now.date()]
+        lines = [hello]
+        if waiting:
+            lines.append("Ждут вашего решения: " + "; ".join(f"№{t.id} «{t.title}»" for t in waiting) + ".")
+        if running:
+            lines.append("В работе: " + "; ".join(f"№{t.id} «{t.title}»" for t in running) + ".")
+        if queued:
+            lines.append(f"Ещё {len(queued)} в очереди.")
+        if done_today:
+            lines.append(f"Сегодня сделано: {len(done_today)}.")
+        ideas = self.ideas_dir / f"{now.date().isoformat()}-telegram.md"
+        if ideas.exists():
+            n = sum(1 for line in ideas.read_text(encoding="utf-8").splitlines() if line.startswith("- "))
+            lines.append(f"Записано идей за сегодня: {n}.")
+        if len(lines) == 1:
+            lines.append("Всё спокойно: задач нет. Чем займёмся?")
+        elif waiting:
+            lines.append("Начнём с ответа?")
+        return "\n".join(lines)
 
     def _stop(self, t: Task, why: str) -> None:
         t.state, t.progress = State.FAILED, why

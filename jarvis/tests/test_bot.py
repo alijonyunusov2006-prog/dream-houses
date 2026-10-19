@@ -121,6 +121,32 @@ def test_tasks_command_lists_open_tasks(tmp_path):
     assert "№1" in tg.sent[-1][1]
 
 
+def test_greeting_gives_briefing_not_a_task(tmp_path):
+    bot, tg, ctl = make(tmp_path, FakeClaude(questions=["Какие теги?"]))
+    bot.handle(msg("Сделай список дел"))
+    bot.work_once()                                              # №1 ждёт ответа
+    ctl.new_task("Отчёт по Ашану")                               # №2 в очереди
+    done = ctl.new_task("Старое"); ctl.sched.complete(done.id)   # №3 сделано
+    n = len(ctl.sched.tasks)
+    bot.handle(msg("я дома"))
+    assert len(ctl.sched.tasks) == n                             # приветствие — не задача
+    text = tg.sent[-1][1]
+    assert "сэр" in text and "№1" in text and "ждут вашего решения" in text.lower()
+    assert "1 в очереди" in text and "Сегодня сделано: 1" in text
+
+
+@pytest.mark.parametrize("hour, word", [(3, "ночи"), (8, "утро"), (14, "день"), (20, "вечер"), (23, "ночи")])
+def test_briefing_greets_by_time_of_day(tmp_path, hour, word):
+    bot, tg, ctl = make(tmp_path)
+    assert word in bot.briefing(datetime(2026, 10, 20, hour, 0, tzinfo=timezone.utc)).split("\n")[0]
+
+
+def test_greeting_when_nothing_happened(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    bot.handle(msg("Привет"))
+    assert "сэр" in tg.sent[-1][1] and ctl.sched.tasks == {}
+
+
 # --- исполнение ------------------------------------------------------------------
 def test_clear_task_is_understood_then_executed_and_reported(tmp_path):
     claude = FakeClaude()

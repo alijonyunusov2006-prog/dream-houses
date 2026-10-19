@@ -14,6 +14,7 @@ import json
 import logging
 import re
 import threading
+import time
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -21,6 +22,7 @@ from urllib.parse import parse_qs, urlparse
 
 from .controller import STATE_RU
 from .planner import State
+from .wake import find_wake
 
 log = logging.getLogger("jarvis.web")
 PAGE = Path(__file__).with_name("web") / "index.html"
@@ -30,9 +32,38 @@ MAX_VOICE = 25 * 1024 * 1024
 class JarvisWeb:
     """Связка окна с ботом: что пришло из окна → бот; что показать → лента и задачи."""
 
+    ARMED_SEC = 10          # позвали без команды («Джарвис!») — столько секунд ждём команду без имени
+
     def __init__(self, bot, feed, tmp_dir: Path):
         self.bot, self.feed, self.tmp_dir = bot, feed, Path(tmp_dir)
         self._n = 0
+        self._armed_until = 0.0
+        self._hear_lock = threading.Lock()
+
+    def hear(self, audio: bytes, now: float | None = None) -> dict:
+        """Фраза из режима «слушать «Джарвис»». Без зова — выбрасываем, нигде не сохраняя."""
+        now = time.monotonic() if now is None else now
+        self.tmp_dir.mkdir(parents=True, exist_ok=True)
+        with self._hear_lock:
+            self._n += 1
+            path = self.tmp_dir / f"hear-{self._n}.wav"
+            path.write_bytes(audio)
+            try:
+                text = self.bot.stt.transcribe(path)
+            finally:
+                path.unlink(missing_ok=True)
+        found, command = find_wake(text)
+        if not found and now < self._armed_until and text.strip():
+            found, command = True, text.strip()
+        if not found:
+            return {"heard": False}
+        if not command:
+            self._armed_until = now + self.ARMED_SEC
+            self.bot.tg.send(self.bot.owner, "Слушаю, сэр.")
+            return {"heard": True, "armed": True}
+        self._armed_until = 0.0
+        self.send_text(command, None)
+        return {"heard": True, "text": command}
 
     def _message(self, mid: int, text: str = "", reply_to: int | None = None, voice: str = "") -> dict:
         m = {"message_id": mid, "chat": {"id": self.bot.owner, "type": "private"},
@@ -146,6 +177,10 @@ def make_handler(app: JarvisWeb, port: int):
                     if not text:
                         return self._json(400, {"error": "пустое сообщение"})
                     return self._json(200, {"id": app.send_text(text, data.get("reply_to"))})
+                if url.path == "/api/hear":
+                    if not body:
+                        return self._json(400, {"error": "пустая запись"})
+                    return self._json(200, app.hear(body))
                 if url.path == "/api/voice":
                     if not body:
                         return self._json(400, {"error": "пустая запись"})

@@ -66,6 +66,44 @@ def test_window_scripts_are_served_but_nothing_else(web):
         assert call(base + bad)[0] == 404
 
 
+class SaySTT:
+    def __init__(self, *phrases):
+        self.phrases = list(phrases)
+
+    def transcribe(self, path):
+        return self.phrases.pop(0)
+
+
+def make_app(tmp_path, *phrases):
+    feed = WebFeed()
+    ctl = Controller(Scheduler(), tmp_path / "tasks.json")
+    bot = JarvisBot(Broadcast(feed), ctl, NoClaude(), SaySTT(*phrases), owner_chat=0,
+                    ideas_dir=tmp_path / "ideas", tmp_dir=tmp_path / "tmp")
+    return JarvisWeb(bot, feed, tmp_path / "tmp"), ctl, feed
+
+
+def test_hear_without_wake_word_is_dropped_and_not_logged(tmp_path):
+    app, ctl, feed = make_app(tmp_path, "мы обсуждали проект Ашан с клиентом")
+    assert app.hear(b"wav") == {"heard": False}
+    assert feed.since(0) == [] and ctl.sched.tasks == {}
+    assert not list((tmp_path / "tmp").glob("*"))          # запись удалена
+
+
+def test_hear_with_wake_word_runs_command(tmp_path):
+    app, ctl, feed = make_app(tmp_path, "Джарвис, сделай список дел")
+    assert app.hear(b"wav")["text"] == "сделай список дел"
+    assert ctl.sched.tasks["1"].title == "сделай список дел"
+
+
+def test_bare_wake_word_arms_for_next_phrase_only_briefly(tmp_path):
+    app, ctl, feed = make_app(tmp_path, "Джарвис!", "открой проект Ашан", "Джарвис", "и ещё кое-что")
+    assert app.hear(b"wav", now=100.0) == {"heard": True, "armed": True}
+    assert "Слушаю" in feed.since(0)[-1]["text"]
+    assert app.hear(b"wav", now=105.0)["text"] == "открой проект Ашан"
+    app.hear(b"wav", now=200.0)
+    assert app.hear(b"wav", now=260.0) == {"heard": False}       # ожидание истекло
+
+
 def test_post_without_jarvis_header_is_refused(web):
     base, ctl, _ = web
     code, _ = call(base + "/api/send", {"text": "удали всё"})        # так могла бы попытаться чужая страница
