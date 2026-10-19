@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import threading
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -121,6 +122,10 @@ def make_handler(app: JarvisWeb, port: int):
             url = urlparse(self.path)
             if url.path == "/":
                 return self._reply(200, PAGE.read_bytes(), "text/html; charset=utf-8")
+            m = re.fullmatch(r"/([a-z]+)\.js", url.path)            # только скрипты окна, без папок и «..»
+            if m and (PAGE.parent / f"{m.group(1)}.js").is_file():
+                return self._reply(200, (PAGE.parent / f"{m.group(1)}.js").read_bytes(),
+                                   "application/javascript; charset=utf-8")
             if url.path == "/api/state":
                 after = int((parse_qs(url.query).get("after") or ["0"])[0] or 0)
                 return self._json(200, app.state(after))

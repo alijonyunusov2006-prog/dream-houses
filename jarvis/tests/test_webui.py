@@ -58,6 +58,14 @@ def test_message_from_window_becomes_task_and_shows_in_feed(web):
     assert state["stats"] == {"open": 1, "waiting": 0, "running": 0, "done_today": 0}
 
 
+def test_window_scripts_are_served_but_nothing_else(web):
+    base, _, _ = web
+    code, body = call(base + "/reactor.js")
+    assert code == 200 and b"Reactor" in body
+    for bad in ("/../bot.js", "/..%2fbot.js", "/web/reactor.js", "/nope.js", "/index.html.js"):
+        assert call(base + bad)[0] == 404
+
+
 def test_post_without_jarvis_header_is_refused(web):
     base, ctl, _ = web
     code, _ = call(base + "/api/send", {"text": "удали всё"})        # так могла бы попытаться чужая страница
