@@ -295,8 +295,9 @@ function project(p, rot, s, cx, cy) {             // поворот вокруг
   const f = 5 / (5 + z2);
   return [cx + x1 * s * f, cy - y2 * s * f];
 }
-function frame(ts) {
-  const t = ts / 1000, work = busy || pending;
+const T0 = Date.now();
+function frame() {
+  const t = (Date.now() - T0) / 1000, work = busy || pending;
   if (analyser) { const a = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(a); level = level * .7 + a.reduce((x, y) => x + y, 0) / a.length / 255 * .3; } else level *= .9;
   flash *= .94;
   g.clearRect(0, 0, W, Hh);
