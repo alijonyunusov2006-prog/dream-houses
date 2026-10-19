@@ -119,6 +119,8 @@ def test_group_id_command():
 
 
 def test_guard_rules():
+    # случай из проверки на ПК 2026-10-19: модель ответила сама вместо мастера
+    assert handoff_reason("Заказал у вас подставку, она сломалась на второй день. Что делать?") == "жалоба"
     assert handoff_reason("нужно 50 шт на той") == "опт"
     assert handoff_reason("Хочу лампу") is None
     assert lang_of("Ман брелок мехоҳам") == "tj"
