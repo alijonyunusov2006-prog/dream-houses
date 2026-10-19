@@ -141,6 +141,16 @@ def test_briefing_greets_by_time_of_day(tmp_path, hour, word):
     assert word in bot.briefing(datetime(2026, 10, 20, hour, 0, tzinfo=timezone.utc)).split("\n")[0]
 
 
+def test_morning_report_once_a_day_after_report_hour(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    bot.report_hour = 8
+    assert not bot.maybe_morning(datetime(2026, 10, 20, 7, 59))
+    assert bot.maybe_morning(datetime(2026, 10, 20, 8, 1))
+    assert "Утренний доклад" in tg.sent[-1][1]
+    assert not bot.maybe_morning(datetime(2026, 10, 20, 12, 0))          # второй раз в тот же день — нет
+    assert bot.maybe_morning(datetime(2026, 10, 21, 9, 30))              # назавтра — снова
+
+
 def test_greeting_when_nothing_happened(tmp_path):
     bot, tg, ctl = make(tmp_path)
     bot.handle(msg("Привет"))

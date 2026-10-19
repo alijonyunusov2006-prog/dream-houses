@@ -54,6 +54,7 @@ class JarvisBot:
         self.tg, self.ctl, self.claude, self.stt = tg, ctl, claude, stt
         self.owner, self.ideas_dir, self.tmp_dir = owner_chat, Path(ideas_dir), Path(tmp_dir)
         self.lock = threading.RLock()
+        self.report_hour = 8                       # утренний доклад (settings.toml [telegram] report_hour)
 
     # --- входящие ----------------------------------------------------------------
     def handle(self, update: dict) -> None:
@@ -127,6 +128,17 @@ class JarvisBot:
             t.checkpoint["ready"] = False
         self.tg.send(self.owner, f"Принял ответ по задаче №{t.id}, продолжаю.")
 
+    def maybe_morning(self, now: datetime | None = None) -> bool:
+        """Утренний доклад один раз в день, после часа ``report_hour`` (ПК включили позже — придёт при включении)."""
+        now = now or datetime.now()
+        mark = self.tmp_dir.parent / "morning.txt"
+        if now.hour < self.report_hour or (mark.exists() and mark.read_text().strip() == now.date().isoformat()):
+            return False
+        mark.parent.mkdir(parents=True, exist_ok=True)
+        mark.write_text(now.date().isoformat())
+        self.tg.send(self.owner, "Утренний доклад.\n" + self.briefing(now))
+        return True
+
     def briefing(self, now: datetime | None = None) -> str:
         """Доклад в манере дворецкого: «я дома», «привет», утренний отчёт. Без Claude — мгновенно и бесплатно."""
         now = now or datetime.now()
@@ -188,6 +200,10 @@ class JarvisBot:
                     log.exception("тревога не ушла")
                     self.ctl.unmark(a)              # повторить при следующей проверке
             self.ctl.save()
+            try:
+                self.maybe_morning()
+            except Exception:
+                log.exception("утренний доклад")
 
     # --- исполнитель --------------------------------------------------------------
     def _next(self) -> Task | None:

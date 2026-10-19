@@ -119,6 +119,7 @@ def main() -> None:
     owner = tg_owner if tg_owner is not None else WEB_OWNER
     bot = JarvisBot(bc, ctl, ClaudeExecutor(settings),
                     Transcriber(sp.get("stt_model", "large-v3"), sp.get("stt_language", "ru")), owner_chat=owner)
+    bot.report_hour = settings.get("telegram", {}).get("report_hour", 8)
 
     stop = threading.Event()
     threading.Thread(target=_loop, args=(bot.work_once, stop, 5, "исполнитель"), daemon=True).start()
