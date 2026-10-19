@@ -54,6 +54,8 @@ def test_message_from_window_becomes_task_and_shows_in_feed(web):
     state = json.loads(call(base + "/api/state?after=0")[1])
     whos = [m["who"] for m in state["feed"]]
     assert whos == ["owner", "jarvis"] and state["tasks"][0]["state_ru"] == "в очереди"
+    assert state["tasks"][0]["stage"] == 0
+    assert state["stats"] == {"open": 1, "waiting": 0, "running": 0, "done_today": 0}
 
 
 def test_post_without_jarvis_header_is_refused(web):

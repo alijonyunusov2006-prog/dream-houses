@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import logging
 import threading
+from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -60,12 +61,30 @@ class JarvisWeb:
         return mid
 
     def state(self, after: int) -> dict:
+        today = datetime.now().astimezone().date()
         with self.bot.lock:
             tasks = [{"id": t.id, "title": t.title, "state": t.state.value, "state_ru": STATE_RU[t.state],
-                      "ask_msg": t.checkpoint.get("ask_msg"), "confirm": t.checkpoint.get("confirm") or ""}
+                      "ask_msg": t.checkpoint.get("ask_msg"), "confirm": t.checkpoint.get("confirm") or "",
+                      "stage": stage(t)}
                      for t in self.bot.ctl.open_tasks()]
+            done_today = sum(1 for t in self.bot.ctl.sched.tasks.values()
+                             if t.state is State.DONE and t.updated_at.astimezone().date() == today)
         busy = any(t["state"] == State.RUNNING.value for t in tasks)
-        return {"feed": self.feed.since(after), "tasks": tasks, "busy": busy}
+        stats = {"open": len(tasks), "waiting": sum(t["state"] == State.WAITING_HUMAN.value for t in tasks),
+                 "running": sum(t["state"] == State.RUNNING.value for t in tasks), "done_today": done_today}
+        return {"feed": self.feed.since(after), "tasks": tasks, "busy": busy, "stats": stats}
+
+
+STAGES = ["принял", "понимаю", "делаю", "проверка", "отчёт"]
+
+
+def stage(t) -> int:
+    """На каком шаге конвейера задача: 0 принял · 1 понимаю · 2 делаю (· 3–4 — после выполнения)."""
+    if t.state is State.RUNNING:
+        return 2 if t.checkpoint.get("ready") else 1
+    if t.state is State.WAITING_HUMAN:
+        return 1
+    return 0
 
 
 def make_handler(app: JarvisWeb, port: int):
