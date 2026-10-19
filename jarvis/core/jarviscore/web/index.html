@@ -5,54 +5,84 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>JARVIS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600&family=Manrope:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#1B1816; --panel:#26221F; --line:#3a332d; --text:#F7F4EF; --muted:#b9ada0;
-  --bronze:#B89B76; --bronze-d:#7D6549; --ok:#8fb38a; --warn:#d9a35b; --bad:#d97c6b;
+:root,[data-theme="reactor"]{
+  --bg:#03060b; --panel:rgba(0,229,255,.035); --line:rgba(0,229,255,.16); --text:#dff9ff; --muted:#5f8796;
+  --accent:#00e5ff; --accent2:#2979ff; --owner:rgba(41,121,255,.18); --owner-line:rgba(41,121,255,.55);
+  --bad:#ff4d6d; --warn:#ffd166; --glow:0 0 18px rgba(0,229,255,.35); --radius:4px;
+  --head:"Unbounded",sans-serif; --body:"JetBrains Mono",monospace; --grid:rgba(0,229,255,.05);
+}
+[data-theme="plasma"]{
+  --bg:#0b0614; --panel:rgba(255,255,255,.05); --line:rgba(255,255,255,.1); --text:#f3ecff; --muted:#9a8bb8;
+  --accent:#c56cff; --accent2:#ff5fa2; --owner:linear-gradient(135deg,rgba(197,108,255,.35),rgba(255,95,162,.3)); --owner-line:transparent;
+  --bad:#ff6b8b; --warn:#ffcf70; --glow:0 0 30px rgba(197,108,255,.35); --radius:18px;
+  --head:"Unbounded",sans-serif; --body:"Manrope",sans-serif; --grid:transparent;
+}
+[data-theme="acid"]{
+  --bg:#000; --panel:#0a0a0a; --line:#1f1f1f; --text:#f2f2f2; --muted:#6d6d6d;
+  --accent:#c6ff00; --accent2:#c6ff00; --owner:#c6ff00; --owner-line:#c6ff00;
+  --bad:#ff3b30; --warn:#c6ff00; --glow:none; --radius:0px;
+  --head:"Unbounded",sans-serif; --body:"Manrope",sans-serif; --grid:transparent;
 }
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Montserrat,Segoe UI,sans-serif;font-size:15px}
-.app{display:grid;grid-template-columns:300px 1fr 300px;grid-template-rows:auto 1fr;height:100vh;gap:0}
-header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--line)}
-.brand{font-family:"Cormorant Garamond",serif;font-size:26px;letter-spacing:.32em}
-.brand small{font-family:Montserrat;font-size:11px;letter-spacing:.2em;color:var(--muted);margin-left:14px}
-.toggles{display:flex;gap:16px;font-size:12px;color:var(--muted)}
+html,body{margin:0;height:100%;color:var(--text);font-family:var(--body);font-size:14px;background:var(--bg)}
+body{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:40px 40px}
+[data-theme="plasma"] body,body[data-theme="plasma"]{background:radial-gradient(1200px 600px at 15% 10%,rgba(197,108,255,.18),transparent 60%),radial-gradient(900px 500px at 90% 90%,rgba(255,95,162,.14),transparent 60%),var(--bg)}
+.app{display:grid;grid-template-columns:320px 1fr 300px;grid-template-rows:auto 1fr;height:100vh}
+header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--head);font-weight:600;font-size:22px;letter-spacing:.45em;color:var(--accent);text-shadow:var(--glow)}
+.brand small{font-family:var(--body);font-weight:400;font-size:11px;letter-spacing:.25em;color:var(--muted);margin-left:16px;text-shadow:none}
+.toggles{display:flex;gap:18px;align-items:center;font-size:12px;color:var(--muted)}
 .toggles label{display:flex;align-items:center;gap:6px;cursor:pointer}
-aside{padding:22px;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:16px}
-#orb{width:240px;height:240px}
-#status{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--bronze);text-align:center;min-height:18px}
-#mic{width:84px;height:84px;border-radius:50%;border:1px solid var(--bronze);background:transparent;color:var(--bronze);font-size:13px;cursor:pointer;transition:background .2s}
-#mic:hover{background:rgba(184,155,118,.12)}
-#mic.rec{background:var(--bad);border-color:var(--bad);color:#fff}
-.hint{font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+.toggles input{accent-color:var(--accent)}
+.themes{display:flex;gap:8px;align-items:center}
+.themes button{width:18px;height:18px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}
+.themes button.on{border-color:var(--text)}
+aside{padding:26px 22px;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:18px}
+#orb{width:260px;height:260px}
+#status{font-family:var(--head);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);text-align:center;min-height:16px;text-shadow:var(--glow)}
+#mic{width:90px;height:90px;border-radius:50%;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:var(--head);font-size:9px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:transform .15s,background .2s;box-shadow:var(--glow)}
+#mic:hover{transform:scale(1.05)}
+#mic.rec{background:var(--bad);border-color:var(--bad);color:#fff;box-shadow:0 0 30px var(--bad)}
+[data-theme="acid"] #mic{border-radius:0;border-width:2px}
+.hint{font-size:11px;color:var(--muted);text-align:center;line-height:1.6}
 main{display:flex;flex-direction:column;min-height:0}
-#feed{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:12px}
-.msg{max-width:78%;padding:11px 14px;border-radius:12px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
-.msg.jarvis{background:var(--panel);border:1px solid var(--line);align-self:flex-start}
-.msg.owner{background:var(--bronze-d);align-self:flex-end}
-.msg .t{font-size:11px;color:var(--muted);margin-top:6px}
-.msg.owner .t{color:#e8dccb}
-.msg.ask{border-color:var(--bronze)}
+#feed{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:14px}
+.msg{position:relative;max-width:76%;padding:12px 15px;border-radius:var(--radius);line-height:1.55;white-space:pre-wrap;word-wrap:break-word;animation:pop .25s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.msg.jarvis{background:var(--panel);border:1px solid var(--line);align-self:flex-start;backdrop-filter:blur(10px)}
+.msg.owner{background:var(--owner);border:1px solid var(--owner-line);align-self:flex-end}
+[data-theme="acid"] .msg.owner{color:#000}
+[data-theme="acid"] .msg.owner .t{color:#2b3a00}
+[data-theme="reactor"] .msg.jarvis::before,[data-theme="reactor"] .task::before{content:"";position:absolute;top:-1px;left:-1px;width:10px;height:10px;border-top:2px solid var(--accent);border-left:2px solid var(--accent)}
+[data-theme="reactor"] .msg.jarvis::after,[data-theme="reactor"] .task::after{content:"";position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-bottom:2px solid var(--accent);border-right:2px solid var(--accent)}
+[data-theme="acid"] .msg.jarvis{border-left:3px solid var(--accent)}
+.msg .t{font-size:10px;color:var(--muted);margin-top:6px;letter-spacing:.08em}
+.msg.ask{border-color:var(--accent);box-shadow:var(--glow)}
 .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.acts button,.task button{border:1px solid var(--bronze);background:transparent;color:var(--text);border-radius:8px;padding:6px 14px;cursor:pointer;font:inherit;font-size:13px}
-.acts button.yes{background:var(--bronze);color:var(--bg)}
-.composer{border-top:1px solid var(--line);padding:14px 22px;display:flex;flex-direction:column;gap:8px}
-#replybar{display:none;font-size:12px;color:var(--bronze)}
+.acts:empty{display:none}
+.acts button,.task button{border:1px solid var(--accent);background:transparent;color:var(--text);border-radius:var(--radius);padding:6px 14px;cursor:pointer;font:inherit;font-size:12px}
+.acts button.yes{background:var(--accent);color:var(--bg);font-weight:600}
+.composer{border-top:1px solid var(--line);padding:16px 24px;display:flex;flex-direction:column;gap:8px}
+#replybar{display:none;font-size:12px;color:var(--accent)}
 #replybar button{background:none;border:none;color:var(--muted);cursor:pointer;font:inherit}
 .row{display:flex;gap:10px}
-textarea{flex:1;resize:none;height:52px;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:12px;font:inherit}
-textarea:focus{outline:none;border-color:var(--bronze)}
-#send{border:none;background:var(--bronze);color:var(--bg);border-radius:10px;padding:0 22px;font:inherit;font-weight:500;cursor:pointer}
+textarea{flex:1;resize:none;height:52px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);color:var(--text);padding:14px;font:inherit}
+textarea:focus{outline:none;border-color:var(--accent);box-shadow:var(--glow)}
+#send{border:none;background:var(--accent);color:var(--bg);border-radius:var(--radius);padding:0 24px;font-family:var(--head);font-size:11px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer}
+[data-theme="plasma"] #send{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
 #err{font-size:12px;color:var(--bad);min-height:14px}
-#tasks{padding:22px;border-left:1px solid var(--line);overflow-y:auto}
-#tasks h2{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:20px;letter-spacing:.1em;margin:0 0 14px}
-.task{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;background:var(--panel)}
-.task .n{font-size:12px;color:var(--bronze)}
-.task .s{font-size:12px;margin-top:4px}
+#tasks{padding:24px;border-left:1px solid var(--line);overflow-y:auto}
+#tasks h2{font-family:var(--head);font-weight:400;font-size:13px;letter-spacing:.35em;text-transform:uppercase;color:var(--accent);margin:0 0 16px}
+.task{position:relative;border:1px solid var(--line);border-radius:var(--radius);padding:11px 13px;margin-bottom:10px;background:var(--panel)}
+.task .n{font-family:var(--head);font-size:11px;color:var(--accent)}
+.task .s{font-size:11px;margin-top:5px;letter-spacing:.05em}
 .s.running{color:var(--warn)} .s.waiting_human{color:var(--bad)} .s.pending,.s.paused{color:var(--muted)}
-.task button{margin-top:8px;padding:3px 10px;font-size:12px;border-color:var(--line);color:var(--muted)}
-.empty{font-size:13px;color:var(--muted)}
+.task button{margin-top:8px;padding:3px 10px;font-size:11px;border-color:var(--line);color:var(--muted)}
+.empty{font-size:12px;color:var(--muted)}
+::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+@media (prefers-reduced-motion:reduce){.msg{animation:none}}
 @media (max-width:900px){.app{grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto}
   aside{border-right:none;border-bottom:1px solid var(--line);flex-direction:row;flex-wrap:wrap;justify-content:center}
   #orb{width:140px;height:140px} #tasks{border-left:none;border-top:1px solid var(--line);max-height:30vh}}
@@ -61,8 +91,13 @@ textarea:focus{outline:none;border-color:var(--bronze)}
 <body>
 <div class="app">
   <header>
-    <div class="brand">JARVIS<small>DREAM HOUSE</small></div>
+    <div class="brand">JARVIS<small>ALIJON</small></div>
     <div class="toggles">
+      <div class="themes" title="Вариант оформления">
+        <button data-t="reactor" style="background:#00e5ff" aria-label="Вариант 1 — Реактор"></button>
+        <button data-t="plasma" style="background:linear-gradient(135deg,#c56cff,#ff5fa2)" aria-label="Вариант 2 — Плазма"></button>
+        <button data-t="acid" style="background:#c6ff00" aria-label="Вариант 3 — Кислота"></button>
+      </div>
       <label><input type="checkbox" id="speak"> Озвучивать ответы</label>
       <label><input type="checkbox" id="sound" checked> Звуки</label>
     </div>
@@ -243,33 +278,106 @@ $("mic").onclick = async () => {
   updateStatus();
 };
 
-const cv = $("orb"), g = cv.getContext("2d");
+const THEMES = ["reactor", "plasma", "acid"];
+let theme = new URLSearchParams(location.search).get("theme");
+try { theme = theme || localStorage.getItem("theme"); } catch (e) {}
+if (!THEMES.includes(theme)) theme = "reactor";
+function setTheme(t) {
+  theme = t; document.documentElement.dataset.theme = t;
+  document.querySelectorAll(".themes button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
+  try { localStorage.setItem("theme", t); } catch (e) {}
+}
+document.querySelectorAll(".themes button").forEach(b => b.onclick = () => setTheme(b.dataset.t));
+setTheme(theme);
+
+const cv = $("orb"), g = cv.getContext("2d"), W = cv.width, C = W / 2, TAU = Math.PI * 2;
+const stars = Array.from({length: 90}, () => ({a: Math.random() * TAU, r: 0.3 + Math.random() * 0.7, s: 0.2 + Math.random(), z: Math.random()}));
+
+function reactor(t, work, lv) {
+  const r = W * 0.17 * (1 + lv * 0.6 + flash * 0.1);
+  g.shadowColor = "#00e5ff"; g.shadowBlur = 30;
+  const core = g.createRadialGradient(C, C, 0, C, C, r * 1.4);
+  core.addColorStop(0, "rgba(255,255,255,.95)"); core.addColorStop(0.3, "rgba(0,229,255,.85)"); core.addColorStop(1, "rgba(0,229,255,0)");
+  g.fillStyle = core; g.beginPath(); g.arc(C, C, r * 1.4, 0, TAU); g.fill();
+  g.lineWidth = 3; g.strokeStyle = "rgba(0,229,255,.9)";
+  for (let k = 0; k < 3; k++) {                                  // треугольник-сердечник, как у реактора
+    const a = t * (work ? 1.2 : 0.3) + k * TAU / 3;
+    g.beginPath(); g.moveTo(C + Math.cos(a) * r * 0.55, C + Math.sin(a) * r * 0.55);
+    g.lineTo(C + Math.cos(a + TAU / 3) * r * 0.55, C + Math.sin(a + TAU / 3) * r * 0.55); g.stroke();
+  }
+  g.shadowBlur = 12;
+  for (let i = 0; i < 60; i++) {                                 // шкала с делениями
+    const a = i / 60 * TAU + t * 0.05, long = i % 5 === 0, rr = W * 0.36;
+    g.strokeStyle = `rgba(0,229,255,${long ? 0.8 : 0.3})`; g.lineWidth = long ? 3 : 1.5;
+    g.beginPath(); g.moveTo(C + Math.cos(a) * rr, C + Math.sin(a) * rr);
+    g.lineTo(C + Math.cos(a) * (rr - (long ? 18 : 9)), C + Math.sin(a) * (rr - (long ? 18 : 9))); g.stroke();
+  }
+  [[0.27, 1, 4, 0.5], [0.31, -1, 6, 0.35], [0.42, 0.6, 2, 0.8]].forEach(([k, dir, n, len]) => {
+    g.strokeStyle = "rgba(0,229,255,.75)"; g.lineWidth = k > 0.4 ? 2 : 5;
+    for (let j = 0; j < n; j++) {
+      const s = t * dir * (work ? 1.6 : 0.4) + j * TAU / n;
+      g.beginPath(); g.arc(C, C, W * k, s, s + TAU / n * len); g.stroke();
+    }
+  });
+  const sweep = t * (work ? 2.5 : 0.8);                          // луч-сканер
+  const grd = g.createConicGradient ? g.createConicGradient(sweep, C, C) : null;
+  if (grd) { grd.addColorStop(0, "rgba(0,229,255,.25)"); grd.addColorStop(0.12, "rgba(0,229,255,0)"); grd.addColorStop(1, "rgba(0,229,255,0)");
+    g.fillStyle = grd; g.beginPath(); g.arc(C, C, W * 0.45, 0, TAU); g.fill(); }
+  g.shadowBlur = 0;
+}
+
+function plasma(t, work, lv) {
+  const sp = work ? 1.8 : 0.6;
+  for (let layer = 0; layer < 4; layer++) {
+    const base = W * (0.2 + layer * 0.035) * (1 + lv * 0.7 + flash * 0.12);
+    g.beginPath();
+    for (let i = 0; i <= 120; i++) {
+      const a = i / 120 * TAU;
+      const n = Math.sin(a * 3 + t * sp + layer) * 0.08 + Math.sin(a * 5 - t * sp * 1.3 + layer * 2) * 0.05 + Math.sin(a * 2 + t * 0.7) * 0.04;
+      const rr = base * (1 + n * (1 + lv * 2));
+      const x = C + Math.cos(a) * rr, y = C + Math.sin(a) * rr;
+      i ? g.lineTo(x, y) : g.moveTo(x, y);
+    }
+    const gr = g.createLinearGradient(C - base, C - base, C + base, C + base);
+    gr.addColorStop(0, `rgba(197,108,255,${0.55 - layer * 0.1})`); gr.addColorStop(1, `rgba(255,95,162,${0.5 - layer * 0.1})`);
+    g.shadowColor = "#c56cff"; g.shadowBlur = 40; g.fillStyle = gr; g.fill();
+  }
+  const hl = g.createRadialGradient(C - W * 0.06, C - W * 0.07, 0, C, C, W * 0.2);
+  hl.addColorStop(0, "rgba(255,255,255,.55)"); hl.addColorStop(1, "rgba(255,255,255,0)");
+  g.shadowBlur = 0; g.fillStyle = hl; g.beginPath(); g.arc(C, C, W * 0.2, 0, TAU); g.fill();
+  stars.forEach(p => {                                            // искры вокруг
+    p.a += 0.002 * p.s * (work ? 4 : 1);
+    const rr = W * (0.3 + p.r * 0.18);
+    g.fillStyle = `rgba(255,190,240,${0.25 + p.z * 0.5})`;
+    g.beginPath(); g.arc(C + Math.cos(p.a) * rr, C + Math.sin(p.a) * rr, 1 + p.z * 2, 0, TAU); g.fill();
+  });
+}
+
+function acid(t, work, lv) {
+  const bars = 72, r0 = W * 0.2;
+  g.fillStyle = "#c6ff00";
+  for (let i = 0; i < bars; i++) {
+    const a = i / bars * TAU - Math.PI / 2;
+    const wave = (Math.sin(i * 0.9 + t * (work ? 9 : 3)) + Math.sin(i * 0.37 - t * 2)) * 0.5;
+    const h = W * (0.025 + Math.abs(wave) * (work ? 0.09 : 0.035) + lv * 0.18 * (0.5 + Math.random() * 0.5));
+    g.save(); g.translate(C + Math.cos(a) * r0, C + Math.sin(a) * r0); g.rotate(a);
+    g.fillRect(0, -3, h, 6); g.restore();
+  }
+  g.strokeStyle = "#c6ff00"; g.lineWidth = 4;
+  g.beginPath(); g.arc(C, C, r0 * 0.82 * (1 + flash * 0.1), 0, TAU); g.stroke();
+  g.fillStyle = "#c6ff00"; g.font = `600 ${W * 0.07}px Unbounded, sans-serif`; g.textAlign = "center"; g.textBaseline = "middle";
+  g.fillText(work ? "•••".slice(0, 1 + Math.floor(t * 3) % 3) : "J", C, C + 2);
+}
+
 function draw(ts) {
-  const W = cv.width, c = W / 2, t = ts / 1000;
+  const t = ts / 1000;
   if (analyser) {
     const a = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(a);
     level = level * 0.7 + (a.reduce((x, y) => x + y, 0) / a.length / 255) * 0.3;
   } else level *= 0.9;
   flash *= 0.96;
-  const work = busy || pending;
   g.clearRect(0, 0, W, W);
-  const breathe = 1 + Math.sin(t * (work ? 3 : 1.2)) * 0.03 + level * 0.5 + flash * 0.08;
-  const r = W * 0.26 * breathe;
-  const core = g.createRadialGradient(c, c, 0, c, c, r * 1.6);
-  core.addColorStop(0, `rgba(247,244,239,${0.55 + flash * 0.3})`);
-  core.addColorStop(0.35, `rgba(184,155,118,${0.45 + level})`);
-  core.addColorStop(1, "rgba(184,155,118,0)");
-  g.fillStyle = core; g.beginPath(); g.arc(c, c, r * 1.6, 0, Math.PI * 2); g.fill();
-  for (let i = 0; i < 3; i++) {
-    const rr = r * (1.25 + i * 0.22), speed = (work ? 1.4 : 0.35) * (i % 2 ? -1 : 1);
-    g.strokeStyle = `rgba(184,155,118,${0.55 - i * 0.13})`; g.lineWidth = W * 0.006;
-    for (let k = 0; k < 3; k++) {
-      const s = t * speed + k * (Math.PI * 2 / 3) + i;
-      g.beginPath(); g.arc(c, c, rr, s, s + Math.PI * (0.35 + level)); g.stroke();
-    }
-  }
-  g.strokeStyle = "rgba(247,244,239,.25)"; g.lineWidth = W * 0.003;
-  g.beginPath(); g.arc(c, c, r * 0.62, 0, Math.PI * 2); g.stroke();
+  ({reactor, plasma, acid})[theme](t, busy || pending, level);
   requestAnimationFrame(draw);
 }
 requestAnimationFrame(draw);
