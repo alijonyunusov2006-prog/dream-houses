@@ -15,7 +15,7 @@ planner = "opus"                       # ТЗ, план, ревью
 developer = "sonnet"
 tester = "sonnet"
 bulk = "haiku"                         # сортировка, короткие ответы
-local = "qwen3.5:27b"                  # OpenJarvis / Ollama: офлайн и рутина (RTX 3090 24 ГБ — влезает целиком)
+local = "qwen3.8:27b"                  # главная локальная: агент, код, длинные тексты (выбрано 2026-10-19, Apache 2.0)
 local_fast = "qwen3.5:4b"              # сортировка сообщений, когда GPU занят рендером
 
 [disk]
