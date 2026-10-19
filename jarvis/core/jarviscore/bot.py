@@ -7,7 +7,7 @@
 Надёжность: работа с нуля сама не повторяется (сбой, перезапуск ПК → вопрос «повторить?»);
 отмена побеждает работающую задачу; лимит подписки → пауза на час, а не круги.
 
-Запуск на ПК: ``Запустить-бота.cmd`` в папке ``jarvis``.
+Запуск на ПК: ``Запустить-JARVIS.cmd`` в папке ``jarvis`` (окно + Telegram, см. ``app.py``).
 Ключ бота и номер чата владельца — в ``jarvis/.env``: TELEGRAM_BOT_TOKEN, OWNER_CHAT_ID.
 """
 
@@ -18,8 +18,6 @@ import logging
 import os
 import re
 import threading
-import time
-import tomllib
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -276,7 +274,8 @@ class ClaudeExecutor:
         "Ты JARVIS. Выполни задание владельца полностью, по правилам CLAUDE.md и brain/10-rules.\n"
         "Что ты понял: {understood}\n\nЗадание:\n{text}{answers}\n\n"
         "В конце — короткий отчёт по-русски: Сделано / Проверено (как) / Нужно решить / Следующий шаг / Файлы. "
-        "Не пиши «готово», если не проверил."
+        "Не пиши «готово», если не проверил. Пиши простым текстом без разметки: без звёздочек, решёток и таблиц — "
+        "ответ читают в Telegram и в окне JARVIS."
     )
     HIDDEN = ["Read(./.env)", "Read(./**/.env)", "Read(.env)"]
 
@@ -324,7 +323,6 @@ class ClaudeExecutor:
                          allowed_tools=cc.get("default_allowed_tools"), timeout_sec=3600)
 
 
-# --- запуск ----------------------------------------------------------------------
 def load_env(path: Path) -> None:
     """Простейший .env: KEY=VALUE построчно; уже заданные переменные окружения не перезаписываются."""
     if not path.exists():
@@ -333,57 +331,3 @@ def load_env(path: Path) -> None:
         if "=" in line and not line.lstrip().startswith("#"):
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip().strip('"'))
-
-
-def _loop(step, stop: threading.Event, every: float, name: str) -> None:
-    while not stop.is_set():
-        try:
-            step()
-        except Exception:
-            log.exception(name)
-        stop.wait(every)
-
-
-def main() -> None:
-    from .stt import Transcriber
-    from .telegram import Telegram
-
-    (ROOT / "data" / "logs").mkdir(parents=True, exist_ok=True)
-    logging.basicConfig(filename=ROOT / "data" / "logs" / "bot.log", level=logging.INFO, encoding="utf-8",
-                        format="%(asctime)s %(levelname)s %(name)s: %(message)s")
-    load_env(ROOT / ".env")
-    settings = tomllib.loads((ROOT / "config" / "settings.toml").read_text(encoding="utf-8"))
-    owner = int(os.environ["OWNER_CHAT_ID"]) if os.environ.get("OWNER_CHAT_ID", "").strip() else None
-    tg = Telegram(os.environ.get("TELEGRAM_BOT_TOKEN", ""))
-    ctl = Controller.load(ROOT / "data" / "tasks.json",
-                          escalation_min=settings.get("telegram", {}).get("escalation_minutes", 10))
-    sp = settings.get("speech", {})
-    bot = JarvisBot(tg, ctl, ClaudeExecutor(settings), Transcriber(sp.get("stt_model", "large-v3"),
-                                                                 sp.get("stt_language", "ru")), owner_chat=owner)
-    stop = threading.Event()
-    threading.Thread(target=_loop, args=(bot.work_once, stop, 5, "исполнитель"), daemon=True).start()
-    threading.Thread(target=_loop, args=(bot.check_alerts, stop, 30, "контролёр"), daemon=True).start()
-    if owner:
-        tg.send(owner, "JARVIS на связи. /help — что я умею.")
-    print("JARVIS запущен" + ("" if owner else " — владелец не задан: напишите боту /id"), flush=True)
-    offset_file = ROOT / "data" / "tg_offset.txt"
-    offset = int(offset_file.read_text()) if offset_file.exists() else None
-    while True:
-        try:
-            for u in tg.get_updates(offset):
-                offset = u["update_id"] + 1
-                offset_file.write_text(str(offset))
-                try:
-                    bot.handle(u)
-                except Exception:
-                    log.exception("сообщение %s", u.get("update_id"))
-        except KeyboardInterrupt:
-            stop.set()
-            break
-        except Exception:
-            log.exception("связь с Telegram")
-            time.sleep(10)
-
-
-if __name__ == "__main__":
-    main()

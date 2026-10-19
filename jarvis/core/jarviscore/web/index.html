@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JARVIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1B1816; --panel:#26221F; --line:#3a332d; --text:#F7F4EF; --muted:#b9ada0;
+  --bronze:#B89B76; --bronze-d:#7D6549; --ok:#8fb38a; --warn:#d9a35b; --bad:#d97c6b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Montserrat,Segoe UI,sans-serif;font-size:15px}
+.app{display:grid;grid-template-columns:300px 1fr 300px;grid-template-rows:auto 1fr;height:100vh;gap:0}
+header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--line)}
+.brand{font-family:"Cormorant Garamond",serif;font-size:26px;letter-spacing:.32em}
+.brand small{font-family:Montserrat;font-size:11px;letter-spacing:.2em;color:var(--muted);margin-left:14px}
+.toggles{display:flex;gap:16px;font-size:12px;color:var(--muted)}
+.toggles label{display:flex;align-items:center;gap:6px;cursor:pointer}
+aside{padding:22px;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:16px}
+#orb{width:240px;height:240px}
+#status{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--bronze);text-align:center;min-height:18px}
+#mic{width:84px;height:84px;border-radius:50%;border:1px solid var(--bronze);background:transparent;color:var(--bronze);font-size:13px;cursor:pointer;transition:background .2s}
+#mic:hover{background:rgba(184,155,118,.12)}
+#mic.rec{background:var(--bad);border-color:var(--bad);color:#fff}
+.hint{font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+main{display:flex;flex-direction:column;min-height:0}
+#feed{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:78%;padding:11px 14px;border-radius:12px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
+.msg.jarvis{background:var(--panel);border:1px solid var(--line);align-self:flex-start}
+.msg.owner{background:var(--bronze-d);align-self:flex-end}
+.msg .t{font-size:11px;color:var(--muted);margin-top:6px}
+.msg.owner .t{color:#e8dccb}
+.msg.ask{border-color:var(--bronze)}
+.acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.acts button,.task button{border:1px solid var(--bronze);background:transparent;color:var(--text);border-radius:8px;padding:6px 14px;cursor:pointer;font:inherit;font-size:13px}
+.acts button.yes{background:var(--bronze);color:var(--bg)}
+.composer{border-top:1px solid var(--line);padding:14px 22px;display:flex;flex-direction:column;gap:8px}
+#replybar{display:none;font-size:12px;color:var(--bronze)}
+#replybar button{background:none;border:none;color:var(--muted);cursor:pointer;font:inherit}
+.row{display:flex;gap:10px}
+textarea{flex:1;resize:none;height:52px;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:12px;font:inherit}
+textarea:focus{outline:none;border-color:var(--bronze)}
+#send{border:none;background:var(--bronze);color:var(--bg);border-radius:10px;padding:0 22px;font:inherit;font-weight:500;cursor:pointer}
+#err{font-size:12px;color:var(--bad);min-height:14px}
+#tasks{padding:22px;border-left:1px solid var(--line);overflow-y:auto}
+#tasks h2{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:20px;letter-spacing:.1em;margin:0 0 14px}
+.task{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;background:var(--panel)}
+.task .n{font-size:12px;color:var(--bronze)}
+.task .s{font-size:12px;margin-top:4px}
+.s.running{color:var(--warn)} .s.waiting_human{color:var(--bad)} .s.pending,.s.paused{color:var(--muted)}
+.task button{margin-top:8px;padding:3px 10px;font-size:12px;border-color:var(--line);color:var(--muted)}
+.empty{font-size:13px;color:var(--muted)}
+@media (max-width:900px){.app{grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto}
+  aside{border-right:none;border-bottom:1px solid var(--line);flex-direction:row;flex-wrap:wrap;justify-content:center}
+  #orb{width:140px;height:140px} #tasks{border-left:none;border-top:1px solid var(--line);max-height:30vh}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">JARVIS<small>DREAM HOUSE</small></div>
+    <div class="toggles">
+      <label><input type="checkbox" id="speak"> Озвучивать ответы</label>
+      <label><input type="checkbox" id="sound" checked> Звуки</label>
+    </div>
+  </header>
+  <aside>
+    <canvas id="orb" width="480" height="480" aria-label="Шар JARVIS"></canvas>
+    <div id="status">на связи</div>
+    <button id="mic" title="Нажмите и говорите, нажмите ещё раз — отправить">Говорить</button>
+    <div class="hint">Нажмите «Говорить», скажите задание, нажмите ещё раз.<br>«Идея: …» — запишу во второй мозг.</div>
+  </aside>
+  <main>
+    <div id="feed" aria-live="polite"></div>
+    <div class="composer">
+      <div id="replybar">Ответ на вопрос <span id="replyn"></span> <button id="replyx">× отменить</button></div>
+      <div class="row">
+        <textarea id="text" placeholder="Напишите задание…" title="Enter — отправить, Shift+Enter — новая строка"></textarea>
+        <button id="send">Отправить</button>
+      </div>
+      <div id="err"></div>
+    </div>
+  </main>
+  <section id="tasks"><h2>Задачи</h2><div id="tlist"><div class="empty">Открытых задач нет.</div></div></section>
+</div>
+<script>
+const H = {"X-Jarvis": "1"};
+const $ = id => document.getElementById(id);
+let lastId = 0, tasks = [], busy = false, replyTo = null, recording = false, mediaRec = null, chunks = [];
+let flash = 0, level = 0, analyser = null, pending = false;
+const rendered = new Map();
+
+try { $("speak").checked = localStorage.getItem("speak") === "1"; $("sound").checked = localStorage.getItem("sound") !== "0"; } catch (e) {}
+$("speak").onchange = () => { try { localStorage.setItem("speak", $("speak").checked ? "1" : "0"); } catch (e) {} };
+$("sound").onchange = () => { try { localStorage.setItem("sound", $("sound").checked ? "1" : "0"); } catch (e) {} };
+
+let actx = null;
+function chime(freqs, dur = 0.12) {
+  if (!$("sound").checked) return;
+  actx = actx || new AudioContext();
+  freqs.forEach((f, i) => {
+    const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i * dur;
+    o.type = "sine"; o.frequency.value = f;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.08, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur * 2);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur * 2 + 0.05);
+  });
+}
+
+function say(text) {
+  if (!$("speak").checked || !("speechSynthesis" in window)) return;
+  const u = new SpeechSynthesisUtterance(text.slice(0, 600));
+  u.lang = "ru-RU";
+  const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith("ru"));
+  if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+
+function askInfo(id) {
+  for (const t of tasks) if (t.ask_msg === id && t.state === "waiting_human") return t;
+  return null;
+}
+
+function renderActions(el, id) {
+  const box = el.querySelector(".acts");
+  const t = askInfo(id);
+  el.classList.toggle("ask", !!t);
+  box.innerHTML = "";
+  if (!t) return;
+  if (t.confirm) {
+    const y = document.createElement("button"); y.className = "yes"; y.textContent = "Да, делай";
+    y.onclick = () => send("да", id);
+    const n = document.createElement("button"); n.textContent = "Нет";
+    n.onclick = () => send("нет", id);
+    box.append(y, n);
+  }
+  const r = document.createElement("button"); r.textContent = "Ответить";
+  r.onclick = () => setReply(id, t.id);
+  box.append(r);
+}
+
+function addMsg(m) {
+  const el = document.createElement("div");
+  el.className = "msg " + m.who;
+  const body = document.createElement("div"); body.textContent = m.text.replace(/\*\*|`/g, "");
+  const acts = document.createElement("div"); acts.className = "acts";
+  const ts = document.createElement("div"); ts.className = "t"; ts.textContent = (m.who === "owner" ? "Вы · " : "JARVIS · ") + m.ts;
+  el.append(body, acts, ts);
+  $("feed").append(el);
+  rendered.set(m.id, el);
+  return el;
+}
+
+function renderTasks() {
+  const box = $("tlist"); box.innerHTML = "";
+  if (!tasks.length) { box.innerHTML = '<div class="empty">Открытых задач нет.</div>'; return; }
+  for (const t of tasks) {
+    const el = document.createElement("div"); el.className = "task";
+    const n = document.createElement("div"); n.className = "n"; n.textContent = "№" + t.id;
+    const ti = document.createElement("div"); ti.textContent = t.title;
+    const s = document.createElement("div"); s.className = "s " + t.state; s.textContent = t.state_ru;
+    const c = document.createElement("button"); c.textContent = "Отменить";
+    c.onclick = () => { if (confirm("Отменить задачу №" + t.id + "?")) send("/cancel " + t.id); };
+    el.append(n, ti, s, c); box.append(el);
+  }
+}
+
+async function poll() {
+  try {
+    const r = await fetch("/api/state?after=" + lastId);
+    const s = await r.json();
+    tasks = s.tasks; busy = s.busy;
+    const atBottom = $("feed").scrollHeight - $("feed").scrollTop - $("feed").clientHeight < 80;
+    let fresh = false;
+    for (const m of s.feed) {
+      addMsg(m); lastId = Math.max(lastId, m.id);
+      if (m.who === "jarvis" && lastId > initialId) { fresh = true; flash = 1; say(m.text); }
+    }
+    for (const [id, el] of rendered) renderActions(el, id);
+    renderTasks();
+    if (fresh) { chime([660, 880]); pending = false; }
+    if (fresh || atBottom) $("feed").scrollTop = $("feed").scrollHeight;
+    $("err").textContent = "";
+  } catch (e) { $("err").textContent = "Нет связи с JARVIS. Окно бота открыто?"; }
+  updateStatus();
+}
+let initialId = Infinity;
+
+function updateStatus() {
+  const waiting = tasks.some(t => t.state === "waiting_human");
+  $("status").textContent = recording ? "слушаю…" : busy || pending ? "работаю…" : waiting ? "жду вашего ответа" : "на связи";
+}
+
+function setReply(id, taskId) {
+  replyTo = id; $("replyn").textContent = "по задаче №" + taskId;
+  $("replybar").style.display = "block"; $("text").focus();
+}
+$("replyx").onclick = () => { replyTo = null; $("replybar").style.display = "none"; };
+
+async function send(text, reply = replyTo) {
+  text = (text || "").trim();
+  if (!text) { $("err").textContent = "Сначала напишите, что сделать."; return; }
+  try {
+    const r = await fetch("/api/send", {method: "POST", headers: {...H, "Content-Type": "application/json"},
+      body: JSON.stringify({text, reply_to: reply})});
+    if (!r.ok) throw new Error((await r.json()).error);
+    pending = true; chime([520]);
+    if (reply === replyTo) $("replyx").onclick();
+    poll();
+  } catch (e) { $("err").textContent = "Не отправилось: " + e.message; }
+}
+$("send").onclick = () => { const t = $("text").value; if (t.trim()) { send(t); $("text").value = ""; } else send(""); };
+$("text").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("send").onclick(); } });
+$("text").addEventListener("input", () => { $("err").textContent = ""; });
+
+$("mic").onclick = async () => {
+  if (recording) { mediaRec.stop(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+    actx = actx || new AudioContext();
+    analyser = actx.createAnalyser(); analyser.fftSize = 256;
+    actx.createMediaStreamSource(stream).connect(analyser);
+    mediaRec = new MediaRecorder(stream); chunks = [];
+    mediaRec.ondataavailable = e => chunks.push(e.data);
+    mediaRec.onstop = async () => {
+      recording = false; analyser = null; $("mic").classList.remove("rec"); $("mic").textContent = "Говорить";
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(chunks, {type: "audio/webm"});
+      const q = replyTo ? "?reply_to=" + replyTo : "";
+      try {
+        const r = await fetch("/api/voice" + q, {method: "POST", headers: H, body: blob});
+        if (!r.ok) throw new Error((await r.json()).error);
+        pending = true; chime([520, 440]);
+        if (replyTo) $("replyx").onclick();
+        poll();
+      } catch (e) { $("err").textContent = "Голосовое не ушло: " + e.message; }
+    };
+    mediaRec.start(); recording = true; chime([440, 660]);
+    $("mic").classList.add("rec"); $("mic").textContent = "Стоп";
+  } catch (e) { $("err").textContent = "Нет доступа к микрофону: " + e.message; }
+  updateStatus();
+};
+
+const cv = $("orb"), g = cv.getContext("2d");
+function draw(ts) {
+  const W = cv.width, c = W / 2, t = ts / 1000;
+  if (analyser) {
+    const a = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(a);
+    level = level * 0.7 + (a.reduce((x, y) => x + y, 0) / a.length / 255) * 0.3;
+  } else level *= 0.9;
+  flash *= 0.96;
+  const work = busy || pending;
+  g.clearRect(0, 0, W, W);
+  const breathe = 1 + Math.sin(t * (work ? 3 : 1.2)) * 0.03 + level * 0.5 + flash * 0.08;
+  const r = W * 0.26 * breathe;
+  const core = g.createRadialGradient(c, c, 0, c, c, r * 1.6);
+  core.addColorStop(0, `rgba(247,244,239,${0.55 + flash * 0.3})`);
+  core.addColorStop(0.35, `rgba(184,155,118,${0.45 + level})`);
+  core.addColorStop(1, "rgba(184,155,118,0)");
+  g.fillStyle = core; g.beginPath(); g.arc(c, c, r * 1.6, 0, Math.PI * 2); g.fill();
+  for (let i = 0; i < 3; i++) {
+    const rr = r * (1.25 + i * 0.22), speed = (work ? 1.4 : 0.35) * (i % 2 ? -1 : 1);
+    g.strokeStyle = `rgba(184,155,118,${0.55 - i * 0.13})`; g.lineWidth = W * 0.006;
+    for (let k = 0; k < 3; k++) {
+      const s = t * speed + k * (Math.PI * 2 / 3) + i;
+      g.beginPath(); g.arc(c, c, rr, s, s + Math.PI * (0.35 + level)); g.stroke();
+    }
+  }
+  g.strokeStyle = "rgba(247,244,239,.25)"; g.lineWidth = W * 0.003;
+  g.beginPath(); g.arc(c, c, r * 0.62, 0, Math.PI * 2); g.stroke();
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+
+(async () => { await poll(); initialId = lastId; $("feed").scrollTop = $("feed").scrollHeight; setInterval(poll, 1500); })();
+</script>
+</body>
+</html>
