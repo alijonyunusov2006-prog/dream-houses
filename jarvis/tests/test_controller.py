@@ -78,6 +78,13 @@ def test_done_tasks_are_silent_and_not_in_open_list(tmp_path):
     assert c.open_tasks() == []
 
 
+def test_several_tasks_can_run_at_once(tmp_path):
+    c = make(tmp_path)
+    a, b = c.new_task("Первая", now=T0), c.new_task("Вторая", now=T0)
+    c.sched.start(a.id)
+    assert [t.id for t in c.sched.runnable()] == [b.id]          # вторая не ждёт, пока первая закончит
+
+
 def test_summary_lists_open_tasks_with_state_in_russian(tmp_path):
     c = make(tmp_path)
     c.new_task("Первая", now=T0)

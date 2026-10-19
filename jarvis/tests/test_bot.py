@@ -151,6 +151,14 @@ def test_morning_report_once_a_day_after_report_hour(tmp_path):
     assert bot.maybe_morning(datetime(2026, 10, 21, 9, 30))              # назавтра — снова
 
 
+def test_recall_answers_from_notes_without_task(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    (tmp_path / "decided.md").write_text("| 2026-10-05 | Цены Qabat — на паузе |\n", encoding="utf-8")
+    bot.memory_roots = [tmp_path]
+    bot.handle(msg("Вспомни, что мы решили про цены Qabat"))
+    assert "паузе" in tg.sent[-1][1] and ctl.sched.tasks == {}
+
+
 def test_greeting_when_nothing_happened(tmp_path):
     bot, tg, ctl = make(tmp_path)
     bot.handle(msg("Привет"))

@@ -32,6 +32,7 @@ warn_at_percent = 80
 [claude_code]
 permission_mode = "acceptEdits"
 max_turns = 40
+max_parallel = 3                       # сколько задач JARVIS ведёт одновременно (задачи с мышью на экране — по одной, позже)
 default_allowed_tools = ["Read", "Edit", "Write", "Glob", "Grep", "Bash"]
 
 [telegram]

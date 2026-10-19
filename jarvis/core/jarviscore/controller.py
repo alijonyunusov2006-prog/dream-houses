@@ -67,7 +67,7 @@ class Controller:
         now = now or _now()
         title = " ".join(text.split())[:60]
         t = Task(id=self._next_id(), title=title, priority=priority, deadline=deadline,
-                 resources=["claude"], checkpoint={"text": text, "source": source, "answers": []},
+                 resources=[], checkpoint={"text": text, "source": source, "answers": []},
                  created_at=now, updated_at=now)
         return self.sched.add(t)
 

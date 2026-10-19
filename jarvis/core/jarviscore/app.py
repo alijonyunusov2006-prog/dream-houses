@@ -14,6 +14,7 @@ import threading
 import time
 import tomllib
 import webbrowser
+from pathlib import Path
 
 from .bot import ROOT, ClaudeExecutor, JarvisBot, load_env
 from .channels import Broadcast, WebFeed
@@ -120,9 +121,14 @@ def main() -> None:
     bot = JarvisBot(bc, ctl, ClaudeExecutor(settings),
                     Transcriber(sp.get("stt_model", "large-v3"), sp.get("stt_language", "ru")), owner_chat=owner)
     bot.report_hour = settings.get("telegram", {}).get("report_hour", 8)
+    vault = Path(os.environ.get("OBSIDIAN_VAULT", r"C:\Users\alijo\OneDrive\Документы\Obsidian Vault"))
+    if vault.exists():
+        bot.memory_roots.append(vault)
 
     stop = threading.Event()
-    threading.Thread(target=_loop, args=(bot.work_once, stop, 5, "исполнитель"), daemon=True).start()
+    parallel = max(1, int(settings.get("claude_code", {}).get("max_parallel", 3)))   # до 3 задач сразу
+    for i in range(parallel):
+        threading.Thread(target=_loop, args=(bot.work_once, stop, 5, f"исполнитель {i + 1}"), daemon=True).start()
     threading.Thread(target=_loop, args=(bot.check_alerts, stop, 30, "контролёр"), daemon=True).start()
     serve(JarvisWeb(bot, feed, ROOT / "data" / "tmp"), PORT)
     if tg:

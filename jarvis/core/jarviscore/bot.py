@@ -24,6 +24,8 @@ from pathlib import Path
 from .claude_runner import BudgetExceeded
 from .controller import Controller
 from .planner import State, Task
+from . import memory
+from .memory import is_recall
 from .wake import is_greeting
 
 ROOT = Path(__file__).resolve().parents[2]          # .../jarvis
@@ -55,6 +57,7 @@ class JarvisBot:
         self.owner, self.ideas_dir, self.tmp_dir = owner_chat, Path(ideas_dir), Path(tmp_dir)
         self.lock = threading.RLock()
         self.report_hour = 8                       # утренний доклад (settings.toml [telegram] report_hour)
+        self.memory_roots = [self.ideas_dir.parent]  # где искать «вспомни…»: brain/ (+ хранилище Obsidian из app.py)
 
     # --- входящие ----------------------------------------------------------------
     def handle(self, update: dict) -> None:
@@ -103,6 +106,8 @@ class JarvisBot:
             return self.tg.send(self.owner, self.ctl.summary())
         if text.startswith("/cancel"):
             return self._cancel(text.removeprefix("/cancel").strip())
+        if is_recall(text):
+            return self.tg.send(self.owner, memory.answer(text, self.memory_roots))
         if is_greeting(text):
             return self.tg.send(self.owner, self.briefing())
         if IDEA.match(text):
