@@ -85,9 +85,22 @@ def _from_telegram(u: dict, tg, bot: JarvisBot, feed: WebFeed, bc: Broadcast) ->
         log.exception("сообщение %s", u.get("update_id"))
 
 
+def already_running(port: int = PORT) -> bool:
+    import socket
+
+    with socket.socket() as s:
+        s.settimeout(0.5)
+        return s.connect_ex(("127.0.0.1", port)) == 0
+
+
 def main() -> None:
     from .stt import Transcriber
     from .telegram import Telegram
+
+    if already_running():          # второй щелчок по ярлыку — просто показать окно работающего JARVIS
+        print("JARVIS уже запущен — открываю окно.", flush=True)
+        open_window(f"http://127.0.0.1:{PORT}/")
+        return
 
     (ROOT / "data" / "logs").mkdir(parents=True, exist_ok=True)
     logging.basicConfig(filename=ROOT / "data" / "logs" / "bot.log", level=logging.INFO, encoding="utf-8",
