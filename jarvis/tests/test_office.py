@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 import threading
@@ -51,14 +51,16 @@ def test_unknown_agent_goes_to_jarvis():
 
 def test_projects_parsed_and_secrets_and_english_dropped(tmp_path):
     (tmp_path / "Макет.md").write_text(
-        "# Макет\n\n> Печать макета на P1S.\n\n**Где на диске:** `C:\maket`\n**Работали:** 2026-10-01 — 2026-10-18 (5 дн.)\n\n"
-        "## На чём остановились\n\nРабота закончена. Файл на флешке.\nпароль от wifi: qwerty12345\n\n## Дни работы\n", encoding="utf-8")
+        "# Макет\n\n> Печать макета на P1S.\n\n**Где на диске:** `C:\\maket`\n**Работали:** 2026-10-01 — 2026-10-18 (5 дн.)\n\n"
+        "## На чём остановились\n\nРабота закончена. Файл на флешке.\nпароль от wifi: qwerty12345\n"
+        "логин ali / qwerty1\nтокен 123456789:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw\n\n## Дни работы\n", encoding="utf-8")
     (tmp_path / "Старое.md").write_text(
         "# Старое\n**Работали:** 2026-08-01\n\n## На чём остановились\n\nMonitor CUDA library installation.\n", encoding="utf-8")
     p = {x["name"]: x for x in load_projects(tmp_path, now=datetime(2026, 10, 21))}
     m = p["Макет"]
     assert m["state"] == "done" and m["last"] == "2026-10-18" and m["days"] == 5
     assert "флешке" in m["next"] and "qwerty" not in m["next"] and "пароль" not in m["next"]
+    assert "AAH" not in m["next"] and "логин" not in m["next"]
     assert m["summary"] == "Печать макета на P1S." and "maket" in m["where"]
     assert p["Старое"]["state"] == "quiet" and p["Старое"]["next"] == ""
     assert load_projects(tmp_path / "нет") == []

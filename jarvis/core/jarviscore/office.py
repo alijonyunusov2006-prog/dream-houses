@@ -20,8 +20,7 @@ from .planner import State
 
 JARVIS_ID = "jarvis"
 # строка с этим — выбрасывается целиком (пароли, ключи, токены); слово «секретарь» не трогаем
-SECRET = re.compile(r"парол|password|passwd|токен|token|api[_ ]?key|ключ\s*(?:api|бота|доступа)|секрет(?!ар)|"
-                    r"=\s*\S{20,}|sk-[A-Za-z0-9]{10,}", re.I)
+from .secrets_filter import SECRET   # единый фильтр: пароли, ключи, токены, логины, номера карт
 # русские имена там, где в описании агента латиница (владелец не читает по-английски)
 RU_ROLE = {"3d": "3D-печать и модели", "archicad": "Планировки в Архикаде", "academy": "Академия Dream House",
            "crm": "Учёт клиентов и задач", "browser": "Работа с сайтами", "content": "Контент",
@@ -39,6 +38,8 @@ QUIET_DAYS = 14          # дольше не трогали — «стоит»
 def _clean(text: str, limit: int) -> str:
     t = "\n".join(line for line in (text or "").splitlines() if not SECRET.search(line))   # строка с секретом — целиком вон
     t = re.sub(r"\[\[([^\]|]+)\|?([^\]]*)\]\]", lambda m: m.group(2) or m.group(1), t)   # [[ссылка]] → текст
+    t = re.sub(r"[\w.+-]+@[\w-]+\.[\w.-]+", "[почта]", t)          # чужие адреса почты на экране не показываем
+    t = re.sub(r"\+?\d[\d\s()-]{8,}\d", "[телефон]", t)              # и телефоны
     t = re.sub(r"[*_`#>]", "", t)
     t = re.sub(r"\s+", " ", t).strip()
     return t if len(t) <= limit else t[: limit - 1].rstrip() + "…"
@@ -104,6 +105,19 @@ def _section(text: str, title: str) -> str:
     return m.group(1).strip() if m else ""
 
 
+_PROJ_CACHE: dict = {}
+PROJ_TTL = 30            # офис опрашивает каждые 4 с, а файлы второго мозга (OneDrive) читаем не чаще раза в 30 с
+
+
+def load_projects_cached(projects_dir: Path | None) -> list[dict]:
+    key = str(projects_dir)
+    at, val = _PROJ_CACHE.get(key, (0.0, None))
+    if val is None or time.monotonic() - at > PROJ_TTL:
+        val = load_projects(projects_dir)
+        _PROJ_CACHE[key] = (time.monotonic(), val)
+    return val
+
+
 def load_projects(projects_dir: Path | None, now: datetime | None = None) -> list[dict]:
     """Проекты из второго мозга: имя, суть, последние даты, «на чём остановились», состояние."""
     if not projects_dir or not projects_dir.is_dir():
@@ -120,6 +134,7 @@ def load_projects(projects_dir: Path | None, now: datetime | None = None) -> lis
         days = int(m.group(3)) if m and m.group(3) else 0
         nxt = _section(text, "На чём остановились")
         nxt = re.sub(r"_\(итог от [^)]*\)_", "", nxt)
+        nxt = "\n".join(line for line in nxt.splitlines() if not SECRET.search(line))   # секреты — до проверки языка
         letters = re.findall(r"[A-Za-zА-Яа-яЁё]", nxt)
         if letters and sum(c.isascii() for c in letters) / len(letters) > 0.5:
             nxt = ""                                     # запись на английском — владелец её не прочтёт
@@ -197,7 +212,7 @@ def snapshot(bot, agents_dir: Path, projects_dir: Path | None, machine: Machine 
         view = agents_view(agents, tasks, today)
     mach = machine.get() if machine else {}
     return {"updated": datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds"),
-            "jarvis": jarvis, "agents": view, "projects": load_projects(projects_dir), "machine": mach}
+            "jarvis": jarvis, "agents": view, "projects": load_projects_cached(projects_dir), "machine": mach}
 
 
 def to_json(data: dict) -> bytes:

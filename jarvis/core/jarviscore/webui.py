@@ -191,6 +191,16 @@ def make_handler(app: JarvisWeb, port: int):
             return self.headers.get("Host", "") in allowed_hosts
 
         def do_GET(self):
+            try:
+                self._get()
+            except Exception:
+                log.exception("окно: GET %s", self.path[:200])
+                try:
+                    self._json(500, {"error": "ошибка на стороне JARVIS, смотрите data/logs/bot.log"})
+                except Exception:
+                    pass                                         # клиент уже ушёл
+
+        def _get(self):
             if not self._host_ok():
                 return self._json(403, {"error": "чужой адрес"})
             url = urlparse(self.path)

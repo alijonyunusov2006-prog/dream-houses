@@ -23,7 +23,7 @@ STOP = {"что", "мы", "про", "о", "об", "в", "во", "на", "и", "�
         "какой", "какая", "какие", "решили", "говорили", "обсуждали", "вспомни", "напомни", "найди", "памяти",
         "где", "лежит", "лежат", "мне", "я", "ты", "он", "за", "для", "же", "ли", "не", "то"}
 WORD = re.compile(r"[a-zа-яё0-9]+", re.I)
-SECRET = re.compile(r"парол|password|passwd|токен|token|secret|секрет|api[_ ]?key|ключ\s*(?:api|бота|доступа)|=\s*\S{20,}", re.I)
+from .secrets_filter import SECRET   # единый фильтр секретов (память и офис)
 SKIP_DIRS = {".obsidian", ".git", ".trash", "node_modules", "graphify-out", ".venv", "__pycache__"}
 MAX_BYTES = 1_000_000
 CLOUD_ONLY = 0x400000 | 0x1000        # RECALL_ON_DATA_ACCESS | OFFLINE (OneDrive «только в облаке»)

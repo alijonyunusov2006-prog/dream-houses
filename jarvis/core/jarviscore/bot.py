@@ -63,6 +63,7 @@ class JarvisBot:
         self.local = None                          # LocalBrain — простые вопросы на локальной модели (app.py)
         self.last_said = ""                        # для «повтори»
         self.paused_until: datetime | None = None  # лимит подписки: до этого времени задачи не начинаем
+        self._limit_said: datetime | None = None   # когда последний раз говорили про лимит
         self.telegram_on = False
         self.on_office = None                      # app.py: открыть 3D-офис окном
 
@@ -326,7 +327,8 @@ class JarvisBot:
                 self._execute(t)
         except (LimitReached, BudgetExceeded) as e:
             with self.lock:
-                self._pause_for_limit(t, str(e))
+                t.checkpoint.pop("executing", None)   # лимит — не обрыв: после сброса продолжим сами, без «повторить?»
+                self._pause_for_limit(t, str(e), budget=isinstance(e, BudgetExceeded))
         except Exception as e:
             log.exception("задача %s", t.id)
             with self.lock:
@@ -347,18 +349,23 @@ class JarvisBot:
                 self._stop(t, res.result[:300])
                 self.say("Не смог ответить, сэр. Скажите иначе или дайте задание — разберусь подробно.")
 
-    def _pause_for_limit(self, t: Task, why: str) -> None:
+    def _pause_for_limit(self, t: Task, why: str, budget: bool = False) -> None:
         """Лимит подписки: все задачи ждут сброса (время берём из сообщения Claude), владельцу — по-русски, один раз."""
         log.warning("лимит: %s", why[:300])
         until = limit_until(why)
-        announce = not (self.paused_until and self.paused_until >= until)
+        now = _now()
+        # говорим один раз за паузу; если время сброса не известно и пауза продлевается — не чаще раза в 3 часа
+        announce = not (self.paused_until and self.paused_until >= until) and (
+            not self._limit_said or now - self._limit_said >= timedelta(hours=3))
         self.paused_until = until
         if self._live(t):
             t.state = State.PAUSED                     # начнётся сам после сброса (not_before)
             t.checkpoint["not_before"] = until.isoformat()
             t.touch()
         if announce:
-            self.say(f"Сэр, лимит подписки Claude исчерпан до {until.astimezone():%H:%M}. Задачи подождут — "
+            self._limit_said = now
+            what = "дневной порог расходов" if budget else "лимит подписки Claude"
+            self.say(f"Сэр, {what} исчерпан до {until.astimezone():%H:%M}. Задачи подождут — "
                      f"начну сам в {until.astimezone():%H:%M}. Доклад, счёт, память и идеи работают и сейчас.")
 
     def _understand(self, t: Task) -> None:
@@ -429,17 +436,22 @@ def _short(title: str, n: int = 60) -> str:
 def limit_until(text: str, now: datetime | None = None) -> datetime:
     """Когда сбросится лимит: «resets 10:10pm» → сегодня/завтра 22:10 по часам ПК; не нашли — через час."""
     now = (now or datetime.now()).astimezone()
-    m = re.search(r"resets?\s+(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)?", text or "", re.I)
+    # только настоящее время: «10:10pm», «10pm», «22:10»; «resets 25 Oct» — не время (ревью 2026-10-21)
+    m = re.search(r"resets?\s+(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b|resets?\s+(?:at\s+)?(\d{1,2}):(\d{2})\b",
+                  text or "", re.I)
     if not m:
         return (now + timedelta(minutes=LIMIT_PAUSE_MIN)).astimezone(timezone.utc)
-    h, mi, ap = int(m.group(1)), int(m.group(2) or 0), (m.group(3) or "").lower()
-    if ap == "pm" and h < 12:
-        h += 12
-    if ap == "am" and h == 12:
-        h = 0
-    at = now.replace(hour=h % 24, minute=mi, second=0, microsecond=0)
+    if m.group(1):
+        h, mi, ap = int(m.group(1)), int(m.group(2) or 0), m.group(3).lower()
+        h = (h % 12) + (12 if ap == "pm" else 0)
+    else:
+        h, mi = int(m.group(4)), int(m.group(5))
+    if h > 23 or mi > 59:
+        return (now + timedelta(minutes=LIMIT_PAUSE_MIN)).astimezone(timezone.utc)
+    at = now.replace(hour=h, minute=mi, second=0, microsecond=0)
     if at <= now:
-        at += timedelta(days=1)
+        # только что прошло (часы ПК чуть спешат) — сброс уже был; давно прошло — значит, завтра
+        at = now + timedelta(minutes=1) if now - at < timedelta(minutes=10) else at + timedelta(days=1)
     return at.astimezone(timezone.utc)
 
 

@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Офис Dream House</title>
 <script>try { var t = localStorage.getItem('dh-office-theme'); if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); } catch (e) { /* хранилище недоступно */ }</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -88,6 +90,47 @@
     border: 1px dashed color-mix(in oklab, var(--warn) 60%, var(--line)); background: color-mix(in oklab, var(--warn) 9%, var(--surface)); color: var(--earth); font-size: 13px; }
   .demo-tag { font: 600 10.5px/1 var(--f-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--warn); display: inline-flex; align-items: center; gap: 8px; }
   .demo-tag::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--warn); transform: rotate(45deg); }
+  /* живой режим: данные из JARVIS */
+  .demo-band.is-live { border-style: solid; border-color: color-mix(in oklab, var(--ok) 45%, var(--line)); background: color-mix(in oklab, var(--ok) 8%, var(--surface)); }
+  .demo-band.is-live .demo-tag { color: var(--ok); }
+  .demo-band.is-live .demo-tag::before { background: var(--ok); border-radius: 50%; transform: none; }
+  .kpi .v b.ok { color: var(--ok); }
+  .kpis.is-live { grid-template-columns: repeat(4, minmax(0, .82fr)) minmax(0, 1.6fr); }
+  @media (max-width: 640px) { .kpis.is-live { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .kpi .hl { display: grid; grid-template-columns: repeat(2, minmax(0, auto)); justify-content: start; gap: 3px 14px; margin-top: 5px; font-size: 12px; color: var(--earth); }
+  .kpi .hl span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .kpi .hl b { font: 600 12.5px/1 var(--f-num); color: var(--ink); }
+  ul.hl-list { list-style: none; margin: 0; padding: 0; display: grid; }
+  ul.hl-list li { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13px; color: var(--earth); }
+  ul.hl-list li:first-child { border-top: 0; }
+  ul.hl-list b { font: 600 13px/1.2 var(--f-num); color: var(--ink); text-align: right; }
+  .task.st-wait { border-left: 3px solid var(--warn); } .task.st-work { border-left: 3px solid var(--ok); }
+  .task .task-sub.lv { margin: 0 0 4px; font: 500 9.5px/1.3 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .task.st-wait .task-sub.lv { color: var(--warn); } .task.st-work .task-sub.lv { color: var(--ok); }
+  .task.free b { margin: 0; font-weight: 500; color: var(--earth); }
+  .report b { display: block; font-weight: 600; margin-bottom: 4px; }
+  .report span { display: block; color: var(--earth); white-space: pre-line; }
+  .path { margin: 0; font: 400 12px/1.5 var(--f-mono); color: var(--earth); overflow-wrap: anywhere; }
+  .sev.ok { color: var(--ok); }
+  .seg-n.wait { background: var(--warn); }
+  .live.ok::before { background: var(--ok); animation: none; }
+  .stage-demo.live { color: var(--ok); border-style: solid; border-color: color-mix(in oklab, var(--ok) 55%, transparent); }
+  /* проекты */
+  .pj-list { list-style: none; margin: 0; padding: 0; display: grid; }
+  .pj { width: 100%; display: grid; grid-template-columns: 172px minmax(0, 1fr) auto; gap: 3px 18px; align-items: baseline; text-align: left; background: none; border: 0; border-top: 1px solid var(--line); padding: 11px 6px; cursor: pointer; border-radius: 0; color: var(--ink); }
+  .pj-list li:first-child .pj { border-top: 0; }
+  .pj:hover { background: color-mix(in oklab, var(--champ) 7%, transparent); }
+  .pj:hover b { text-decoration: underline; text-underline-offset: 3px; }
+  .pj.is-sel { background: var(--brand-soft); }
+  .pj b { grid-column: 2; grid-row: 1; font-weight: 600; font-size: 14px; }
+  .pj-next { grid-column: 2; grid-row: 2; font-size: 12.5px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .pj-st { grid-column: 1; grid-row: 1; display: inline-flex; align-items: center; gap: 8px; font: 500 10px/1.3 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--earth); }
+  .pj-date { grid-column: 3; grid-row: 1; font: 500 11.5px/1.3 var(--f-mono); color: var(--muted); white-space: nowrap; }
+  @media (max-width: 640px) {
+    .pj { grid-template-columns: minmax(0, 1fr) auto; padding: 11px 2px; }
+    .pj-st { grid-column: 1; grid-row: 1; } .pj-date { grid-column: 2; grid-row: 1; }
+    .pj b { grid-column: 1 / -1; grid-row: 2; } .pj-next { grid-column: 1 / -1; grid-row: 3; }
+  }
 
   /* шапка */
   .top { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px 22px; }
@@ -129,6 +172,7 @@
   .dot.wait { background: var(--warn); box-shadow: 0 0 0 3px color-mix(in oklab, var(--warn) 22%, transparent); }
   .dot.bad { background: var(--bad); box-shadow: 0 0 0 3px color-mix(in oklab, var(--bad) 24%, transparent); }
   .dot.off { background: transparent; border: 1.5px solid var(--off); }
+  .dot.idle { background: var(--faint); }
 
   /* сцена и карточка */
   .main { display: grid; grid-template-columns: minmax(0, 1fr) 384px; gap: 14px; }
@@ -203,9 +247,9 @@
   @media (max-width: 640px) {
     .rl { padding: 4px 7px 5px; } .rl-top { font-size: 8.5px; letter-spacing: .12em; gap: 5px; } .rl-code { display: none; }
     .labels.near .rl-sub { display: none; } .rl.is-sel .rl-sub { display: block; }
-    .rl.st-work:not(.is-sel):not([data-room="cloud"]), .rl.st-off:not(.is-sel), .rl.pl.st-free:not(.is-sel) { padding: 5px; border-radius: 50%; }
+    .rl.st-work:not(.is-sel):not([data-room="cloud"]), .rl.st-off:not(.is-sel), .rl.st-idle:not(.is-sel), .rl.pl.st-free:not(.is-sel) { padding: 5px; border-radius: 50%; }
     .rl.pl .rl-sub { display: none !important; } .zl { font-size: 8.5px; letter-spacing: .1em; } .zl span { display: none; }
-    .rl.st-work:not(.is-sel):not([data-room="cloud"]) .rl-top > :not(.dot), .rl.st-off:not(.is-sel) .rl-top > :not(.dot), .rl.pl.st-free:not(.is-sel) .rl-top > :not(.dot) { display: none; }
+    .rl.st-work:not(.is-sel):not([data-room="cloud"]) .rl-top > :not(.dot), .rl.st-off:not(.is-sel) .rl-top > :not(.dot), .rl.st-idle:not(.is-sel) .rl-top > :not(.dot), .rl.pl.st-free:not(.is-sel) .rl-top > :not(.dot) { display: none; }
   }
 
   /* экскурсия */
@@ -230,6 +274,7 @@
   .pill.wait { color: var(--warn); border-color: color-mix(in oklab, var(--warn) 50%, var(--line)); }
   .pill.bad { color: var(--bad); border-color: color-mix(in oklab, var(--bad) 50%, var(--line)); }
   .pill.off { color: var(--muted); }
+  .pill.idle { color: var(--earth); }
   .pill.model { color: var(--champ-ink); border-color: color-mix(in oklab, var(--champ) 55%, var(--line)); background: var(--brand-soft); }
   .sec-l { font: 500 9.5px/1.3 var(--f-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin: 16px 0 7px; display: flex; justify-content: space-between; gap: 8px; }
   .task { padding: 12px 13px; border-radius: 11px; background: var(--surface-2); border: 1px solid var(--line); }
@@ -477,8 +522,8 @@
   .dl small { font: 500 9px var(--f-mono); color: var(--muted); letter-spacing: .1em; margin-left: 6px; }
   .labels:not(.far) .dl { display: none; }
   @media (max-width: 640px) { .dl { font-size: 7.5px; letter-spacing: .1em; padding: 3px 5px; box-shadow: none; } .dl small { display: none; } .labels.far .rl.st-wait:not(.is-sel):not(.pl), .labels.far .rl.st-bad:not(.is-sel):not(.pl) { padding: 4px; border-radius: 50%; } .labels.far .rl.st-wait:not(.is-sel):not(.pl) .rl-top > :not(.dot), .labels.far .rl.st-bad:not(.is-sel):not(.pl) .rl-top > :not(.dot) { display: none; } }
-  .labels.far .rl.st-work:not(.is-sel):not(.pl), .labels.far .rl.st-off:not(.is-sel):not(.pl) { padding: 5px; border-radius: 50%; }
-  .labels.far .rl.st-work:not(.is-sel):not(.pl) .rl-top > :not(.dot), .labels.far .rl.st-off:not(.is-sel):not(.pl) .rl-top > :not(.dot) { display: none; }
+  .labels.far .rl.st-work:not(.is-sel):not(.pl), .labels.far .rl.st-off:not(.is-sel):not(.pl), .labels.far .rl.st-idle:not(.is-sel):not(.pl) { padding: 5px; border-radius: 50%; }
+  .labels.far .rl.st-work:not(.is-sel):not(.pl) .rl-top > :not(.dot), .labels.far .rl.st-off:not(.is-sel):not(.pl) .rl-top > :not(.dot), .labels.far .rl.st-idle:not(.is-sel):not(.pl) .rl-top > :not(.dot) { display: none; }
   /* план месяца */
   .month-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 0.9fr); gap: 10px; }
   @media (max-width: 1180px) { .month-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -501,9 +546,9 @@
 </style>
 
 <div class="app" id="app">
-  <div class="demo-band" role="note">
-    <span class="demo-tag">Демо-данные</span>
-    <span>Подключение к DH OS и к ПК — на этапе 3. Задачи, цифры и события ниже — пример того, как офис будет выглядеть с живыми данными. Пометка <b>«факт»</b> — то, что верно уже сейчас.</span>
+  <div class="demo-band" id="band" role="note" aria-live="polite">
+    <span class="demo-tag" id="band-tag">Демо: цифры для примера</span>
+    <span id="band-text">Страница открыта не из JARVIS, поэтому задачи, цифры и события ниже — пример того, как будет выглядеть офис. Живые данные появятся, если открыть офис из JARVIS. Пометка <b>«факт»</b> — то, что было верно на 3 октября.</span>
   </div>
 
   <header class="top">
@@ -548,7 +593,8 @@
         <div class="seg" role="group" aria-label="Вид на макет">
           <button class="seg-b is-on" type="button" data-view="overview">Общий</button>
           <button class="seg-b" type="button" data-view="plan">Сверху (план)</button>
-          <button class="seg-b" type="button" data-view="problems">Проблемы <b class="seg-n" id="seg-n">0</b></button>
+          <button class="seg-b" type="button" data-view="problems"><span id="seg-l">Проблемы</span> <b class="seg-n" id="seg-n">0</b></button>
+          <button class="seg-b" type="button" data-go="projects" id="seg-pj" hidden>Проекты</button>
         </div>
         <div class="seg floors" role="group" aria-label="Какой офис показать">
           <button class="fl-b is-on" type="button" data-floor="all">Оба рядом</button>
@@ -577,7 +623,7 @@
       </div>
       <div class="hud hud-br" style="flex-direction:column;align-items:flex-end">
         <div class="hint">Тяните — вращать · колесо или два пальца — ближе · клик по комнате — карточка</div>
-        <span class="stage-demo">ДЕМО</span>
+        <span class="stage-demo" id="stage-demo">ДЕМО</span>
       </div>
 
       <div class="tour" id="tour" hidden aria-live="polite">
@@ -610,6 +656,14 @@
       <div id="side-home"></div>
       <div id="side-room" hidden></div>
     </aside>
+  </section>
+
+  <section class="block" id="projects" aria-labelledby="pj-h" hidden>
+    <div class="sec-h">
+      <div><div class="eyebrow" id="pj-eyebrow">Проекты</div><h2 id="pj-h">Что идёт по проектам</h2></div>
+      <div class="g-legend" id="pj-legend"></div>
+    </div>
+    <ol class="pj-list" id="pj-list"></ol>
   </section>
 
   <section class="block" id="problems" aria-labelledby="pr-h">
@@ -653,7 +707,7 @@
   <section class="block" id="dhos-sys" aria-labelledby="ds-h">
     <div class="sec-h">
       <div><div class="eyebrow">DH OS · системы · пом. 2.61</div><h2 id="ds-h">DH OS — что уже автоматизировано</h2></div>
-      <p class="sec-note"><span class="src">По коду</span> Есть в DH OS по коду, работу JARVIS ещё не проверял. На макете — светящиеся модули павильона DH OS, кабель идёт в комнату CRM.</p>
+      <p class="sec-note"><span class="src">По коду</span> Есть в DH OS по коду, работу JARVIS ещё не проверял. На макете — светящиеся модули павильона DH OS, кабель идёт в комнату учёта клиентов.</p>
     </div>
     <ol class="sys-grid" id="sys-grid"></ol>
   </section>
@@ -702,7 +756,7 @@ const store = {
 };
 const DAYS = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
 const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-const ST = { work: 'Работает', wait: 'Ждёт', bad: 'Проблема', off: 'Выключено' };
+const ST = { work: 'Работает', wait: 'Ждёт', bad: 'Проблема', off: 'Выключено', idle: 'Свободен' };
 const SEV = { bad: 'Критично', warn: 'Внимание', risk: 'Риск' };
 
 /* ---------- зоны офиса: по одному агенту на зону (демо-задачи + факт на 3 октября) ---------- */
@@ -728,6 +782,12 @@ const ROOMS = [
     queue: ['План: каталог архитектурных макетов на сайте', 'Оценка заказа: 12 тракторов на K1'],
     report: { at: T(-1.1), t: 'ТЗ «Список дел с тегами» передано разработчику: 6 критериев готовности, оценка 5 часов.' },
     fact: { now: 'Определён. Модель Opus.', need: 'Первое задание.', where: '.claude/agents/planner.md' } },
+  { id: 'coach', code: '2.03', name: 'Наставник', short: 'Наставник', role: 'Наставник', agent: 'coach', model: 'Opus', st: 'work', share: 0.4,
+    d: 'Объясняет, а не только делает: разбирает вместе с вами, что получилось и что лучше делать иначе, и помогает учиться по ходу работы.',
+    task: { t: 'Разбор недели: что получилось и что улучшить', p: 30, eta: T(2.0) },
+    queue: ['Памятка: как проверять работу агентов'],
+    report: { at: T(-1.6), t: 'Три урока недели записаны во второй мозг (демо).' },
+    fact: { now: 'Агент определён.', need: 'Первое задание.', where: '.claude/agents/coach.md' } },
   { id: 'developer', code: '2.10', name: 'Разработка', short: 'Разработка', role: 'Разработчик', agent: 'developer', model: 'Sonnet', st: 'work', share: 3.30,
     d: 'Пишет код в отдельной папке проекта: тест → код → коммит. Вашу CRM не трогает.',
     task: { t: 'Список дел с тегами: код и тесты', p: 72, eta: T(2.0), due: T(3.0) },
@@ -742,15 +802,21 @@ const ROOMS = [
     queue: ['Проверка: список дел с тегами — после разработчика', 'Повторная проверка шлюза'],
     report: { at: T(-0.15), t: 'Протокол готов: 7 из 9 критериев прошли. Доказательства — 9 скриншотов.' },
     fact: { now: 'Определён.', need: '—', where: '.claude/agents/tester.md' } },
-  { id: 'archicad', code: '2.12', name: 'Мастерская Archicad', short: 'Archicad', role: 'Планировки в Archicad', agent: 'archicad', model: 'Sonnet', st: 'wait', share: 0.85,
-    d: 'Строит планировки в Archicad по фото и размерам через Tapir и MCP. Отчитывается скриншотами и данными модели.',
+  { id: 'archviz', code: '2.14', name: 'Студия визуализации', short: 'Визуализация', role: '3D-визуализатор', agent: 'archviz', model: 'Sonnet', st: 'work', share: 0.6,
+    d: 'Фотореалистичные кадры интерьеров и фасадов: свет, материалы, ракурсы, рендер. Перед показом проверяет кадр по правилам арт-директора.',
+    task: { t: 'Рендер гостиной: два ракурса, вечерний свет', p: 40, eta: T(1.8) },
+    queue: ['Фасад коттеджа: дневной кадр', 'Кухня: третий ракурс'],
+    report: { at: T(-0.9), t: 'Первый ракурс гостиной готов, свет поправлен по замечанию (демо).' },
+    fact: { now: 'Агент определён.', need: 'Первое задание.', where: '.claude/agents/archviz.md' } },
+  { id: 'archicad', code: '2.12', name: 'Мастерская Архикада', short: 'Архикад', role: 'Планировки в Архикаде', agent: 'archicad', model: 'Sonnet', st: 'wait', share: 0.85,
+    d: 'Строит планировки в Архикаде по фото и размерам. Отчитывается скриншотами и данными модели.',
     task: { t: 'Планировка: квартира 78 м², 3 комнаты, по фото плана', p: 45, eta: T(3.6), due: T(2.2), risk: true },
     blocker: { k: 'wait', t: 'Ждёт от вас глубину ниши в коридоре. Без ответа срок ' + T(2.2) + ' не успеть.' },
     queue: ['Вариант расстановки №2 для гостиной', 'Экспорт PDF и IFC для бригады'],
     report: { at: T(-0.6), t: 'Стены и проёмы построены, зоны размечены: 3 комнаты, кухня-гостиная, 2 санузла. Остановлено: нет размера ниши.' },
     fact: { now: 'Навык написан, на ПК не проверен. Лицензия Archicad куплена.', need: 'Версия Archicad; установка Tapir.', where: 'skills/archicad/' } },
   { id: 'print', code: '2.13', name: '3D и печать', short: '3D и печать', role: 'Модели и печать', agent: '3d', model: 'Sonnet', st: 'work', share: 0.40,
-    d: 'Заказы на печать: фото → ТЗ → 3ds Max или Blender → проверка сетки → нарезка в OrcaSlicer. Физический старт печати — только с вашего подтверждения.',
+    d: 'Заказы на печать: фото → ТЗ → модель в Максе или Блендере → проверка сетки → нарезка. Физический старт печати — только с вашего подтверждения.',
     task: { t: 'Партия: трактор на два цвета, 30 шт.', p: 60, kind: 'k1', eta: T(7.5), due: T(6.5), risk: true },
     queue: ['Нарезка: макет ЖК, крыша', 'Проверка сетки: подарочная табличка'],
     report: { at: T(-0.5), t: 'P1S: первый слой проверен, печать идёт без ошибок. K1: нить на исходе — нужна смена катушки.' },
@@ -761,12 +827,12 @@ const ROOMS = [
       { s: 'wait', b: 'Creality K1', t: 'Одноцветный. Управление: root и Moonraker. Нить на исходе.', w: 'printer:creality-k1' },
     ] },
   { id: 'content', code: '2.23', name: 'Контент-студия', short: 'Контент', role: 'Контент', agent: 'content', model: 'Sonnet', st: 'work', share: 0.75,
-    d: 'Контент-планы, карусели, сторис и Reels для @dream_houses.tj. Публикует через Metricool только то, что вы утвердили.',
+    d: 'Контент-планы, карусели, сторис и рилс для Инстаграма студии. Публикует только то, что вы утвердили.',
     task: { t: 'Карусель «Как печатаем архитектурный макет», 7 слайдов', p: 80, eta: T(0.6), due: T(1.3) },
     queue: ['Reels: процесс печати, 20 секунд', 'Сторис: до и после гостиной'],
     report: { at: T(-0.25), t: 'Тексты слайдов 1–7 готовы в голосе бренда. Ждут вашего утверждения к ' + T(1.3) + '.' },
     fact: { now: 'Определён. Metricool подключён.', need: 'Голос бренда записан (brand-voice.md).', where: '.claude/agents/content.md' } },
-  { id: 'crm', code: '2.31', name: 'CRM · DH OS', short: 'CRM', role: 'CRM · DH OS', agent: 'crm', model: 'Haiku', st: 'wait', share: 0.18,
+  { id: 'crm', code: '2.31', name: 'Учёт клиентов · DH OS', short: 'Клиенты', role: 'Учёт клиентов и задач', agent: 'crm', model: 'Haiku', st: 'wait', share: 0.18,
     d: 'Читает DH OS: задачи сотрудникам, статусы заявок, просрочки. Записывает только с вашего подтверждения.',
     task: { t: 'Сводка заявок за неделю', p: 35, eta: T(1.5) },
     blocker: { k: 'wait', t: 'Факт: вход для JARVIS в DH OS готов — MCP-сервер с ключом. Ждём ключ: вы выдадите его на ПК при установке.' },
@@ -781,20 +847,20 @@ const ROOMS = [
     report: { at: T(-3.2), t: 'Скриншоты сайта студии на трёх ширинах сохранены.' },
     fact: { now: 'Определён.', need: 'Playwright, этап 5.', where: '.claude/agents/browser.md' } },
   { id: 'secretary', code: '2.50', name: 'Секретарь', short: 'Секретарь', role: 'Секретарь', agent: 'secretary', model: 'Haiku', st: 'work', share: 0.07,
-    d: 'Дайджест в 08:00: календарь, письма, заявки, сроки и что ждёт вашего решения. Напоминания и отчёты — в Telegram.',
+    d: 'Дайджест в 08:00: календарь, письма, заявки, сроки и что ждёт вашего решения. Напоминания и отчёты — в Телеграм.',
     task: { t: 'Напоминания на завтра: замер и встреча с клиентом', p: 50, eta: T(0.5) },
     queue: ['Вечерняя сводка в Telegram'],
     report: { at: '08:00', t: 'Дайджест отправлен: 3 встречи, 5 писем, 1 решение за вами.' },
     fact: { now: 'Определён. Модель Haiku.', need: 'Telegram-бот.', where: '.claude/agents/secretary.md' } },
   { id: 'sysadmin', code: '2.51', name: 'Сисадмин', short: 'Сисадмин', role: 'Сисадмин', agent: 'sysadmin', model: 'Sonnet + скрипты', st: 'wait', share: 0.15,
-    d: 'Аудит диска без удаления, четыре корзины, порядок в файлах, поиск за секунду (Everything), бэкапы и режимы питания.',
+    d: 'Аудит диска без удаления, четыре корзины, порядок в файлах, быстрый поиск файлов, резервные копии и режимы питания.',
     task: { t: 'План переноса архива: 312 ГБ с C: на D:', p: 100, label: 'План готов, перенос заблокирован' },
     blocker: { k: 'wait', t: 'Заблокировано: диск D: ещё не установлен. Удаление файлов — только с вашего подтверждения.' },
     queue: ['Еженедельный бэкап brain/', 'Проверка здоровья SSD'],
     report: { at: T(-1.4), t: 'Аудит C: — 4 корзины: архив 312 ГБ, дубликаты 41 ГБ, кэш 18 ГБ, временное 9 ГБ. Ничего не удалено.' },
     fact: { now: 'Скрипт аудита проверен на тестовой папке.', need: 'Запуск на ПК; HDD.', where: 'skills/disk-audit/' } },
   { id: 'targetolog', code: '2.20', name: 'Таргет', short: 'Таргет', role: 'Таргетолог', agent: 'targetolog', model: 'Sonnet', st: 'work', share: 0.55, dept: 'mk',
-    d: 'Реклама в Instagram и Facebook: что работает, что сливает бюджет, что выключить и что усилить. Любое изменение рекламы — только после вашего «да».',
+    d: 'Реклама в Инстаграме и Фейсбуке: что работает, что сливает бюджет, что выключить и что усилить. Любое изменение рекламы — только после вашего «да».',
     task: { t: 'Разбор рекламы за неделю: что сливает бюджет', p: 55, eta: T(1.4) },
     queue: ['Три креатива для теста: макет с подсветкой', 'Отчёт: цена заявки по кампаниям'],
     report: { at: T(-0.7), t: 'Одна кампания из четырёх даёт 70 % заявок. Предложение: перенести в неё бюджет двух слабых — ждёт вашего решения.' },
@@ -806,13 +872,13 @@ const ROOMS = [
     report: { at: T(-1.0), t: 'Три канала на октябрь: Instagram, рекомендации клиентов, витрина макетов для застройщиков.' },
     fact: { now: 'Агент создан 3 октября.', need: 'Данные — после подключения Windsor.ai, Metricool и DH OS.', where: '.claude/agents/marketolog.md' } },
   { id: 'screenwriter', code: '2.22', name: 'Сценарии', short: 'Сценарии', role: 'Сценарист', agent: 'screenwriter', model: 'Sonnet', st: 'work', share: 0.36, dept: 'mk',
-    d: 'Сценарии Reels, сторис и коротких видео для @dream_houses.tj: хук в первую секунду, раскадровка, текст за кадром, подпись.',
+    d: 'Сценарии рилс, сторис и коротких видео для Инстаграма студии: хук в первую секунду, раскадровка, текст за кадром, подпись.',
     task: { t: 'Сценарий Reels: макет загорается квартира за квартирой', p: 40, eta: T(1.2) },
     queue: ['Сторис-серия: день в студии', 'Reels: до и после гостиной'],
     report: { at: T(-0.5), t: 'Раскадровка на 8 кадров готова, 18 секунд. Хук: свет гаснет — и загорается одна квартира.' },
     fact: { now: 'Агент создан 3 октября.', need: 'Данные — после подключения Windsor.ai, Metricool и DH OS.', where: '.claude/agents/screenwriter.md' } },
   { id: 'analyst', code: '2.24', name: 'Аналитика', short: 'Аналитика', role: 'Аналитик', agent: 'analyst', model: 'Sonnet', st: 'wait', share: 0.42, dept: 'mk',
-    d: 'Разбирает рекламу, Instagram, работу студии и конкурентов в Душанбе: что приносит заявки и договоры, где теряются клиенты.',
+    d: 'Разбирает рекламу, Инстаграм, работу студии и конкурентов в Душанбе: что приносит заявки и договоры, где теряются клиенты.',
     task: { t: 'Где теряются клиенты: от заявки до договора', p: 30, eta: T(3.0) },
     blocker: { k: 'wait', t: 'Ждёт данные: без DH OS и Windsor.ai выводы будут на примерных цифрах.' },
     queue: ['Обзор пяти конкурентов в Instagram', 'Какие посты приводят заявки'],
@@ -879,7 +945,7 @@ const ROOMS = [
       { s: 'work', b: 'Ядро jarviscore · 43 теста', t: 'Разрешения (можно, спросить, нельзя), правило удаления «три раза», счётчик света, планировщик с ресурсами, запуск Claude Code с учётом расходов, формат отчёта, хуки. Проверено тестами, на Windows не запускалось.', w: 'core/jarviscore/' },
       { s: 'work', b: 'Железо с запасом', t: 'i9 · 64 ГБ · RTX 3090: локальные модели, речь и голос без облака.', w: 'brain/20-me/profile.md' },
     ] },
-  { id: 'cloud', code: '2.60', name: 'Облачный павильон', short: 'Облако', role: 'Telegram-бот и очередь', agent: 'шлюз JARVIS', model: 'Без модели · Vercel + Supabase', st: 'work', share: 0, cloud: true,
+  { id: 'cloud', code: '2.60', name: 'Облачный павильон', short: 'Облако', role: 'Телеграм-бот и очередь', agent: 'шлюз JARVIS', model: 'Без модели · Vercel + Supabase', st: 'work', share: 0, cloud: true,
     d: 'Принимает задания с телефона голосом и текстом, фото планов и пересланные сообщения клиентов. Пока ПК выключен, держит их в очереди, потом ПК забирает всё сразу. Отвечает только вам.',
     task: { t: 'Очередь задач', p: 0, kind: 'queue' },
     queue: [],
@@ -889,8 +955,8 @@ const ROOMS = [
 const byId = Object.fromEntries(ROOMS.map((r) => [r.id, r]));
 /* ---------- отделы этажа агентов: этаж читается как компания ---------- */
 const DEPTS = [
-  { id: 'mgmt', name: 'Управление', rooms: ['jarvis', 'planner', 'strategist'] },
-  { id: 'prod', name: 'Производство', rooms: ['archicad', 'print', 'developer', 'tester'] },
+  { id: 'mgmt', name: 'Управление', rooms: ['jarvis', 'coach', 'planner', 'strategist'] },
+  { id: 'prod', name: 'Производство', rooms: ['archicad', 'archviz', 'print', 'developer', 'tester'] },
   { id: 'mk', name: 'Маркетинг', rooms: ['targetolog', 'marketolog', 'screenwriter', 'content', 'analyst'] },
   { id: 'sales', name: 'Продажи и клиенты', rooms: ['sales', 'crm', 'quality', 'academy'] },
   { id: 'money', name: 'Деньги и люди', rooms: ['finance', 'hr', 'procurement'] },
@@ -899,7 +965,7 @@ const DEPTS = [
 const deptOf = (id) => DEPTS.find((d) => d.rooms.includes(id));
 /* ---------- что уже автоматизировано в DH OS (по коду DH OS; работу JARVIS ещё не проверял) ---------- */
 const DHOS_SYS = [
-  ['Чат-бот клиентов', 'Instagram, WhatsApp и сайт: отвечает клиентам и собирает заявки', 'crm'],
+  ['Чат-бот клиентов', 'Инстаграм, Ватсап и сайт: отвечает клиентам и собирает заявки', 'crm'],
   ['Распределение заявок', 'новая заявка сразу попадает к ответственному', 'sales'],
   ['Напоминания клиентам', 'о замере, встрече и оплате этапа', 'sales'],
   ['Отчёт дня', 'что сделано и что сорвалось за день', 'secretary'],
@@ -915,8 +981,76 @@ const DHOS_SYS = [
   ['Курсы академии', 'группы, уроки и посещаемость DH Academy', 'academy'],
 ];
 
-const ORDER = ['jarvis', 'planner', 'strategist', 'developer', 'tester', 'archicad', 'print', 'targetolog', 'marketolog', 'screenwriter', 'content', 'analyst', 'sales', 'crm', 'quality', 'academy', 'finance', 'hr', 'procurement', 'secretary', 'sysadmin', 'browser', 'server', 'cloud', 'dhos'];
+const ORDER = ['jarvis', 'coach', 'planner', 'strategist', 'developer', 'tester', 'archicad', 'archviz', 'print', 'targetolog', 'marketolog', 'screenwriter', 'content', 'analyst', 'sales', 'crm', 'quality', 'academy', 'finance', 'hr', 'procurement', 'secretary', 'sysadmin', 'browser', 'server', 'cloud', 'dhos'];
 const MK_IDS = ['targetolog', 'marketolog', 'screenwriter', 'analyst', 'finance', 'strategist'];
+
+/* ---------- живой режим: правда из JARVIS (GET /api/office), опрос каждые 4 секунды ---------- */
+const LIVE = { on: false, data: null, agents: {}, sig: '', at: 0, fail: 0 };
+const POLL_MS = 4000;
+const agentIdOf = (r) => (!r ? null : r.id === 'jarvis' ? 'jarvis' : /^[a-z0-9]+$/.test(r.agent) ? r.agent : null);
+const roomOfAgent = (aid) => { const r = ROOMS.find((x) => agentIdOf(x) === aid); return r ? r.id : null; };
+const AGENT_ROOMS = ROOMS.filter((r) => agentIdOf(r)).map((r) => r.id);
+const N_AGENTS = AGENT_ROOMS.length - 1; /* без самого JARVIS */
+const ST_LIVE = { work: 'Работает', wait: 'Ждёт вашего ответа', idle: 'Свободен', off: 'Нет данных' };
+const LEG_LIVE = { work: 'Работают', wait: 'Ждут вас', idle: 'Свободны' };
+const cap = (s) => { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); };
+function liveAgent(id) { const aid = agentIdOf(byId[id]); return aid ? LIVE.agents[aid] || null : null; }
+function liveStatus(id) {
+  const r = byId[id]; if (!r) return 'off';
+  if (agentIdOf(r)) { const a = liveAgent(id); return a && (a.status === 'work' || a.status === 'wait') ? a.status : 'idle'; }
+  const d = LIVE.data || {};
+  if (id === 'server') return d.machine && Object.keys(d.machine).length ? 'idle' : 'off';
+  if (id === 'cloud') return d.jarvis && d.jarvis.telegram ? 'idle' : 'off';
+  return 'off';
+}
+function liveStName(id, st) {
+  if (agentIdOf(byId[id])) return ST_LIVE[st] || ST_LIVE.idle;
+  if (id === 'server') return st === 'off' ? 'Нет данных' : 'Включён';
+  if (id === 'cloud') return st === 'off' ? 'Не подключён' : 'Подключён';
+  return 'Нет данных';
+}
+function roleOf(id) { const a = liveAgent(id); return (LIVE.on && a && a.role) || (byId[id] || {}).role || id; }
+/* дата и время по Душанбе: «сегодня 14:05», «вчера 19:32», «19 октября, 10:15» */
+const dayKey = (ms) => { const d = loc(ms); return d.getUTCFullYear() * 400 + d.getUTCMonth() * 32 + d.getUTCDate(); };
+function fmtWhen(v) {
+  const ms = typeof v === 'number' ? v : Date.parse(v); if (!isFinite(ms)) return '—';
+  const k = dayKey(ms), now = Date.now();
+  if (k === dayKey(now)) return 'сегодня ' + hhmm(ms);
+  if (k === dayKey(now - DAY)) return 'вчера ' + hhmm(ms);
+  const d = loc(ms); return d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()] + (d.getUTCFullYear() !== loc(now).getUTCFullYear() ? ' ' + d.getUTCFullYear() : '') + ', ' + hhmm(ms);
+}
+function fmtShort(ms) { if (dayKey(ms) === dayKey(Date.now())) return hhmm(ms); if (dayKey(ms) === dayKey(Date.now() - DAY)) return 'вчера'; const d = loc(ms); return pad(d.getUTCDate()) + '.' + pad(d.getUTCMonth() + 1); }
+function fmtDate(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || '')); if (!m) return 'дата неизвестна';
+  return (+m[3]) + ' ' + MONTHS[+m[2] - 1] + (+m[1] !== loc(Date.now()).getUTCFullYear() ? ' ' + m[1] : '');
+}
+const PJ_ST = { active: ['work', 'идёт', 'Идёт работа'], done: ['free', 'готово', 'Готово'], quiet: ['wait', 'стоит', 'Стоит дольше 2 недель'] };
+const pjSt = (p) => PJ_ST[p && p.state] || PJ_ST.active;
+function liveCounts() {
+  const c = { work: 0, wait: 0, idle: 0 };
+  ((LIVE.data && LIVE.data.agents) || []).forEach((a) => { c[a.status === 'work' || a.status === 'wait' ? a.status : 'idle']++; });
+  return c;
+}
+const nAg = (n) => n + ' ' + plural(n, 'агент', 'агента', 'агентов');
+/* одна строка о комнате для экскурсии и подписей */
+function liveRoomLine(id) {
+  const a = liveAgent(id); if (!a) return 'Нет данных.';
+  let s = a.task ? cap(a.task.state_ru) + ': №' + a.task.id + ' «' + a.task.title + '».' : 'Задач нет — свободен.';
+  if (a.queue && a.queue.length) s += ' В очереди ' + a.queue.length + '.';
+  if (a.last) s += ' Последний отчёт — ' + fmtWhen(a.last.at) + ': «' + a.last.title + '».';
+  return s;
+}
+function deptLine(d) {
+  const w = [], q = [];
+  d.rooms.filter((id) => agentIdOf(byId[id])).forEach((id) => { const st = liveStatus(id); if (st === 'work') w.push(roleOf(id)); if (st === 'wait') q.push(roleOf(id)); });
+  if (!w.length && !q.length) return 'Все свободны — задач нет.';
+  return (q.length ? 'Ждут вашего ответа: ' + q.join(', ') + '. ' : '') + (w.length ? 'Работают: ' + w.join(', ') + '. ' : '') + 'Остальные свободны.';
+}
+function machineLine() {
+  const m = (LIVE.data && LIVE.data.machine) || {};
+  return 'Голос ' + (m.voice ? 'работает' : 'не отвечает') + ', локальная модель ' + (m.local_model ? 'работает' : 'не отвечает') +
+    (m.disk_free_gb != null ? ', на диске свободно ' + m.disk_free_gb + ' ГБ' : '') + (m.gpu_pct != null ? ', видеокарта занята на ' + m.gpu_pct + ' %' : '') + '.';
+}
 
 
 /* ---------- этаж 1: сотрудники студии — ДАННЫЕ, не код сцены.
@@ -939,7 +1073,7 @@ const STAFF = [
   { id: 'supervisor', name: null, now: 'Объект: проверка электрики', outfit: { style: 'workwear', top: '#b58a3c', bottom: '#4a433d', hair: 'short', hairColor: '#2b2420', skin: '#c2946b', acc: 'helmet' }, n: '05', role: 'Авторский надзор', gen: 'авторского надзора', short: 'Надзор', enumR: 'SUPERVISOR', zone: 'open', st: 'work',
     d: 'Следит на объекте, чтобы бригада строила по чертежам, а не «как привыкла». Надзор идёт весь срок ремонта — 8 месяцев.',
     tasks: [{ t: 'Выезд на объект: проверка электрики', due: 'пятница' }] },
-  { id: 'smm', name: null, now: 'Съёмка печати макета для Reels', outfit: { style: 'shirt', top: '#d4794e', bottom: '#3d3a36', hair: 'long', hairColor: '#2a1f1a', skin: '#e0bc98', acc: 'phone' }, n: '06', role: 'SMM (контент и реклама)', gen: 'SMM', short: 'SMM', enumR: 'SMM', zone: 'open', st: 'work',
+  { id: 'smm', name: null, now: 'Съёмка печати макета для Reels', outfit: { style: 'shirt', top: '#d4794e', bottom: '#3d3a36', hair: 'long', hairColor: '#2a1f1a', skin: '#e0bc98', acc: 'phone' }, n: '06', role: 'СММ (контент и реклама)', gen: 'СММ', short: 'СММ', enumR: 'SMM', zone: 'open', st: 'work',
     d: 'Контент и реклама @dream_houses.tj: съёмки, посты, Reels. Работает вместе с агентами контента, сценариев и таргета.',
     tasks: [{ t: 'Снять процесс печати макета для Reels', due: 'завтра' }] },
   { id: 'teacher', name: null, now: 'Урок: развёртки стен', outfit: { style: 'cardigan', top: '#7d6549', bottom: '#2f2b28', hair: 'short', hairColor: '#6b6259', skin: '#d2a882', acc: 'laptop' }, n: '07', role: 'Преподаватель DH Academy', gen: 'преподавателя DH Academy', short: 'Преподаватель', enumR: 'TEACHER', zone: 'academy', st: 'work',
@@ -1083,14 +1217,20 @@ const PTRIPS = [
 const QPOOL = ['Сделай планировку по фото, 64 м²', 'Напомни про замер завтра в 11:00', 'Сколько заявок за неделю?', 'Подготовь пост про макет коттеджа', 'Хватит ли нити на 12 тракторов?', 'Найди чертёж санузла с прошлой недели', 'Пришли сводку по просрочкам', 'Отрендерь кухню, второй ракурс', 'Ответь клиенту про сроки', 'Карусель про DH Academy', 'Запусти бэкап brain/', 'Скриншот сайта на телефоне'];
 
 /* ---------- состояние и шина событий ---------- */
-const state = { selected: null, view: 'overview', floor: 'all', pc: 'online', queue: [], k1Done: 18, p1sLayer: 212, gpu: 78, timeOverride: null, uptime0: NOW0 - (6 * H + 12 * 60e3) };
+const state = { selected: null, project: null, gpuKnown: true, view: 'overview', floor: 'all', pc: 'online', queue: [], k1Done: 18, p1sLayer: 212, gpu: 78, timeOverride: null, uptime0: NOW0 - (6 * H + 12 * 60e3) };
 const bus = {};
 const DH = window.DH = {
   ROOMS, byId, ORDER, DEPTS, deptOf, DHOS_SYS, ACADEMY, TASKS, RES, HANDOFFS, STAFF, PEOPLE, byPid, ZONES, PTRIPS, MK_IDS, entity, state, REDUCED,
   on(e, f) { (bus[e] || (bus[e] = [])).push(f); },
   emit(e, d) { (bus[e] || []).forEach((f) => { try { f(d); } catch (err) { console.error(err); } }); },
   statusOf, select, clearSelection, setView, setFloor, pushEvent: (r, t) => pushEvent(r, t),
-  sceneTime, ready: false,
+  sceneTime, ready: false, live: false, LIVE, agentIdOf, plural, N_AGENTS,
+  labelSub(id, st) {
+    if (agentIdOf(byId[id])) { const a = liveAgent(id); return (st === 'work' || st === 'wait') && a && a.task ? a.task.state_ru : st === 'wait' ? 'ждёт вашего ответа' : st === 'work' ? 'в работе' : 'свободен'; }
+    if (id === 'server') return st === 'off' ? 'нет данных' : 'компьютер включён';
+    if (id === 'cloud') return st === 'off' ? 'Телеграм не подключён' : 'Телеграм подключён';
+    return 'нет данных';
+  },
   sceneReady() { DH.ready = true; $('#loading').hidden = true; $('#nowebgl').hidden = true; },
   noWebGL() { if (DH.ready) return; $('#loading').hidden = true; $('#nowebgl').hidden = false; },
   k1Complete() {
@@ -1102,6 +1242,7 @@ const DH = window.DH = {
 };
 function pcOn() { return state.pc === 'online' || state.pc === 'stopping'; }
 function statusOf(id) {
+  if (LIVE.on) return liveStatus(id);
   const r = byId[id]; if (!r) return 'off';
   if (!pcOn() && !r.cloud && !r.always) return 'off';
   return r.st;
@@ -1114,6 +1255,7 @@ function sceneTime() {
 
 /* ---------- шапка ---------- */
 function renderKPIs() {
+  if (LIVE.on) return renderKPIsLive();
   const on = pcOn();
   const active = TASKS.filter((t) => (t.st === 'work' || t.st === 'risk') && statusOf(t.room) !== 'off').length;
   $('#k-work').textContent = active + 2;
@@ -1150,6 +1292,13 @@ function counts() {
 function pcounts() { const c = { work: 0, free: 0, late: 0 }; PEOPLE.forEach((p) => { c[p.st]++; }); return c; }
 function renderLegend() {
   const c = counts(), pc = pcounts();
+  if (LIVE.on) {
+    const lc = liveCounts();
+    const ag2 = ['work', 'wait', 'idle'].map((k) => '<span><i class="dot ' + k + '"></i>' + LEG_LIVE[k] + ' <b>' + lc[k] + '</b></span>').join('');
+    const pe2 = ['work', 'free', 'late'].map((k) => '<span><i class="dot ' + (k === 'late' ? 'bad' : k) + '"></i>' + PST[k] + ' <b>' + pc[k] + '</b></span>').join('');
+    $('#legend').innerHTML = state.floor === '1' ? '<span class="lg-h">Люди · пример</span>' + pe2 : state.floor === '2' ? ag2 : '<span class="lg-h">Агенты</span>' + ag2 + '<span class="lg-h">Люди · пример</span>' + pe2;
+    return;
+  }
   const ag = ['work', 'wait', 'bad', 'off'].map((k) => '<span><i class="dot ' + k + '"></i>' + ST[k] + ' <b>' + c[k] + '</b></span>').join('');
   const pe = ['work', 'free', 'late'].map((k) => '<span><i class="dot ' + (k === 'late' ? 'bad' : k) + '"></i>' + PST[k] + ' <b>' + pc[k] + '</b></span>').join('');
   $('#legend').innerHTML = state.floor === '1' ? '<span class="lg-h">Люди</span>' + pe : state.floor === '2' ? ag : '<span class="lg-h">Агенты</span>' + ag + '<span class="lg-h">Люди</span>' + pe;
@@ -1166,6 +1315,7 @@ function zoneTitle() {
   return parts.join(', ');
 }
 function renderHome() {
+  if (LIVE.on) return renderHomeLive();
   const c = counts(), total = ROOMS.length;
   const d = loc(Date.now());
   const bar = ['work', 'wait', 'bad', 'off'].filter((k) => c[k]).map((k) => '<i style="flex:' + c[k] + ';background:var(--' + { work: 'ok', wait: 'warn', bad: 'bad', off: 'off' }[k] + ')" title="' + ST[k] + ': ' + c[k] + '"></i>').join('');
@@ -1240,6 +1390,7 @@ function printerMeters() {
 }
 function renderRoom(id) {
   const r = byId[id]; if (!r) return;
+  if (LIVE.on) return renderRoomLive(id);
   const st = statusOf(id);
   const q = r.cloud ? state.queue.slice().reverse() : r.queue;
   const spend = r.local ? '0 $ <small>локально</small>' : r.cloud ? '0 $ <small>бесплатно</small>' : money(roomSpend(r));
@@ -1281,13 +1432,13 @@ function personCard(p) {
     (p.name ? '<p class="name-ph is-name">' + esc(p.name) + '</p>' : '<p class="name-ph">Имя придёт из DH OS</p>') +
     '<p class="lead">' + esc(p.d) + '</p>' +
     (p.now ? '<p class="now-line"><span>Сейчас</span>' + esc(p.now) + '</p>' : '') +
-    '<div class="sec-l"><span>Задачи сейчас</span><span>демо</span></div>' +
+    '<div class="sec-l"><span>Задачи сейчас</span><span>' + (LIVE.on ? 'пример' : 'демо') + '</span></div>' +
     '<ul class="ptasks">' + p.tasks.map((t) => '<li class="' + (t.late ? 'late' : t.done ? 'done' : t.fresh ? 'fresh' : '') + '"><b>' + esc(t.t) + '</b><span>' + esc(t.due) + '</span></li>').join('') + '</ul>' +
     '<dl class="facts">' +
     '<div><dt>В работе</dt><dd>' + open + ' <small>' + plural(open, 'задача', 'задачи', 'задач') + '</small></dd></div>' +
     '<div><dt>Просрочено</dt><dd' + (late ? ' style="color:var(--bad)"' : '') + '>' + late + '</dd></div>' +
-    '<div><dt>Роль в DH OS</dt><dd style="font-size:12.5px">' + p.enumR + '</dd></div>' +
-    '<div><dt>Задачи приходят</dt><dd style="font-size:12.5px">в Telegram от бота</dd></div>' +
+    '<div><dt>Роль в DH OS</dt><dd style="font-size:12.5px">' + esc(p.short) + '</dd></div>' +
+    '<div><dt>Задачи приходят</dt><dd style="font-size:12.5px">в Телеграм от бота</dd></div>' +
     '</dl>' +
     '<div class="sec-l"><span>Дать задание</span><span>через DH OS</span></div>' +
     '<form class="tform" id="tform" novalidate>' +
@@ -1295,8 +1446,8 @@ function personCard(p) {
     '<div class="tform-row"><div><label for="tk-due">Срок</label><input type="date" id="tk-due" value="' + tom + '"></div>' +
     '<button class="btn primary" type="submit" data-pid="' + p.id + '">Дать задание</button></div>' +
     '<p class="tform-err" id="tk-err" hidden></p></form>' +
-    '<div class="fact"><div class="eyebrow">По факту на 3 октября · не демо</div><dl>' +
-    '<dt>Сейчас</dt><dd>Роль есть в DH OS. Имени, задач и просрочек JARVIS пока не видит.</dd><dt>Нужно</dt><dd>Ключ DH OS на ПК (DHOS_AGENT_KEY).</dd><dt>Как</dt><dd>Задачи людям ставит агент CRM через DH OS — только после вашего «да».</dd></dl></div>' +
+    peopleNote('<div class="fact"><div class="eyebrow">По факту на 3 октября · не демо</div><dl>' +
+    '<dt>Сейчас</dt><dd>Роль есть в DH OS. Имени, задач и просрочек JARVIS пока не видит.</dd><dt>Нужно</dt><dd>Ключ DH OS на компьютере.</dd><dt>Как</dt><dd>Задачи людям ставит агент учёта клиентов через DH OS — только после вашего «да».</dd></dl></div>') +
     '<div class="card-actions"><button class="link-btn" type="button" data-act="back">← Ко всей студии</button></div>';
 }
 function zoneCard(z) {
@@ -1311,7 +1462,7 @@ function zoneCard(z) {
     (list.length ? '<div class="sec-l"><span>' + (z.id === 'open' ? 'Команда · ' + PEOPLE.length + ' мест' : 'Кто здесь') + '</span><span>демо</span></div><ul class="brief">' + list.map((p) => '<li data-room="p:' + p.id + '" tabindex="0"><span class="dot ' + (p.st === 'late' ? 'bad' : p.st) + '"></span><div><b>' + esc(p.role) + '</b>' + PST[p.st] + ' · ' + esc((p.tasks.find((t) => t.late) || p.tasks[0]).t) + '</div></li>').join('') + '</ul>' : '') +
     (z.id === 'academy' ? '<div class="sec-l"><span>Курс сейчас</span><span>демо</span></div><p class="now-line"><span>«' + esc(ACADEMY.course) + '»</span>урок «' + esc(ACADEMY.lesson) + '», ' + ACADEMY.students + ' ' + plural(ACADEMY.students, 'студент', 'студента', 'студентов') + '</p>' : '') +
     (z.book ? '<div class="sec-l"><span>Брони на сегодня</span><span>демо</span></div><ul class="rel">' + z.book.map((b) => '<li><span class="dot free"></span><div><b>' + b[0] + '</b> ' + esc(b[1]) + '</div></li>').join('') + '</ul>' : '') +
-    '<p class="note">Имена не выдумываем: на табличках роли из DH OS. Имена придут после подключения ключа.</p>' +
+    peopleNote('') + '<p class="note">Имена не выдумываем: на табличках роли из DH OS. Имена придут после подключения ключа.</p>' +
     '<div class="card-actions"><button class="link-btn" type="button" data-act="back">← Ко всему макету</button></div>';
 }
 function studentCard(n) {
@@ -1322,10 +1473,11 @@ function studentCard(n) {
     '<p class="name-ph">Имя придёт из DH OS</p>' +
     '<p class="lead">Сейчас урок: «' + esc(ACADEMY.lesson) + '». Курсы чертёжника и 3D-визуализатора, набор ежемесячно.</p>' +
     '<dl class="facts"><div><dt>Курс</dt><dd>' + esc(ACADEMY.course) + '</dd></div><div><dt>В группе</dt><dd>' + ACADEMY.students + ' <small>' + plural(ACADEMY.students, 'студент', 'студента', 'студентов') + '</small></dd></div></dl>' +
-    '<div class="fact"><div class="eyebrow">По факту на 3 октября · не демо</div><dl><dt>Сейчас</dt><dd>Курсы академии есть в DH OS по коду. Список студентов и посещаемость JARVIS ещё не видел.</dd><dt>Нужно</dt><dd>Ключ DH OS на ПК (DHOS_AGENT_KEY).</dd></dl></div>' +
+    peopleNote('<div class="fact"><div class="eyebrow">По факту на 3 октября · не демо</div><dl><dt>Сейчас</dt><dd>Курсы академии есть в DH OS по коду. Список студентов и посещаемость JARVIS ещё не видел.</dd><dt>Нужно</dt><dd>Ключ DH OS на компьютере.</dd></dl></div>') +
     '<div class="card-actions"><button class="link-btn" type="button" data-act="back">← Ко всей студии</button></div>';
 }
 function deptCard(d) {
+  if (LIVE.on) return deptCardLive(d);
   const c = { work: 0, wait: 0, bad: 0, off: 0 }; d.rooms.forEach((id) => { c[statusOf(id)]++; });
   $('#side-room').innerHTML =
     '<div class="eyebrow">Мои агенты · Отдел · ' + d.rooms.length + ' ' + plural(d.rooms.length, 'комната', 'комнаты', 'комнат') + '</div>' +
@@ -1338,6 +1490,7 @@ function renderSysGrid() {
   $('#sys-grid').innerHTML = DHOS_SYS.map((x, i) => '<li class="sys"><span class="sys-n">' + pad(i + 1) + '</span><div><b>' + esc(x[0]) + '</b><span>' + esc(x[1]) + '</span><button class="link-btn" type="button" data-room="' + x[2] + '">Агент: ' + esc(byId[x[2]].role) + ' →</button></div></li>').join('');
 }
 function renderSide() {
+  if (state.project != null && LIVE.on) { $('#side-home').hidden = true; $('#side-room').hidden = false; projectCard(state.project); return; }
   if (state.selected) {
     $('#side-home').hidden = true; $('#side-room').hidden = false;
     const id = state.selected;
@@ -1360,7 +1513,7 @@ function select(id, opts) {
   opts = opts || {};
   const ent = entity(id); if (!ent) return;
   if (state.floor !== 'all' && state.floor !== ent.floor) setFloor(ent.floor, true);
-  state.selected = id;
+  state.selected = id; state.project = null; markProject();
   renderSide();
   $('#side').scrollTop = 0;
   DH.emit('select', { id, fly: opts.fly !== false });
@@ -1371,6 +1524,7 @@ function select(id, opts) {
   }
 }
 function clearSelection(noCamera) {
+  state.project = null; markProject();
   state.selected = null; store.del('dh-office-sel'); renderSide();
   DH.emit('select', { id: null, fly: false });
   if (!noCamera) DH.emit('view', state.view);
@@ -1381,7 +1535,7 @@ function setView(v) {
   if (state.selected) { state.selected = null; store.del('dh-office-sel'); renderSide(); DH.emit('select', { id: null, fly: false }); }
   DH.emit('view', v);
 }
-$$('.seg-b').forEach((b) => b.addEventListener('click', () => { tourStop(); setView(b.dataset.view); }));
+$$('.seg-b').forEach((b) => b.addEventListener('click', () => { tourStop(); if (b.dataset.go) { $('#' + b.dataset.go).scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }); return; } setView(b.dataset.view); }));
 $$('.fl-b').forEach((b) => b.addEventListener('click', () => { tourStop(); setFloor(b.dataset.floor); }));
 $('#toast').addEventListener('click', () => { $('#toast').hidden = true; $('#side').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }); });
 $('#side').addEventListener('click', (e) => {
@@ -1391,6 +1545,7 @@ $('#side').addEventListener('click', (e) => {
     if (a === 'back') { tourStop(); clearSelection(); }
     if (a === 'tour') tourStart();
     if (a === 'problems') setView('problems');
+    if (a === 'projects') $('#projects').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
     if (a === 'gantt') { const id = state.selected; $('#gantt-block').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }); highlightGantt(id); }
     return;
   }
@@ -1408,12 +1563,12 @@ $('#side').addEventListener('submit', (e) => {
   const [yy, mm, dd] = due.split('-').map(Number);
   const dueTxt = dd + ' ' + MONTHS[mm - 1] + (yy !== loc(Date.now()).getUTCFullYear() ? ' ' + yy : '');
   openModal({
-    eyebrow: 'DH OS · задача сотруднику · демо', title: 'Создам задачу „' + what + '“ для ' + p.gen + ', срок ' + dueTxt + '. Подтвердите', small: true,
+    eyebrow: 'DH OS · задача сотруднику · ' + (LIVE.on ? 'пример' : 'демо'), title: 'Создам задачу „' + what + '“ для ' + p.gen + ', срок ' + dueTxt + '. Подтвердите', small: true,
     body: '', honest: null, ok: 'Подтвердить',
     onOk: () => {
       p.tasks.unshift({ t: what, due: 'срок ' + dueTxt + ' · новая, демо', fresh: true });
       pushEvent('crm', 'Задание для ' + p.gen + ': «' + what + '», срок ' + dueTxt + ' — демо, никуда не ушло');
-      openModal({ eyebrow: 'Демо', title: 'Задача не отправлена', body: 'В демо задача никуда не ушла. На ПК JARVIS отправит её через DH OS, и сотрудник получит её в Telegram от бота компании.', honest: null, ok: 'Понятно', noCancel: true });
+      openModal({ eyebrow: LIVE.on ? 'Пример' : 'Демо', title: 'Задача не отправлена', body: 'Это пример: задача никуда не ушла. Когда подключим DH OS, JARVIS отправит её туда, и сотрудник получит её в Телеграме от бота компании.', honest: null, ok: 'Понятно', noCancel: true });
       if (state.selected === 'p:' + p.id) renderSide();
     },
   });
@@ -1422,6 +1577,7 @@ $('#side').addEventListener('keydown', (e) => { const li = e.target.closest('li[
 
 /* ---------- полоса «Где проблемы» ---------- */
 function renderProblems() {
+  if (LIVE.on) return renderProblemsLive();
   const list = problems();
   const nBad = list.filter((p) => p.sev === 'bad').length;
   $('#pr-eyebrow').textContent = 'Где проблемы · ' + list.length + ' · критичных ' + nBad;
@@ -1456,6 +1612,7 @@ function renderGanttLegend() {
     '<span><i style="width:2px;height:12px;background:var(--champ);display:inline-block"></i>Сейчас</span>';
 }
 function renderGantt() {
+  if (LIVE.on) return;
   const svg = $('#gantt'), wrap = $('#g-scroll');
   const W = Math.max(820, Math.floor(wrap.clientWidth));
   const LW = wrap.clientWidth < 600 ? 178 : 226, PR = 18, TOP = 36;
@@ -1602,6 +1759,7 @@ $('#gantt').addEventListener('click', (e) => { const g = e.target.closest('.g-ro
 
 /* ---------- питание ПК ---------- */
 function renderPower() {
+  if (LIVE.on) return renderPowerLive();
   const s = state.pc, on = s === 'online';
   const label = { online: 'Онлайн', stopping: 'Завершает задачи', off: 'Выключен', booting: 'Включается…' }[s];
   const dot = { online: 'work', stopping: 'wait', off: 'off', booting: 'wait' }[s];
@@ -1699,7 +1857,7 @@ function renderDHOS() {
 
 /* ---------- «Скажите Джарвису»: разбор по ключевым словам (демо) ---------- */
 const SAY_PEOPLE = { owner: ['руководител', 'владельц', 'владелец'], manager: ['менеджер'], designer: ['дизайнер', 'проектировщик'], viz: ['визуализатор'], supervisor: ['надзор'], smm: ['smm', 'смм'], teacher: ['преподавател', 'учител'], maker: ['макетчик'] };
-const SAY_AGENTS = { targetolog: ['таргетолог', 'таргет'], marketolog: ['маркетолог'], screenwriter: ['сценарист'], content: ['контент-студи', 'контентщик'], analyst: ['аналитик'], finance: ['финансист', 'финансам', 'финансы'], hr: ['кадрам', 'кадры', 'кадров', 'hr'], procurement: ['снабжен'], sales: ['продажам', 'продажник', 'отдел продаж'], quality: ['отдел качеств', 'контролю качества'], academy: ['академи'], planner: ['планировщик'], developer: ['разработчик', 'программист'], tester: ['тестировщик'], archicad: ['archicad', 'архикад'], print: ['принтер', '3d-печат'], crm: ['crm', 'срм'], browser: ['браузер'], secretary: ['секретар'], sysadmin: ['сисадмин', 'админ'], strategist: ['стратег'] };
+const SAY_AGENTS = { targetolog: ['таргетолог', 'таргет'], marketolog: ['маркетолог'], screenwriter: ['сценарист'], content: ['контент-студи', 'контентщик'], analyst: ['аналитик'], finance: ['финансист', 'финансам', 'финансы'], hr: ['кадрам', 'кадры', 'кадров', 'hr'], procurement: ['снабжен'], sales: ['продажам', 'продажник', 'отдел продаж'], quality: ['отдел качеств', 'контролю качества'], academy: ['академи'], planner: ['планировщик'], developer: ['разработчик', 'программист'], tester: ['тестировщик'], archicad: ['archicad', 'архикад'], print: ['принтер', '3d-печат'], crm: ['crm', 'срм'], browser: ['браузер'], coach: ['наставник'], archviz: ['визуализаци'], secretary: ['секретар'], sysadmin: ['сисадмин', 'админ'], strategist: ['стратег'] };
 const SAY_TOPICS = { marketolog: ['контент-план', 'контент план', 'продвижен', 'оффер', 'акци'], targetolog: ['реклам', 'кампани'], screenwriter: ['сценари', 'reels', 'рилс', 'сторис', 'ролик', 'видео'], content: ['пост', 'карусел', 'публикац'], analyst: ['конкурент', 'анализ', 'статистик'], finance: ['прибыл', 'план месяца', 'бюджет', 'выручк', 'деньг'], hr: ['ваканси', 'подбор', 'собеседован', 'новичк', 'рабочее время', 'нагрузк'], procurement: ['смет', 'поставщик', 'материал', 'закуп', 'пластик', 'нить'], quality: ['отзыв', 'гарант', 'качеств'], academy: ['студент', 'курс', 'урок', 'набор'], archicad: ['планировк', 'чертеж', 'чертёж'], print: ['печат', '3d', 'модел'], developer: ['код', 'сайт'], tester: ['провер', 'тест'], secretary: ['напомн', 'календар', 'встреч', 'письм', 'дайджест'], sysadmin: ['диск', 'бэкап', 'файл', 'компьютер'], strategist: ['совет', 'стратеги', 'рост'], sales: ['заявк', 'кп', 'коммерческ', 'дожим', 'клиент'] };
 const MONTHS_RE = MONTHS.join('|');
 function sayFind(text, dict) { let best = null; for (const id in dict) for (const k of dict[id]) { const i = text.indexOf(k); if (i >= 0 && (!best || i < best.i)) best = { id, i, k }; } return best; }
@@ -1727,7 +1885,7 @@ function sayParse(raw) {
     .replace(/(?<!\p{L})(задачу|задачи|задание|поручение)(?!\p{L})\s*/iu, '').replace(/^\s*(чтобы|:|—|-)\s*/i, '').replace(/\s{2,}/g, ' ').trim().replace(/[.,;!]+$/, '');
   if (w.length < 3) w = raw.trim();
   w = w.charAt(0).toUpperCase() + w.slice(1);
-  if (kind === 'person') { const p = byPid[hit.id]; return { kind, id: 'p:' + p.id, p, what: w, due: due || 'не указан — поставлю на завтра', to: p.role + ' · реальный офис, место ' + p.n, via: 'DH OS → Telegram от бота компании, после вашего «да»' }; }
+  if (kind === 'person') { const p = byPid[hit.id]; return { kind, id: 'p:' + p.id, p, what: w, due: due || 'не указан — поставлю на завтра', to: p.role + ' · реальный офис, место ' + p.n, via: 'DH OS → Телеграм от бота компании, после вашего «да»' }; }
   const r = byId[hit.id]; return { kind, id: r.id, r, what: w, due: due || 'не указан — поставлю на завтра', to: r.role + ' · мои агенты, пом. ' + r.code + ' · ' + ((deptOf(r.id) || {}).name || ''), via: 'Очередь JARVIS на ПК → агент «' + r.role + '»' };
 }
 let sayPending = null;
@@ -1748,14 +1906,13 @@ $('#say-card').addEventListener('click', (e) => {
   const b = e.target.closest('[data-say]'); if (!b) return;
   const r = sayPending; $('#say-card').hidden = true; sayPending = null;
   if (b.dataset.say !== 'ok' || !r) return;
-  if (r.kind === 'person') r.p.tasks.unshift({ t: r.what, due: r.due + ' · новая, демо', fresh: true });
-  else r.r.queue.unshift(r.what + ' (новая, демо)');
+  if (!LIVE.on) { if (r.kind === 'person') r.p.tasks.unshift({ t: r.what, due: r.due + ' · новая, демо', fresh: true }); else r.r.queue.unshift(r.what + ' (новая, демо)'); }
   const ent = entity(r.id);
   if (state.floor !== 'all' && ent && ent.floor !== state.floor) setFloor('all');
   DH.emit('say-send', { id: r.id });
   pushEvent(r.kind === 'person' ? r.id : r.id, 'Задание: «' + r.what + '», ' + r.due + ' — демо, никуда не ушло');
   const h = $('#say-honest');
-  h.textContent = 'Демо: задача «' + r.what + '» никуда не ушла — коробочка полетела на макете. В реальном режиме задача людям уходит через DH OS в Telegram от бота компании, агентам — в очередь JARVIS на ПК. Каждая — после вашего «да».';
+  h.textContent = (LIVE.on ? 'Пример: задача «' + r.what + '» никуда не ушла — коробочка только пролетела по макету. Настоящую задачу агенту ставьте в окне JARVIS.' : 'Демо: задача «' + r.what + '» никуда не ушла — коробочка полетела на макете. В реальном режиме задача людям уходит через DH OS в Телеграм от бота компании, агентам — в очередь JARVIS. Каждая — после вашего «да».');
   h.hidden = false; $('#say-in').value = '';
   if (state.selected === r.id) renderSide();
 });
@@ -1763,6 +1920,7 @@ $('#say-ex').addEventListener('click', (e) => { e.preventDefault(); $('#say-in')
 
 /* ---------- план месяца (демо) ---------- */
 function renderMonth() {
+  if (LIVE.on) return;
   const d = loc(Date.now()), day = d.getUTCDate(), N = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
   const k = day / N;
   const oPlan = 12, oFact = Math.max(0, Math.round(oPlan * k * 0.85)), oFc = Math.round(oFact / Math.max(k, 0.05));
@@ -1785,12 +1943,14 @@ function renderMonth() {
 const feed = [];
 let feedPaused = false;
 function pushEvent(room, text, ts) {
+  if (LIVE.on) return; /* в живом режиме лента строится только из данных JARVIS */
   feed.unshift({ room, text, ts: ts || Date.now(), fresh: !ts });
   if (feed.length && !byId[room] && !String(room).startsWith('p:')) feed[0].room = 'jarvis';
   if (feed.length > 9) feed.length = 9;
   renderFeed();
 }
 function renderFeed() {
+  if (LIVE.on) return renderFeedLive();
   $('#feed').innerHTML = feed.map((f) => '<li class="' + (f.fresh ? 'new' : '') + '"><time>' + hhmm(f.ts) + '</time><div><span class="who">' + esc((entity(f.room) || {}).short || 'JARVIS') + '</span>' + esc(f.text) + '</div></li>').join('');
   feed.forEach((f) => { f.fresh = false; });
 }
@@ -1824,19 +1984,19 @@ const POOL = [
 ];
 let lastPool = -1;
 function feedTick() {
-  if (feedPaused || document.hidden) return;
+  if (feedPaused || document.hidden || LIVE.on) return;
   const pool = pcOn() ? POOL : POOL.filter((p) => p[0] === 'print' || p[0] === 'cloud');
   let i; do { i = Math.floor(Math.random() * pool.length); } while (pool.length > 1 && pool[i] === POOL[lastPool]);
   lastPool = POOL.indexOf(pool[i]);
   pushEvent(pool[i][0], pool[i][1]());
 }
 $('#feed-pause').addEventListener('click', () => { feedPaused = !feedPaused; $('#feed-pause').textContent = feedPaused ? 'Дальше' : 'Пауза'; $('#feed-live').textContent = feedPaused ? 'Имитация · на паузе' : 'Имитация · обновляется сама'; });
-DH.on('handoff', (h) => { if (!feedPaused) pushEvent(h.from, h.text); });
+DH.on('handoff', (h) => { if (!feedPaused && !LIVE.on) pushEvent(h.from, h.text); });
 DH.on('ptrip', (h) => { if (!feedPaused) pushEvent('p:' + h.from, h.text); });
 
 /* ---------- экскурсия: ярлык → заголовок → факты → действие ---------- */
 const TOUR = [
-  { view: 'overview', floor: 'all', eb: 'Общий вид · два офиса рядом', title: 'Офис Dream House — макет под стеклом', text: () => 'Слева реальный офис: команда студии и DH Academy. Справа мои агенты: JARVIS и 21 агент в шести отделах. Между ними мост и павильон DH OS — по ним задачи идут людям. Подсветка комнаты — её состояние: зелёная работает, янтарная ждёт, красная — проблема.', act: 'Показать проблемы →', go: () => setView('problems') },
+  { view: 'overview', floor: 'all', eb: 'Общий вид · два офиса рядом', title: 'Офис Dream House — макет под стеклом', text: () => 'Слева реальный офис: команда студии и DH Academy. Справа мои агенты: JARVIS и ' + nAg(N_AGENTS) + ' в шести отделах. Между ними мост и павильон DH OS — по ним задачи идут людям. Подсветка комнаты — её состояние: зелёная работает, янтарная ждёт, красная — проблема.', act: 'Показать проблемы →', go: () => setView('problems') },
   { view: 'overview', floor: '1', eb: 'Реальный офис · Dream House', title: 'Команда в одном зале', text: () => '8 мест — по одному на роль из DH OS. Кольцо у фигурки: зелёное — на задаче, шампань — свободен, красное — просрочка. Имена придут из DH OS.', act: 'Открыть место менеджера →', open: 'p:manager' },
   { room: 'jarvis', eb: 'Пом. 2.00 · Кабинет JARVIS', title: 'Управляющий раздаёт задачи', text: () => 'Модель Opus. Сейчас — разбор голосового задания, 60 %. В очереди 3 задачи: протокол проверки, заказ на печать, вечерний отчёт.', act: 'Открыть карточку →' },
   { rooms: ['planner', 'developer', 'tester'], eb: 'Пом. 2.01 · 2.10–2.11 · план → код → проверка', title: 'План → код → проверка', text: () => 'Белая коробочка — задача. Планировщик передаёт ТЗ разработчику, тот сдаёт сборку на проверку. Сейчас проверка вернула шлюз: 2 из 9 критериев не прошли.', act: 'Открыть проверку →', open: 'tester' },
@@ -1850,14 +2010,24 @@ const TOUR = [
   { room: 'cloud', eb: 'Пом. 2.60 · Облачный павильон', title: 'Связь, когда ПК выключен', text: () => 'Telegram-бот и очередь на Vercel и Supabase. Выключите ПК в карточке «Питание ПК» — задачи начнут копиться здесь.', act: 'К питанию ПК ↓', go: () => $('#power').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'center' }) },
   { view: 'problems', eb: 'Итог', title: 'Где проблемы', text: () => { const l = problems(); return l.length + ' пунктов, критичных ' + l.filter((p) => p.sev === 'bad').length + '. У каждого — кнопка «Показать»: камера подлетит к комнате.'; }, act: 'К списку проблем ↓', go: () => $('#problems').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }) },
 ];
+/* экскурсия в живом режиме: только правда из JARVIS, без придуманных задач */
+const TOUR_LIVE = [
+  { view: 'overview', floor: 'all', eb: 'Общий вид · два офиса рядом', title: 'Офис Dream House — макет под стеклом', text: () => 'Справа мои агенты: JARVIS и ' + nAg(N_AGENTS) + ' в шести отделах — это живые данные. Подсветка комнаты: зелёная — работает, янтарная — ждёт вашего ответа, серая — свободен. Слева реальный офис людей — пока пример, подключится вместе с DH OS.', act: 'Кто ждёт вас →', go: () => setView('problems') },
+  { view: 'overview', floor: '1', eb: 'Реальный офис · пример', title: 'Команда студии', text: () => 'Места по ролям из DH OS. Имён, задач и просрочек сотрудников JARVIS пока не видит — это пример, подключится вместе с DH OS.', act: 'Открыть общий зал →', open: 'z:open' },
+  { room: 'jarvis', eb: 'Пом. 2.00 · Кабинет JARVIS', title: 'Управляющий', text: () => liveRoomLine('jarvis'), act: 'Открыть карточку →' },
+  ...DEPTS.map((d) => ({ rooms: d.rooms.filter((id) => agentIdOf(byId[id])), floor: '2', eb: 'Отдел · ' + d.name, title: d.name, text: () => deptLine(d), act: 'Открыть отдел →', open: 'd:' + d.id })),
+  { room: 'server', eb: 'Пом. 2.53 · Компьютер', title: 'Здоровье компьютера', text: () => machineLine(), act: 'Открыть карточку →' },
+  { view: 'problems', eb: 'Итог', title: 'Кто ждёт вашего ответа', text: () => { const c = liveCounts(); return c.wait ? 'Ждут вашего ответа: ' + nAg(c.wait) + '. У каждого — кнопка «Показать»: камера подлетит к комнате.' : 'Никто не ждёт вашего ответа. Работают: ' + nAg(c.work) + '.'; }, act: 'К списку ↓', go: () => $('#problems').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }) },
+];
+const TL = () => (LIVE.on ? TOUR_LIVE : TOUR);
 const tour = { on: false, i: 0, play: false, t: 0, last: 0, dur: 7600 };
 function tourShow() {
-  const s = TOUR[tour.i];
-  $('#t-eyebrow').textContent = 'Экскурсия · ' + pad(tour.i + 1) + ' / ' + pad(TOUR.length) + ' · ' + s.eb;
+  const s = TL()[tour.i];
+  $('#t-eyebrow').textContent = 'Экскурсия · ' + pad(tour.i + 1) + ' / ' + pad(TL().length) + ' · ' + s.eb;
   $('#t-title').textContent = s.title;
   $('#t-text').textContent = s.text();
   $('#t-act').textContent = s.act;
-  $('#t-next').textContent = tour.i === TOUR.length - 1 ? 'Сначала' : 'Дальше →';
+  $('#t-next').textContent = tour.i === TL().length - 1 ? 'Сначала' : 'Дальше →';
   if (s.floor) setFloor(s.floor, true);
   if (s.room) select(s.room, { silent: true });
   else if (s.rooms) { if (state.selected) clearSelection(true); DH.emit('focus', { rooms: s.rooms }); }
@@ -1874,17 +2044,17 @@ function tourTick(ts) {
   const dt = ts - tour.last; tour.last = ts;
   if (tour.play) {
     tour.t += dt;
-    if (tour.t >= tour.dur) { if (tour.i < TOUR.length - 1) { tour.i++; tourShow(); } else { tour.play = false; tour.t = tour.dur; $('#t-pause').textContent = 'Дальше'; } }
+    if (tour.t >= tour.dur) { if (tour.i < TL().length - 1) { tour.i++; tourShow(); } else { tour.play = false; tour.t = tour.dur; $('#t-pause').textContent = 'Дальше'; } }
   }
   $('#t-prog').style.width = Math.min(100, tour.t / tour.dur * 100) + '%';
   requestAnimationFrame(tourTick);
 }
 $('#tour-btn').addEventListener('click', () => (tour.on ? tourStop() : tourStart()));
 $('#t-close').addEventListener('click', () => { tourStop(); setView('overview'); });
-$('#t-next').addEventListener('click', () => { tour.i = tour.i < TOUR.length - 1 ? tour.i + 1 : 0; tour.play = true; $('#t-pause').textContent = 'Пауза'; tourShow(); });
+$('#t-next').addEventListener('click', () => { tour.i = tour.i < TL().length - 1 ? tour.i + 1 : 0; tour.play = true; $('#t-pause').textContent = 'Пауза'; tourShow(); });
 $('#t-prev').addEventListener('click', () => { tour.i = Math.max(0, tour.i - 1); tourShow(); });
 $('#t-pause').addEventListener('click', () => { tour.play = !tour.play; $('#t-pause').textContent = tour.play ? 'Пауза' : 'Дальше'; });
-$('#t-act').addEventListener('click', () => { const s = TOUR[tour.i]; tour.play = false; $('#t-pause').textContent = 'Дальше'; if (s.go) s.go(); else select(s.open || s.room); });
+$('#t-act').addEventListener('click', () => { const s = TL()[tour.i]; tour.play = false; $('#t-pause').textContent = 'Дальше'; if (s.go) s.go(); else select(s.open || s.room); });
 DH.on('user', () => { if (tour.on && tour.play) { tour.play = false; $('#t-pause').textContent = 'Дальше'; } });
 
 /* ---------- время суток на макете ---------- */
@@ -1901,6 +2071,227 @@ DH.theme = theme;
 $('#theme-btn').addEventListener('click', () => { const next = theme() === 'dark' ? 'light' : 'dark'; root.setAttribute('data-theme', next); store.set('dh-office-theme', next); });
 new MutationObserver(() => { themeIcon(); DH.emit('theme'); }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { themeIcon(); DH.emit('theme'); });
+
+/* ---------- живой режим: отрисовка из данных JARVIS ---------- */
+function peopleNote(demoHtml) {
+  if (!LIVE.on) return demoHtml;
+  return '<div class="fact"><div class="eyebrow" style="color:var(--warn)">Пример · подключится вместе с DH OS</div><p class="note" style="margin:6px 0 0">Реальный офис людей пока пример: имён, задач и просрочек сотрудников JARVIS не видит. Живые данные появятся вместе с DH OS.</p></div>';
+}
+function healthItems(m) {
+  m = m || {};
+  return [
+    ['Голос', m.voice ? 'работает' : 'не отвечает', m.voice ? 'work' : 'wait'],
+    ['Локальная модель', m.local_model ? 'работает' : 'не отвечает', m.local_model ? 'work' : 'wait'],
+    ['Диск: свободно', m.disk_free_gb != null ? m.disk_free_gb + ' ГБ' : 'нет данных', m.disk_free_gb == null ? 'off' : m.disk_free_gb < 30 ? 'wait' : 'work'],
+    ['Видеокарта занята', m.gpu_pct != null ? m.gpu_pct + ' %' : 'нет данных', m.gpu_pct == null ? 'off' : 'work'],
+  ];
+}
+function renderKPIsLive() {
+  const c = liveCounts(), j = (LIVE.data && LIVE.data.jarvis) || {}, m = (LIVE.data && LIVE.data.machine) || {};
+  const set = (id, v) => { const e = $('#' + id); if (e) e.textContent = v; };
+  set('lk-work', c.work); set('lk-wait', c.wait); set('lk-idle', c.idle); set('lk-done', j.done_today || 0);
+  set('lk-work-s', plural(c.work, 'агент', 'агента', 'агентов')); set('lk-wait-s', plural(c.wait, 'агент', 'агента', 'агентов'));
+  set('lk-idle-s', plural(c.idle, 'агент', 'агента', 'агентов')); set('lk-done-s', plural(j.done_today || 0, 'задача', 'задачи', 'задач'));
+  const w = $('#lk-work'); if (w) w.classList.toggle('ok', c.work > 0);
+  const hl = $('#lk-pc'); if (hl) hl.innerHTML = healthItems(m).map((h) => '<span title="' + esc(h[0] + ': ' + h[1]) + '"><i class="dot ' + h[2] + '"></i>' + esc(h[0] === 'Диск: свободно' ? 'Диск' : h[0] === 'Видеокарта занята' ? 'Видеокарта' : h[0] === 'Локальная модель' ? 'Модель' : h[0]) + (h[0].startsWith('Диск') || h[0].startsWith('Видео') ? ' <b>' + esc(h[1]) + '</b>' : '') + '</span>').join('');
+}
+function renderHomeLive() {
+  const c = liveCounts(), j = LIVE.data.jarvis || {}, d = loc(Date.now()), total = c.work + c.wait + c.idle;
+  const parts = [];
+  if (c.wait) parts.push(c.wait + ' ' + plural(c.wait, 'ждёт', 'ждут', 'ждут') + ' вашего ответа');
+  if (c.work) parts.push(c.work + ' ' + plural(c.work, 'работает', 'работают', 'работают'));
+  const title = parts.length ? parts.join(', ') : 'Все агенты свободны — задач нет';
+  const bar = ['work', 'wait', 'idle'].filter((k) => c[k]).map((k) => '<i style="flex:' + c[k] + ';background:var(--' + { work: 'ok', wait: 'warn', idle: 'line-2' }[k] + ')" title="' + LEG_LIVE[k] + ': ' + c[k] + '"></i>').join('');
+  const busy = LIVE.data.agents.filter((a) => a.status === 'wait' || a.status === 'work').sort((a, b) => (a.status === 'wait' ? 0 : 1) - (b.status === 'wait' ? 0 : 1));
+  const lasts = LIVE.data.agents.filter((a) => a.last && isFinite(Date.parse(a.last.at))).sort((a, b) => Date.parse(b.last.at) - Date.parse(a.last.at)).slice(0, 3);
+  const li = (room, dot, b, t) => '<li data-room="' + room + '" tabindex="0"><span class="dot ' + dot + '"></span><div><b>' + esc(b) + '</b>' + esc(t) + '</div></li>';
+  $('#side-home').innerHTML =
+    '<div class="eyebrow">Сводка · ' + DAYS[d.getUTCDay()] + ', ' + d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()] + ' · живые данные</div>' +
+    '<h2>' + esc(title) + '</h2>' +
+    '<div class="zonebar" aria-hidden="true">' + bar + '</div>' +
+    '<div class="zonelegend">' + ['work', 'wait', 'idle'].map((k) => '<span><i class="dot ' + k + '"></i>' + LEG_LIVE[k] + ' <b>' + c[k] + '</b></span>').join('') + '<span>из ' + total + '</span></div>' +
+    '<div class="sec-l"><span>Сейчас</span><span>' + busy.length + '</span></div>' +
+    (busy.length ? '<ul class="brief">' + busy.map((a) => li(roomOfAgent(a.id) || 'jarvis', a.status, a.role + ' · ' + (a.task ? a.task.state_ru : ST_LIVE[a.status].toLowerCase()), a.task ? '№' + a.task.id + ' · ' + a.task.title : '')).join('') + '</ul>' : '<p class="note" style="margin:0">Задач в работе нет — все свободны.</p>') +
+    '<div class="sec-l"><span>Последние отчёты</span><span>' + lasts.length + '</span></div>' +
+    (lasts.length ? '<ul class="brief">' + lasts.map((a) => li(roomOfAgent(a.id) || 'jarvis', 'idle', a.role + ' · ' + fmtWhen(a.last.at), '№' + a.last.id + ' · ' + a.last.title)).join('') + '</ul>' : '<p class="note" style="margin:0">Отчётов пока нет.</p>') +
+    '<dl class="facts"><div><dt>Открыто задач</dt><dd>' + (j.open || 0) + '</dd></div><div><dt>Выполняются</dt><dd>' + (j.running || 0) + '</dd></div><div><dt>Ждут вас</dt><dd>' + (j.waiting || 0) + '</dd></div><div><dt>Сделано сегодня</dt><dd>' + (j.done_today || 0) + '</dd></div></dl>' +
+    '<div class="card-actions"><button class="btn primary" type="button" data-act="tour">Начать экскурсию →</button><button class="btn" type="button" data-act="problems">Кто ждёт вас</button><button class="btn" type="button" data-act="projects">Проекты ↓</button></div>' +
+    '<p class="note">Нажмите на комнату на макете: задача, очередь и последний отчёт агента. Обновляется каждые 4 секунды.</p>';
+}
+function liveTaskBlock(a, st) {
+  if (!a || !a.task) return '<div class="task free"><b>Задач нет — свободен</b></div>';
+  return '<div class="task st-' + st + '"><div class="task-sub lv">' + esc(a.task.state_ru || ST_LIVE[st]) + '</div><b>№' + esc(a.task.id) + ' · ' + esc(a.task.title) + '</b></div>';
+}
+function liveReport(last) {
+  if (!last) return '<p class="note" style="margin:0">Отчётов пока нет.</p>';
+  return '<div class="report"><b>№' + esc(last.id) + ' · ' + esc(last.title) + '</b>' + (last.text ? '<span>' + esc(last.text) + '</span>' : '') + '</div>';
+}
+function renderRoomLive(id) {
+  const r = byId[id], st = statusOf(id), dept = (deptOf(id) || {}).name || '';
+  const back = '<div class="card-actions"><button class="link-btn" type="button" data-act="back">← Ко всему макету</button></div>';
+  const head = (h2, pill, lead) => '<div class="eyebrow">Пом. ' + r.code + ' · ' + esc(dept) + ' · ' + esc(r.name) + '</div><h2>' + esc(h2) + '</h2>' +
+    '<div class="pills"><span class="pill ' + st + '"><span class="dot ' + st + '"></span>' + esc(pill) + '</span></div>' + (lead ? '<p class="lead">' + esc(lead) + '</p>' : '');
+  const j = LIVE.data.jarvis || {};
+  let html;
+  if (id === 'server') {
+    html = head('Компьютер', liveStStr(id, st), 'Здесь работает JARVIS: голос, локальная модель и все агенты.') +
+      '<div class="sec-l"><span>Здоровье</span><span>живые данные</span></div><ul class="hl-list">' + healthItems(LIVE.data.machine).map((h) => '<li><span class="dot ' + h[2] + '"></span><span>' + esc(h[0]) + '</span><b>' + esc(h[1]) + '</b></li>').join('') + '</ul>' +
+      '<p class="note">Нагрузку процессора и памяти JARVIS пока не передаёт — здесь только то, что он отдаёт на самом деле.</p>';
+  } else if (id === 'cloud') {
+    html = head('Телеграм-бот', liveStStr(id, st), j.telegram ? 'Принимает задания с телефона и передаёт их JARVIS.' : 'Бот не подключён. Задания пока ставятся в окне JARVIS на компьютере.') +
+      '<dl class="facts"><div><dt>Открыто задач</dt><dd>' + (j.open || 0) + '</dd></div><div><dt>Выполняются</dt><dd>' + (j.running || 0) + '</dd></div><div><dt>Ждут вас</dt><dd>' + (j.waiting || 0) + '</dd></div><div><dt>Сделано сегодня</dt><dd>' + (j.done_today || 0) + '</dd></div></dl>';
+  } else if (!agentIdOf(r)) {
+    html = head('Системы DH OS', 'Нет данных', 'Что в DH OS автоматизировано по коду. Живых данных пока нет — подключится вместе с DH OS.') + taskBlock(r, 'off');
+  } else {
+    const a = liveAgent(id), q = (a && a.queue) || [];
+    html = head((a && a.role) || r.role, ST_LIVE[st], r.d) +
+      '<div class="sec-l"><span>Сейчас</span><span>живые данные</span></div>' + liveTaskBlock(a, st) +
+      '<dl class="facts"><div><dt>Сделано сегодня</dt><dd>' + ((a && a.done_today) || 0) + ' <small>' + plural((a && a.done_today) || 0, 'задача', 'задачи', 'задач') + '</small></dd></div>' +
+      '<div><dt>В очереди</dt><dd>' + q.length + ' <small>' + plural(q.length, 'задача', 'задачи', 'задач') + '</small></dd></div>' +
+      (id === 'jarvis' ? '<div><dt>Открыто всего</dt><dd>' + (j.open || 0) + '</dd></div><div><dt>Ждут вас</dt><dd>' + (j.waiting || 0) + '</dd></div>' : '') + '</dl>' +
+      '<div class="sec-l"><span>Очередь</span><span>' + q.length + '</span></div>' +
+      (q.length ? '<ol class="queue">' + q.map((x) => '<li>№' + esc(x.id) + ' · ' + esc(x.title) + '</li>').join('') + '</ol>' : '<p class="note" style="margin:0">Пусто.</p>') +
+      '<div class="sec-l"><span>Последний отчёт</span><span>' + (a && a.last ? esc(fmtWhen(a.last.at)) : '—') + '</span></div>' + liveReport(a && a.last);
+  }
+  $('#side-room').innerHTML = html + back;
+}
+const liveStStr = (id, st) => liveStName(id, st);
+function deptCardLive(d) {
+  const ids = d.rooms, c = { work: 0, wait: 0, idle: 0, off: 0 }; ids.forEach((id) => { c[statusOf(id)]++; });
+  $('#side-room').innerHTML =
+    '<div class="eyebrow">Мои агенты · Отдел · ' + ids.length + ' ' + plural(ids.length, 'комната', 'комнаты', 'комнат') + '</div>' +
+    '<h2>' + esc(d.name) + '</h2>' +
+    '<div class="pills">' + ['work', 'wait', 'idle', 'off'].filter((k) => c[k]).map((k) => '<span class="pill ' + k + '"><span class="dot ' + k + '"></span>' + (k === 'off' ? 'Нет данных' : LEG_LIVE[k]) + ' ' + c[k] + '</span>').join('') + '</div>' +
+    '<ul class="brief">' + ids.map((id) => { const r = byId[id], st = statusOf(id), a = liveAgent(id); return '<li data-room="' + id + '" tabindex="0"><span class="dot ' + st + '"></span><div><b>' + r.code + ' · ' + esc(roleOf(id)) + '</b>' + esc(agentIdOf(r) ? (a && a.task ? a.task.state_ru + ': №' + a.task.id + ' · ' + a.task.title : 'свободен — задач нет') : DH.labelSub(id, st)) + '</div></li>'; }).join('') + '</ul>' +
+    '<div class="card-actions"><button class="link-btn" type="button" data-act="back">← Ко всему макету</button></div>';
+}
+function renderProblemsLive() {
+  const ag = LIVE.data.agents, wait = ag.filter((a) => a.status === 'wait'), work = ag.filter((a) => a.status === 'work');
+  $('#pr-eyebrow').textContent = 'Ждут вас · ' + wait.length + ' · работают ' + work.length;
+  $('#pr-h').textContent = 'Что ждёт вашего ответа';
+  $('#seg-n').textContent = wait.length; $('#seg-n').hidden = !wait.length; $('#seg-n').classList.add('wait'); $('#seg-l').textContent = 'Ждут вас';
+  const card = (a, sev, lab) => { const room = roomOfAgent(a.id) || 'jarvis', r = byId[room];
+    return '<li class="pr"><div class="pr-head"><span class="sev ' + sev + '">' + lab + '</span><span class="src fact">Живые данные</span></div>' +
+      '<b>' + (a.task ? '№' + esc(a.task.id) + ' · ' + esc(a.task.title) : esc(a.role)) + '</b><p>' + esc(a.role) + (a.task ? ' · ' + esc(a.task.state_ru) : '') + '</p>' +
+      '<div class="pr-foot"><span class="pr-room">' + r.code + ' · ' + esc(r.short) + '</span><button class="btn" type="button" data-show="' + room + '">Показать →</button></div></li>'; };
+  $('#pr-list').innerHTML = wait.map((a) => card(a, 'warn', 'Ждёт вашего ответа')).join('') + work.map((a) => card(a, 'ok', 'Работает')).join('') ||
+    '<li class="pr"><div class="pr-head"><span class="sev risk">Тихо</span><span class="src fact">Живые данные</span></div><b>Никто не ждёт вашего ответа</b><p>Все агенты свободны: задач в работе нет.</p></li>';
+}
+function renderPowerLive() {
+  const m = LIVE.data.machine || {}, up = !!Object.keys(m).length;
+  $('#power').innerHTML =
+    '<div class="panel-head"><div><div class="eyebrow">Компьютер · живые данные</div><h3 id="pw-h">Здоровье компьютера</h3></div><span class="src fact">Факт</span></div>' +
+    '<div class="pstate"><span class="dot ' + (up ? 'work' : 'off') + '"></span><span><b>' + (up ? 'Включён' : 'Нет данных') + '</b> · ' + (LIVE.fail ? 'нет связи с JARVIS' : 'JARVIS отвечает, обновлено ' + hhmm(LIVE.at)) + '</span></div>' +
+    '<ul class="hl-list">' + healthItems(m).map((h) => '<li><span class="dot ' + h[2] + '"></span><span>' + esc(h[0]) + '</span><b>' + esc(h[1]) + '</b></li>').join('') + '</ul>' +
+    '<p class="note">Включение и выключение компьютера по сети подключится позже — поэтому кнопок здесь нет.</p>';
+}
+function liveFeedItems() {
+  const out = [];
+  for (const a of LIVE.data.agents) {
+    const room = roomOfAgent(a.id) || 'jarvis';
+    if (a.task) out.push({ room, ts: null, ord: a.status === 'wait' ? 0 : 1, text: cap(a.task.state_ru) + ': №' + a.task.id + ' «' + a.task.title + '»' });
+    if (a.last) { const ts = Date.parse(a.last.at); if (isFinite(ts)) out.push({ room, ts, ord: 2, text: 'Отчёт №' + a.last.id + ': ' + a.last.title }); }
+  }
+  return out.sort((x, y) => (x.ord - y.ord) || ((y.ts || 0) - (x.ts || 0))).slice(0, 9);
+}
+function renderFeedLive() {
+  const it = liveFeedItems();
+  $('#feed').innerHTML = it.length ? it.map((f) => '<li><time>' + (f.ts ? fmtShort(f.ts) : 'сейчас') + '</time><div><span class="who">' + esc(roleOf(f.room)) + '</span>' + esc(f.text) + '</div></li>').join('')
+    : '<li><time>—</time><div>Событий пока нет: задач и отчётов у агентов нет.</div></li>';
+}
+function renderProjects() {
+  if (!LIVE.on) return;
+  const ps = LIVE.data.projects || [];
+  const c = { active: 0, done: 0, quiet: 0 }; ps.forEach((p) => { c[PJ_ST[p.state] ? p.state : 'active']++; });
+  $('#pj-eyebrow').textContent = 'Проекты · ' + ps.length + ' · свежие сверху';
+  $('#pj-legend').innerHTML = ['active', 'done', 'quiet'].map((k) => '<span><i class="dot ' + PJ_ST[k][0] + '"></i>' + PJ_ST[k][2] + ' <b class="num">' + c[k] + '</b></span>').join('');
+  $('#pj-list').innerHTML = ps.length ? ps.map((p) => { const s = pjSt(p);
+    return '<li><button class="pj' + (state.project === p.id ? ' is-sel' : '') + '" type="button" data-pj="' + esc(p.id) + '"><span class="pj-st"><i class="dot ' + s[0] + '"></i>' + s[1] + '</span><b>' + esc(p.name) + '</b>' +
+      '<span class="pj-date">' + (p.last ? fmtDate(p.last) : 'дата неизвестна') + '</span><span class="pj-next">' + esc(p.next || p.summary || 'Запись «на чём остановились» пока пустая.') + '</span></button></li>'; }).join('')
+    : '<li><p class="note">Проектов пока нет.</p></li>';
+}
+function markProject() { $$('#pj-list .pj').forEach((b) => b.classList.toggle('is-sel', b.dataset.pj === state.project)); }
+function projectCard(pid) {
+  const p = ((LIVE.data && LIVE.data.projects) || []).find((x) => x.id === pid);
+  if (!p) { state.project = null; renderSide(); return; }
+  const s = pjSt(p);
+  $('#side-room').innerHTML =
+    '<div class="eyebrow">Проект · ' + s[2] + '</div><h2>' + esc(p.name) + '</h2>' +
+    '<div class="pills"><span class="pill ' + (s[0] === 'free' ? 'free' : s[0]) + '"><span class="dot ' + s[0] + '"></span>' + s[2] + '</span></div>' +
+    (p.summary ? '<p class="lead">' + esc(p.summary) + '</p>' : '') +
+    '<div class="sec-l"><span>На чём остановились</span></div>' + (p.next ? '<p class="report">' + esc(p.next) + '</p>' : '<p class="note" style="margin:0">Запись пока пустая.</p>') +
+    '<dl class="facts"><div><dt>Последняя работа</dt><dd>' + (p.last ? fmtDate(p.last) : '—') + '</dd></div><div><dt>Работали</dt><dd>' + (p.days || 0) + ' <small>' + plural(p.days || 0, 'день', 'дня', 'дней') + '</small></dd></div></dl>' +
+    '<div class="sec-l"><span>Где на диске</span></div><p class="path">' + (p.where ? esc(p.where) : 'Папка не указана.') + '</p>' +
+    '<div class="card-actions"><button class="link-btn" type="button" data-act="back">← Ко всему макету</button></div>';
+}
+function openProject(pid) {
+  tourStop();
+  if (state.selected) { state.selected = null; store.del('dh-office-sel'); DH.emit('select', { id: null, fly: false }); }
+  state.project = pid; markProject(); renderSide(); $('#side').scrollTop = 0;
+  const sr = $('#side').getBoundingClientRect();
+  if (window.innerWidth <= 1040 || sr.bottom < 0 || sr.top > window.innerHeight) $('#side').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
+}
+$('#pj-list').addEventListener('click', (e) => { const b = e.target.closest('[data-pj]'); if (b) openProject(b.dataset.pj); });
+function renderBand() {
+  const band = $('#band'), tag = $('#band-tag'), txt = $('#band-text');
+  if (!LIVE.on) return;
+  band.classList.toggle('is-live', !LIVE.fail);
+  if (LIVE.fail) { tag.textContent = 'Нет связи с JARVIS'; txt.textContent = 'Показаны данные на ' + hhmm(LIVE.at) + '. Проверяю снова каждые 4 секунды.'; return; }
+  tag.textContent = 'Живые данные JARVIS';
+  txt.textContent = 'Обновлено в ' + hhmm(LIVE.at) + ':' + pad(loc(LIVE.at).getUTCSeconds()) + ', каждые 4 секунды. Агенты, задачи, отчёты, проекты и здоровье компьютера — правда. Реальный офис людей и DH OS — пример, подключатся вместе с DH OS.';
+}
+function goLive() {
+  LIVE.on = true; DH.live = true; state.pc = 'online'; state.queue = []; clearInterval(qTimer);
+  $('.kpis').classList.add('is-live');
+  $('.kpis').innerHTML =
+    '<div class="kpi"><div class="l">Работают</div><div class="v"><b id="lk-work">0</b><small id="lk-work-s">агентов</small></div></div>' +
+    '<div class="kpi warn"><div class="l">Ждут вашего ответа</div><div class="v"><b id="lk-wait">0</b><small id="lk-wait-s">агентов</small></div></div>' +
+    '<div class="kpi"><div class="l">Свободны</div><div class="v"><b id="lk-idle">0</b><small id="lk-idle-s">агентов</small></div></div>' +
+    '<div class="kpi"><div class="l">Сделано сегодня</div><div class="v"><b id="lk-done">0</b><small id="lk-done-s">задач</small></div></div>' +
+    '<div class="kpi"><div class="l">Компьютер</div><div class="hl" id="lk-pc"></div></div>';
+  const sd = $('#stage-demo'); sd.textContent = 'ЖИВЫЕ ДАННЫЕ'; sd.classList.add('live');
+  $('#projects').hidden = false; $('#seg-pj').hidden = false;
+  $('#gantt-block .g-wrap').hidden = true; $('#g-legend').hidden = true;
+  $('#g-h').textContent = 'Шкала дня с ресурсами';
+  $('#g-note').textContent = 'Подключится вместе с DH OS. Пример шкалы скрыт: JARVIS пока не отдаёт время начала и конца задач, а придумывать его нельзя.';
+  $('#month-grid').hidden = true;
+  $('#month .sec-note').innerHTML = '<span class="src demo">Скоро</span> Подключится вместе с DH OS: заказы, прибыль и воронку агент «Финансы и план» посчитает по данным DH OS. Пример цифр скрыт.';
+  $('#dhos').innerHTML = '<div class="panel-head"><div><div class="eyebrow">DH OS · управление компанией</div><h3 id="dh-h">Задачи людям и заявки</h3></div><span class="src demo">Скоро</span></div>' +
+    '<p class="note" style="margin-top:4px">Подключится вместе с DH OS: задачи сотрудникам, просрочки и заявки по статусам. Сейчас JARVIS их не видит, поэтому здесь пусто — без выдуманных цифр.</p>';
+  $('#feed-pause').hidden = true;
+  const fl = $('#feed-live'); fl.textContent = 'Живые данные · задачи и отчёты агентов'; fl.classList.add('ok');
+  $('#say-hint').innerHTML = 'Попробуйте: <a href="#say-in" class="say-ex" id="say-ex2" role="button">«Дай менеджеру задачу обзвонить три новые заявки до 18:00»</a>. Это пример разбора: задача никуда не уходит. Настоящие задачи — в окне JARVIS.';
+  $('#say-ex2').addEventListener('click', (e) => { e.preventDefault(); $('#say-in').value = 'Дай менеджеру задачу обзвонить три новые заявки до 18:00'; $('#say').requestSubmit(); });
+  if (tour.on) tourStop();
+}
+function applyLive(d) {
+  const first = !LIVE.on;
+  LIVE.data = d; LIVE.at = Date.now(); LIVE.fail = 0;
+  LIVE.agents = Object.fromEntries(d.agents.filter((a) => a && a.id).map((a) => [a.id, a]));
+  if (!Array.isArray(d.projects)) d.projects = [];
+  if (first) goLive();
+  const m = d.machine || {}; state.gpu = typeof m.gpu_pct === 'number' ? m.gpu_pct : 0; state.gpuKnown = typeof m.gpu_pct === 'number';
+  renderBand();
+  const sig = JSON.stringify(Object.assign({}, d, { updated: 0 }));
+  if (!first && sig === LIVE.sig) return;
+  LIVE.sig = sig;
+  if (state.project != null && !d.projects.some((p) => p.id === state.project)) state.project = null;
+  refresh(); renderFeed(); renderProjects();
+}
+async function poll() {
+  let d;
+  try {
+    const res = await fetch('/api/office', { cache: 'no-store' });
+    if (!res.ok) throw new Error('ответ ' + res.status);
+    d = await res.json();
+    if (!d || !Array.isArray(d.agents) || !d.agents.length) throw new Error('в ответе нет агентов');
+  } catch (err) {
+    if (LIVE.on) { LIVE.fail++; renderBand(); renderPower(); }
+    return false;
+  }
+  applyLive(d);
+  return true;
+}
 
 /* ---------- общий пересчёт ---------- */
 function refresh() { renderKPIs(); renderLegend(); renderSide(); renderPower(); renderProblems(); DH.emit('refresh'); }
@@ -1924,13 +2315,15 @@ DH.refresh = refresh;
   setInterval(clockTick, 15e3);
   setInterval(() => { renderKPIs(); renderGantt(); renderProblems(); renderMonth(); if (!state.selected) renderHome(); }, 60e3);
   setInterval(() => {
-    if (pcOn()) state.gpu = Math.max(64, Math.min(94, state.gpu + Math.round((Math.random() - 0.5) * 8)));
-    state.p1sLayer = state.p1sLayer >= 640 ? 1 : state.p1sLayer + 1;
+    if (pcOn() && !LIVE.on) state.gpu = Math.max(64, Math.min(94, state.gpu + Math.round((Math.random() - 0.5) * 8)));
+    if (!LIVE.on) state.p1sLayer = state.p1sLayer >= 640 ? 1 : state.p1sLayer + 1;
     renderKPIs(); renderPower();
-    if (state.selected === 'server' || state.selected === 'print') renderRoom(state.selected);
+    if (!LIVE.on && (state.selected === 'server' || state.selected === 'print')) renderRoom(state.selected);
   }, 5000);
   let rw = 0; new ResizeObserver(() => { cancelAnimationFrame(rw); rw = requestAnimationFrame(renderGantt); }).observe($('#g-scroll'));
   setTimeout(() => { if (!DH.ready) DH.noWebGL(); }, 20000);
+  /* живые данные: если страница открыта из JARVIS — опрос каждые 4 секунды; иначе остаётся демо */
+  if (location.protocol === 'http:' || location.protocol === 'https:') poll().then((ok) => { if (ok) setInterval(poll, POLL_MS); });
 })();
 })();
 </script>
@@ -2013,6 +2406,7 @@ function readTokens() {
 }
 readTokens();
 const statusColor = (st) => (st === 'work' ? C.ok : st === 'wait' ? C.warn : st === 'bad' ? C.bad : C.off);
+const calm = (st) => st === 'off' || st === 'idle';   /* свободен или выключен: фигурка не «работает» */
 
 /* ---------- материалы ---------- */
 const M = {
@@ -2087,7 +2481,9 @@ const L = {
   planner: { x0: 0, x1: 7.5, z0: -10, z1: -4.4, door: 'S' },
   server: { x0: 8.7, x1: 15, z0: -10, z1: -4.4, door: 'S' },
   archicad: { x0: -15, x1: -9, z0: -3.2, z1: 3.2, door: 'E' },
-  jarvis: { x0: -7.8, x1: 7.8, z0: -3.2, z1: 3.2, door: 'NSEW' },
+  archviz: { x0: -7.8, x1: -4.4, z0: -3.2, z1: 3.2, door: 'W' },
+  jarvis: { x0: -4.4, x1: 4.4, z0: -3.2, z1: 3.2, door: 'NS' },
+  coach: { x0: 4.4, x1: 7.8, z0: -3.2, z1: 3.2, door: 'E' },
   sysadmin: { x0: 9, x1: 15, z0: -3.2, z1: 3.2, door: 'W' },
   print: { x0: -15, x1: -6, z0: 4.4, z1: 10, door: 'N' },
   strategist: { x0: -6, x1: 0, z0: 4.4, z1: 10, door: 'N' },
@@ -2123,7 +2519,7 @@ function screenMat(id, t) {
 }
 function doorsOf(id) {
   const r = L[id];
-  if (id === 'jarvis') return [{ s: 'N', at: 0, w: 2.6 }, { s: 'S', at: 0, w: 2.6 }, { s: 'W', at: 0, w: 1.6 }, { s: 'E', at: 0, w: 1.6 }];
+  if (id === 'jarvis') return [{ s: 'N', at: 0, w: 2.6 }, { s: 'S', at: 0, w: 2.6 }];
   return [{ s: r.door, at: r.door === 'N' || r.door === 'S' ? r.cx : r.cz, w: 1.3 }];
 }
 function buildWalls(id) {
@@ -2183,8 +2579,8 @@ function seatNode(id, seat, face, via) {
   if (r.door.length > 1) return;
   if (r.door === 'S') { const wing = r.z1 < -10.5; gn('d_' + id, r.cx, r.zb); (wing ? corr.G : corr.A).push(gn('c_' + id, r.cx, wing ? CG : CA)); ge('d_' + id, 'c_' + id); }
   else if (r.door === 'N') { gn('d_' + id, r.cx, r.za); corr.B.push(gn('c_' + id, r.cx, CB)); ge('d_' + id, 'c_' + id); }
-  else if (r.door === 'E') { gn('d_' + id, r.xb, 0); ge('d_' + id, 'L_0'); }
-  else if (r.door === 'W') { gn('d_' + id, r.xa, r.cz); if (r.x0 > 15) { corr.E.push(gn('c_' + id, CE, r.cz)); ge('d_' + id, 'c_' + id); } else ge('d_' + id, 'R_0'); }
+  else if (r.door === 'E') { gn('d_' + id, r.xb, 0); ge('d_' + id, r.x1 > 0 ? 'R_0' : 'L_0'); }
+  else if (r.door === 'W') { gn('d_' + id, r.xa, r.cz); if (r.x0 > 15) { corr.E.push(gn('c_' + id, CE, r.cz)); ge('d_' + id, 'c_' + id); } else ge('d_' + id, r.x0 < 0 ? 'L_0' : 'R_0'); }
   ge('s_' + id, 'd_' + id, via);
 }
 function finishGraph() {
@@ -2321,7 +2717,17 @@ function buildProps() {
   // 1.00 Кабинет JARVIS: ротонда, ядро-армиллярий, полки памяти
   buildRotunda();
   seatNode('jarvis', new V3(0, 0, 1.2), Math.PI);
-  [[-5.3, -2.0], [-5.3, 2.0], [5.3, -2.0], [5.3, 2.0]].forEach(([x, z]) => shelf(x, z, z < 0 ? 0 : Math.PI, 1.8, R));
+  [[-3.2, -2.05], [-3.2, 2.05], [3.2, -2.05], [3.2, 2.05]].forEach(([x, z]) => shelf(x, z, z < 0 ? 0 : Math.PI, 1.45, R));
+  // Производство · Визуализация: стол с двумя мониторами, экран-рендер на стене, рендер на стойке
+  { const r = L.archviz;
+    s = desk('archviz', r.cx + 0.25, -1.95, 0, { mons: 2, tex: [TEX.render, TEX.max] }); seatNode('archviz', s.seat, s.face);
+    screenPanel('archviz', TEX.render, r.cx, 1.3, r.za + 0.11, 0, 2.2, 1.0);
+    screenPanel('archviz', TEX.render, r.xb - 0.45, 1.05, 1.3, -Math.PI / 2, 1.0, 0.62); add(M.dark, cylG(0.03, 0.06, 0.74, r.xb - 0.4, 0.37, 1.3, 8)); }
+  // Управление · Наставник: стол, доска, круглый стол на двоих
+  { const r = L.coach;
+    s = desk('coach', r.cx - 0.25, -1.95, 0, { tex: [TEX.board] }); seatNode('coach', s.seat, s.face);
+    screenPanel('coach', TEX.board, r.cx, 1.3, r.za + 0.11, 0, 2.2, 1.0);
+    add(M.model, cylG(0.38, 0.38, 0.04, r.cx - 0.2, 0.6, 1.5, 24)); add(M.model, cylG(0.05, 0.1, 0.58, r.cx - 0.2, 0.29, 1.5, 10)); }
   // 1.07 3D и печать: верстак, два принтера, лоток тракторов, катушки
   s = desk('print', -8.3, 7.55, 0, { tex: [TEX.max] }); seatNode('print', s.seat, s.face, [[-7.15, s.seat.z], [-7.15, 5.3]]);
   m = TM(-12.35, 8.95, 0);
@@ -2364,6 +2770,7 @@ function buildProps() {
   [[-14.3, -5.2], [-0.75, -5.2], [0.75, -5.2], [-9.75, -2.55], [9.75, -2.55], [-0.6, 9.35], [6.7, 9.35], [-7.1, -2.6], [7.1, -2.6], [-7.1, 2.6], [7.1, 2.6]].forEach(([x, z]) => plant(x, z, 1.1));
   chair(4.2, 9.2, Math.PI * 0.85); chair(5.35, 8.4, -Math.PI * 0.6); add(M.model, cylG(0.3, 0.3, 0.05, 5.0, 0.48, 9.3, 24)); add(M.model, cylG(0.05, 0.08, 0.46, 5.0, 0.23, 9.3, 10));
   chair(-0.9, -6.4, -Math.PI / 2); chair(9.6, -6.1, 0.4);
+  chair(L.coach.cx - 0.95, 1.5, Math.PI / 2); chair(L.coach.cx + 0.55, 1.5, -Math.PI / 2);
   buildWing(plant, chair);
 
 }
@@ -2844,7 +3251,7 @@ function buildDhPavilion() {
 }
 const OSIGN = {};
 function buildOfficeSigns() {
-  [['1', X1 - 1.2, -11.6, 'Реальный офис', 'Dream House · люди студии'], ['2', X2 + 3.0, -18.8, 'Мои агенты', 'JARVIS · 21 агент · 6 отделов']].forEach(([k, x, z, nm, sub]) => {
+  [['1', X1 - 1.2, -11.6, 'Реальный офис', 'Dream House · люди студии'], ['2', X2 + 3.0, -18.8, 'Мои агенты', 'JARVIS · ' + DH.N_AGENTS + ' ' + DH.plural(DH.N_AGENTS, 'агент', 'агента', 'агентов') + ' · ' + DH.DEPTS.length + ' отделов']].forEach(([k, x, z, nm, sub]) => {
     const el = document.createElement('div'); el.className = 'ol'; el.setAttribute('role', 'button'); el.tabIndex = 0;
     el.innerHTML = '<b>' + nm + '</b><small>' + sub + '</small>';
     el.addEventListener('click', (e) => { e.stopPropagation(); DH.setFloor(k); });
@@ -2887,7 +3294,7 @@ function updTaskFlights(dt, t) {
   nextTaskFlight -= dt;
   if (nextTaskFlight <= 0) {
     nextTaskFlight = 5 + Math.random() * 4;
-    if (!REDUCED && DH.state.pc === 'online' && STUDIO.slots.length) { const sl = STUDIO.slots[Math.floor(Math.random() * STUDIO.slots.length)]; launchTask('p:' + sl.p.id, Math.random() < 0.6 ? 'task' : 'report'); }
+    if (!REDUCED && !DH.live && DH.state.pc === 'online' && STUDIO.slots.length) { const sl = STUDIO.slots[Math.floor(Math.random() * STUDIO.slots.length)]; launchTask('p:' + sl.p.id, Math.random() < 0.6 ? 'task' : 'report'); }
   }
   for (let i = taskFlights.length - 1; i >= 0; i--) {
     const f = taskFlights[i]; f.u += dt * f.speed;
@@ -2969,7 +3376,8 @@ function updateLabels() {
     lb.el.className = 'rl st-' + st + (selected === r.id ? ' is-sel' : '') + (hoverId === r.id ? ' is-hover' : '') + (ps && !ps.has(r.id) ? ' is-muted' : '');
     lb.dot.className = 'dot ' + st;
     let sub = r.model.split(' · ')[0] + ' · ';
-    if (st === 'off') sub += 'выключено';
+    if (DH.live) sub = DH.labelSub(r.id, st);
+    else if (st === 'off') sub += 'выключено';
     else if (r.cloud) sub += 'очередь ' + DH.state.queue.length;
     else if (!r.task) sub += 'свободен';
     else if (r.task.kind === 'k1') sub += DH.state.k1Done + ' из 30';
@@ -2980,7 +3388,7 @@ function updateLabels() {
   const showF2 = floor !== '1', showF1 = floor !== '2';
   for (const id in labels) labels[id].o.visible = showF2;
   for (const id in deptLabels) { deptLabels[id].o.visible = showF2; deptLabels[id].el.classList.toggle('is-sel', selected === 'd:' + id); }
-  for (const k in minis) minis[k].style.display = showF2 ? '' : 'none';
+  for (const k in minis) minis[k].style.display = showF2 && !(DH.live && (k === 'c' || k === 'd')) ? '' : 'none';
   labelsEl.classList.toggle('f1', floor === '1'); labelsEl.classList.toggle('fall', floor === 'all');
   for (const id in STUDIO.labels) {
     const lb = STUDIO.labels[id], p = DH.byPid[id.slice(2)]; lb.o.visible = showF1;
@@ -3214,9 +3622,9 @@ gn('J_S', 0, 2.65); gn('J_N', 0, -2.65); gn('J_W', -2.65, 0); gn('J_E', 2.65, 0)
 const arc = (a0, a1) => { const out = []; for (let k = 1; k < 4; k++) { const a = a0 + (a1 - a0) * k / 4; out.push([2.65 * Math.sin(a), 2.65 * Math.cos(a)]); } return out; };
 ge('J_S', 'J_W', arc(0, -Math.PI / 2)); ge('J_W', 'J_N', arc(-Math.PI / 2, -Math.PI)); ge('J_N', 'J_E', arc(Math.PI, Math.PI / 2)); ge('J_E', 'J_S', arc(Math.PI / 2, 0));
 ge('s_jarvis', 'J_S', [[0, 1.9]]);
-gn('Jd_S', 0, 3.08); gn('Jd_N', 0, -3.08); gn('Jd_W', -7.68, 0); gn('Jd_E', 7.68, 0);
-ge('J_S', 'Jd_S'); ge('J_N', 'Jd_N'); ge('J_W', 'Jd_W'); ge('J_E', 'Jd_E');
-corr.B.push(gn('c_JS', 0, CB)); corr.A.push(gn('c_JN', 0, CA)); ge('Jd_S', 'c_JS'); ge('Jd_N', 'c_JN'); ge('Jd_W', 'L_0'); ge('Jd_E', 'R_0');
+gn('Jd_S', 0, 3.08); gn('Jd_N', 0, -3.08);
+ge('J_S', 'Jd_S'); ge('J_N', 'Jd_N');
+corr.B.push(gn('c_JS', 0, CB)); corr.A.push(gn('c_JN', 0, CA)); ge('Jd_S', 'c_JS'); ge('Jd_N', 'c_JN');
 finishGraph();
 for (const id of Object.keys(SEATS)) if (id !== 'server') makeWalker(id, id === 'jarvis' ? 2.15 : 1.95);
 buildCables();
@@ -3257,7 +3665,7 @@ new ResizeObserver(resize).observe(stage); resize();
 /* ---------- живость: шаги, коробочки, печать, частицы ---------- */
 let nextTrip = 3 + Math.random() * 3;
 function startTrip() {
-  if (!DH.state || DH.state.pc !== 'online') return;
+  if (!DH.state || DH.state.pc !== 'online' || DH.live) return;   /* в живом режиме передач между агентами не выдумываем */
   const busy = Object.values(walkers).filter((w) => w.trip).length; if (busy >= 2) return;
   const opts = DH.HANDOFFS.filter((h) => walkers[h.from] && !walkers[h.from].trip && DH.statusOf(h.from) !== 'off' && DH.statusOf(h.to) !== 'off');
   if (!opts.length) return;
@@ -3272,9 +3680,9 @@ function lerpAngle(a, b, k) { let d = ((b - a + Math.PI) % (2 * Math.PI)) - Math
 function updWalkers(dt, t) {
   for (const id in walkers) {
     const w = walkers[id], st = DH.statusOf(id);
-    w.ringMat.color.copy(statusColor(st)).multiplyScalar(st === 'off' ? 0.6 : 2.4 + (selected === id ? 1.2 : 0));
+    w.ringMat.color.copy(statusColor(st)).multiplyScalar(st === 'off' ? 0.6 : st === 'idle' ? 1.1 + (selected === id ? 0.8 : 0) : 2.4 + (selected === id ? 1.2 : 0));
     const tr = w.trip;
-    if (!tr) { w.g.position.copy(SEATS[id].seat); const sw = REDUCED || st === 'off' ? 0 : Math.sin(t * 1.4 + w.ph) * 0.05; w.yaw = lerpAngle(w.yaw, SEATS[id].face + sw, Math.min(1, dt * 4)); w.g.rotation.y = w.yaw; w.g.position.y = st === 'off' ? 0 : Math.abs(Math.sin(t * 2.2 + w.ph)) * 0.006; continue; }
+    if (!tr) { w.g.position.copy(SEATS[id].seat); const sw = REDUCED || calm(st) ? 0 : Math.sin(t * 1.4 + w.ph) * 0.05; w.yaw = lerpAngle(w.yaw, SEATS[id].face + sw, Math.min(1, dt * 4)); w.g.rotation.y = w.yaw; w.g.position.y = calm(st) ? 0 : Math.abs(Math.sin(t * 2.2 + w.ph)) * 0.006; continue; }
     if (tr.stage === 'drop') {
       tr.wait += dt;
       if (tr.wait > 0.9) {
@@ -3302,13 +3710,14 @@ function updRooms(t) {
     const rm = RM[r.id]; if (!rm) continue;
     const st = DH.statusOf(r.id);
     const pul = REDUCED ? 0 : st === 'bad' ? Math.sin(t * 4.2 + rm.pulse) * 0.45 : st === 'wait' ? Math.sin(t * 2.0 + rm.pulse) * 0.28 : 0;
-    let k = { work: 1.7, wait: 2.0, bad: 2.4, off: 0.35 }[st] * (1 + pul) * kBoost * (C.isDark ? 1 : 1.25);
+    let k = { work: 1.7, wait: 2.0, bad: 2.4, off: 0.35, idle: 0.75 }[st] * (1 + pul) * kBoost * (C.isDark ? 1 : 1.25);
     if (selected === r.id) k *= 1.35; if (hoverId === r.id) k *= 1.2; if (ps && !ps.has(r.id)) k *= 0.22;
     rm.led.color.copy(statusColor(st)).multiplyScalar(k);
-    const fe = ({ work: 0.5, wait: 0.85, bad: 0.95, off: 0 }[st] * (1 + pul * 0.6) * (C.isDark ? 1 : 0.6) + (selected === r.id ? 0.18 : 0) + (hoverId === r.id ? 0.1 : 0)) * (0.75 + 0.45 * night);
+    const fe = ({ work: 0.5, wait: 0.85, bad: 0.95, off: 0, idle: 0.06 }[st] * (1 + pul * 0.6) * (C.isDark ? 1 : 0.6) + (selected === r.id ? 0.18 : 0) + (hoverId === r.id ? 0.1 : 0)) * (0.75 + 0.45 * night);
     rm.floor.emissive.copy(statusColor(st)); rm.floor.emissiveIntensity = ps && !ps.has(r.id) ? 0 : fe;
     const scrOn = st !== 'off';
-    for (const m of rm.screens) { m.emissiveIntensity = scrOn ? 0.75 + 0.35 * night : 0.02; m.color.setScalar(scrOn ? 1 : 0.12); }
+    const scrK = st === 'idle' ? 0.35 : 1;
+    for (const m of rm.screens) { m.emissiveIntensity = scrOn ? (0.75 + 0.35 * night) * scrK : 0.02; m.color.setScalar(scrOn ? 0.55 + 0.45 * scrK : 0.12); }
     const b = anim.beacons[r.id];
     if (b && b.g.visible) { b.m.color.copy(statusColor(st)).multiplyScalar(2.6 + (REDUCED ? 0 : Math.sin(t * 4) * 0.6)); b.g.children[0].rotation.y = REDUCED ? 0 : t * 1.4; b.g.position.y = 2.5 + (REDUCED ? 0 : Math.sin(t * 2 + rm.pulse) * 0.06); b.g.scale.setScalar(ps ? 1.5 : 1); }
   }
@@ -3320,7 +3729,7 @@ function updPrinters(dt, t) {
     let prog;
     if (p.kind === 'p1s') prog = DH.state.p1sLayer / 640;
     else {
-      if (!REDUCED) { k1Cycle += dt; if (k1Cycle > 45) { k1Cycle = 0; DH.k1Complete(); } }
+      if (!REDUCED && !DH.live) { k1Cycle += dt; if (k1Cycle > 45) { k1Cycle = 0; DH.k1Complete(); } }
       prog = REDUCED ? 0.6 : k1Cycle / 45;
     }
     const h = p.bedY + 0.012 + prog * p.objH;
@@ -3329,7 +3738,8 @@ function updPrinters(dt, t) {
     p.head.position.set(p.x + hx, h + 0.075 * p.S, p.z + hz); p.rail.position.set(p.x, h + 0.12 * p.S, p.z + hz);
   }
   if (TRAY.mesh) TRAY.mesh.count = Math.min(30, DH.state.k1Done);
-  if (minis.p1s) { minis.p1s.textContent = 'P1S · слой ' + DH.state.p1sLayer + '/640'; minis.k1.textContent = 'K1 · ' + DH.state.k1Done + '/30'; minis.gpu.textContent = DH.state.pc === 'online' ? 'Видеокарта ' + DH.state.gpu + ' %' : 'Видеокарта —'; }
+  if (minis.p1s && DH.live) { minis.p1s.textContent = 'P1S'; minis.k1.textContent = 'K1'; minis.gpu.textContent = DH.state.gpuKnown ? 'Видеокарта ' + DH.state.gpu + ' %' : 'Видеокарта —'; }
+  else if (minis.p1s) { minis.p1s.textContent = 'P1S · слой ' + DH.state.p1sLayer + '/640'; minis.k1.textContent = 'K1 · ' + DH.state.k1Done + '/30'; minis.gpu.textContent = DH.state.pc === 'online' ? 'Видеокарта ' + DH.state.gpu + ' %' : 'Видеокарта —'; }
 }
 function updMachines(t) {
   const on = DH.state.pc === 'online' || DH.state.pc === 'stopping';
@@ -3339,7 +3749,7 @@ function updMachines(t) {
     for (let i = 0; i < 24; i++) { const lit = on && (REDUCED || Math.random() > 0.3); anim.rack.setColorAt(i, col.copy(i % 7 === 0 ? C.ok : C.glow).multiplyScalar(lit ? 2.2 : 0.15)); }
     anim.rack.instanceColor.needsUpdate = true;
   }
-  if (anim.cGauge) anim.cGauge.material.color.copy(C.bad).multiplyScalar(1.6 + (REDUCED ? 0 : Math.sin(t * 3.5) * 0.5));
+  if (anim.cGauge) { if (DH.live) anim.cGauge.material.color.copy(C.champ).multiplyScalar(1.4); else anim.cGauge.material.color.copy(C.bad).multiplyScalar(1.6 + (REDUCED ? 0 : Math.sin(t * 3.5) * 0.5)); }
   anim.rings.forEach((r, i) => { if (!REDUCED) { r.rotation.x += 0.004 * (i + 1); r.rotation.y += 0.006 * (3 - i); } });
   if (anim.globe && !REDUCED) anim.globe.rotation.y = t * 0.3;
   dhMods.forEach((m, i) => { const ph = REDUCED ? 1 : 0.55 + 0.45 * Math.max(0, Math.sin(t * 1.6 - i * 0.45)); m.material.color.copy(C.glow).multiplyScalar((C.isDark ? 2.4 : 1.7) * ph); });
@@ -3355,7 +3765,7 @@ function updParticles(dt, t) {
     let vis = true, c = C.glow, sc = 1;
     if (p.k === 'in') {
       const cb = cables[p.c], st = DH.statusOf(cb.room);
-      vis = on && st !== 'off';
+      vis = on && (DH.live ? st === 'work' || st === 'wait' : st !== 'off');
       if (!REDUCED) p.s = (p.s + p.v * dt + cb.P.len) % cb.P.len;
       polyAt(cb.P, p.s, tv); tv.y = 0.05;
       c = st === 'bad' ? C.bad : st === 'wait' ? C.warn : C.glow;

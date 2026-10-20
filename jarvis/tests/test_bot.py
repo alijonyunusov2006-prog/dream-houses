@@ -493,3 +493,34 @@ def test_show_office_by_voice(tmp_path):
     bot.on_office = lambda: opened.append(1)
     bot.handle(msg("Джарвис, покажи офис"))
     assert opened and "офис" in tg.sent[-1][1] and ctl.sched.tasks == {}
+
+
+def test_limit_until_variants():
+    from jarviscore.bot import limit_until
+    now = datetime(2026, 10, 21, 20, 0).astimezone()
+    loc = lambda s: limit_until(s, now).astimezone()
+    assert (loc("resets 12am").hour, loc("resets 12am").day) == (0, 22)
+    assert loc("resets 10pm").hour == 22 and loc("resets 22:30").minute == 30
+    assert (loc("resets 25 Oct") - now).total_seconds() == 3600          # не время → через час
+    assert loc("resets 7:55pm").day == 21 and loc("resets 7:55pm").hour == 20   # только что прошло → почти сразу
+
+
+def test_limit_during_execute_resumes_without_retry_question(tmp_path):
+    from jarviscore.bot import LimitReached
+
+    class Lim(FakeClaude):
+        def __init__(self):
+            super().__init__(); self.n = 0
+        def execute(self, task):
+            self.n += 1
+            if self.n == 1:
+                raise LimitReached("You've hit your session limit · resets 10:10pm")
+            return super().execute(task)
+    bot, tg, ctl = make(tmp_path, claude=Lim())
+    bot.handle(msg("Сделай список дел"))
+    bot.work_once()
+    t = ctl.sched.tasks["1"]
+    assert "executing" not in t.checkpoint and t.state.value == "paused"
+    bot.paused_until = None; t.checkpoint.pop("not_before")      # «сброс наступил»
+    bot.work_once()
+    assert t.state.value == "done" and not any("Повторить" in s[1] for s in tg.sent)

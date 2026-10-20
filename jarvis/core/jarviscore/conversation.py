@@ -12,18 +12,23 @@ from dataclasses import dataclass
 
 _END = r"[\s,.!?…]*"
 
-STOP = re.compile(r"^\s*(?:не\s+надо|не\s+делай|стоп|отмена|отмени\w*|отставить|хватит|забудь)\b", re.I)
+# Разговорные фразы узнаём только ЦЕЛИКОМ и короткими (ревью 2026-10-21: «Отчёт по Хаджи Акбар подготовь»,
+# «стоп-кадр сохрани», «покажи офис COLORADO в рендере» — это работа, а не разговор).
+_TAIL = r"(?:\s+(?:сэр|джарвис|пожалуйста|сейчас|сегодня|у\s+тебя|у\s+нас|ещё|еще))*" + _END + "$"
+STOP = re.compile(r"^\s*(?:не\s+надо|не\s+делай|стоп(?![-\w])|отмена|отмени(?:те)?(?![\w-])|отставить|"
+                  r"хватит(?!\s+ли)|забудь)", re.I)
 PRESENCE = re.compile(r"^\s*(?:ты\s+(?:здесь|тут|на\s+связи|меня\s+слышишь|слышишь(?:\s+меня)?)|алло|ау|"
-                      r"проверка(?:\s+связи)?|ты\s+где)" + _END + "$", re.I)
-THANKS = re.compile(r"^\s*(?:спасибо|благодарю|молодец|отлично|супер|класс|умница|красава)\w*" + _END +
-                    r"(?:сэр|джарвис)?" + _END + "$", re.I)
-REPEAT = re.compile(r"^\s*(?:повтори\w*|ещ[её]\s+раз|что\s+ты\s+сказал\w*|не\s+расслышал\w*)\b", re.I)
+                      r"проверка(?:\s+связи)?|ты\s+где)" + _TAIL, re.I)
+THANKS = re.compile(r"^\s*(?:спасибо|благодарю|молодец|отлично|супер|класс|умница|красава)\w*" + _TAIL, re.I)
+REPEAT = re.compile(r"^\s*(?:повтори(?:те)?|ещ[её]\s+раз|что\s+ты\s+сказал\w*|не\s+расслышал\w*)" + _TAIL, re.I)
 STATUS = re.compile(r"^\s*(?:что\s+(?:ты\s+)?(?:сейчас\s+)?делаешь|чем\s+(?:ты\s+)?(?:сейчас\s+)?занят|"
                     r"какие\s+(?:у\s+нас\s+|у\s+тебя\s+)?задачи|что\s+в\s+работе|что\s+(?:ты\s+)?(?:уже\s+)?сделал\w*|"
-                    r"что\s+сделано|статус|отч[её]т)\b", re.I)
-OFFICE = re.compile(r"^\s*(?:покажи|открой|включи|давай)\s+(?:мне\s+)?(?:3d[\s-]?|тр[её]хмерный\s+)?офис", re.I)
-ABILITIES = re.compile(r"^\s*(?:что\s+(?:ты\s+)?(?:умеешь|можешь)|помощь|справка|как\s+тобой\s+пользоваться)\b", re.I)
-NUMBER = re.compile(r"(?:номер|№|задач\w*)\s*(\d+)|\b(\d+)\b", re.I)
+                    r"что\s+сделано|статус|отч[её]т)" + _TAIL, re.I)
+OFFICE = re.compile(r"^\s*(?:покажи|открой|включи|давай)\s+(?:мне\s+)?(?:3d[\s-]?|тр[её]хмерный\s+)?офис"
+                    r"(?:\s+агентов|\s+jarvis|\s+джарвиса)?" + _TAIL, re.I)
+ABILITIES = re.compile(r"^\s*(?:что\s+(?:ты\s+)?(?:умеешь|можешь)|помощь|справка|как\s+тобой\s+пользоваться)" + _TAIL, re.I)
+NUM_WORD = re.compile(r"(?:номер|№|задач\w*)\s*(\d+)", re.I)                 # «номер 14», «задачу №7»
+NUM_ALONE = re.compile(r"^\s*\S+(?:\s+\S+)?\s*,?\s*(\d+)" + _END + "$")          # «отмени 7», «не надо 5»
 
 # повелительные глаголы работы: «сделай», «найди», «посчитай» … → задача исполнителю
 WORK = re.compile(r"\b(?:сдела|созда|напиш|нарису|найд|открой|откро|провер|посчита|подготов|скача|установ|удал|"
@@ -42,14 +47,16 @@ class Intent:
 
 def classify(text: str) -> Intent:
     t = (text or "").strip()
+    words = re.findall(r"[а-яёa-z]+", t.lower())
     if STOP.match(t):
-        m = NUMBER.search(t)
-        return Intent("stop", (m.group(1) or m.group(2)) if m else None)
+        m = NUM_WORD.search(t) or NUM_ALONE.match(t)
+        # длинная фраза со «стоп» в начале — команда, только если в ней номер или «слушай/подожди»
+        if len(words) <= 4 or m or re.search(r"слушай|подожди", t, re.I):
+            return Intent("stop", m.group(1) if m else None)
     for kind, rx in (("presence", PRESENCE), ("thanks", THANKS), ("repeat", REPEAT),
                      ("status", STATUS), ("abilities", ABILITIES), ("office", OFFICE)):
         if rx.match(t):
             return Intent(kind)
-    words = re.findall(r"[а-яёa-z]+", t.lower())
     if len(words) <= 1:
         return Intent("noise")
     asked = t.endswith("?") or bool(QUESTION_WORD.match(t))
