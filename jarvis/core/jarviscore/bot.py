@@ -25,6 +25,7 @@ from .claude_runner import BudgetExceeded
 from .controller import Controller
 from .planner import State, Task
 from . import memory
+from .local import is_simple
 from .memory import is_recall
 from .wake import find_wake, is_greeting
 
@@ -58,6 +59,7 @@ class JarvisBot:
         self.lock = threading.RLock()
         self.report_hour = 8                       # утренний доклад (settings.toml [telegram] report_hour)
         self.memory_roots = [self.ideas_dir.parent]  # где искать «вспомни…»: brain/ (+ хранилище Obsidian из app.py)
+        self.local = None                          # LocalBrain — простые вопросы на локальной модели (app.py)
 
     # --- входящие ----------------------------------------------------------------
     def handle(self, update: dict) -> None:
@@ -109,6 +111,10 @@ class JarvisBot:
         called, rest = find_wake(text)          # «Джарвис, …» текстом — имя срезаем, как и в голосе
         if called and rest:
             text = rest
+        if self.local and is_simple(text):      # простой вопрос — локальная модель, бесплатно
+            reply = self.local.answer(text)
+            if reply:
+                return self.tg.send(self.owner, reply)
         if is_recall(text):
             return self.tg.send(self.owner, memory.answer(text, self.memory_roots))
         if is_greeting(text):

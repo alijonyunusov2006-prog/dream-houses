@@ -179,6 +179,28 @@ def test_typed_task_with_name_strips_the_name(tmp_path):
     assert ctl.sched.tasks["1"].title == "сделай список дел"
 
 
+def test_simple_question_answered_locally_without_task(tmp_path):
+    from jarviscore.local import LocalBrain
+
+    class Fake:
+        def reply(self, system, history): return "Будет 96, сэр."
+    bot, tg, ctl = make(tmp_path)
+    bot.local = LocalBrain(Fake())
+    bot.handle(msg("Сколько будет 12 умножить на 8?"))
+    assert tg.sent[-1][1] == "Будет 96, сэр." and ctl.sched.tasks == {}
+
+
+def test_simple_question_falls_back_to_task_when_local_is_down(tmp_path):
+    from jarviscore.local import LocalBrain
+
+    class Down:
+        def reply(self, system, history): return None
+    bot, tg, ctl = make(tmp_path)
+    bot.local = LocalBrain(Down())
+    bot.handle(msg("Сколько будет 12 умножить на 8?"))
+    assert "1" in ctl.sched.tasks
+
+
 def test_greeting_when_nothing_happened(tmp_path):
     bot, tg, ctl = make(tmp_path)
     bot.handle(msg("Привет"))

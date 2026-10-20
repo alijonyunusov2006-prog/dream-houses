@@ -19,6 +19,8 @@ from pathlib import Path
 from .bot import ROOT, ClaudeExecutor, JarvisBot, load_env
 from .channels import Broadcast, WebFeed
 from .controller import Controller
+from .local import LocalBrain
+from .ollama import Ollama
 from .webui import JarvisWeb, serve
 
 log = logging.getLogger("jarvis.app")
@@ -195,6 +197,8 @@ def main() -> None:
     bot = JarvisBot(bc, ctl, ClaudeExecutor(settings),
                     Transcriber(sp.get("stt_model", "large-v3"), sp.get("stt_language", "ru")), owner_chat=owner)
     bot.report_hour = settings.get("telegram", {}).get("report_hour", 8)
+    m = settings.get("models", {})
+    bot.local = LocalBrain(Ollama("http://127.0.0.1:11434", m.get("local_fast", "qwen3.5:4b"), timeout=20))   # простые вопросы — бесплатно
     vault = Path(os.environ.get("OBSIDIAN_VAULT", r"C:\Users\alijo\OneDrive\Документы\Obsidian Vault"))
     if vault.exists():
         bot.memory_roots.append(vault)
