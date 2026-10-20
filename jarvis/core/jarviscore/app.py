@@ -18,7 +18,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .bot import ROOT, ClaudeExecutor, JarvisBot, load_env
-from .channels import Broadcast, WebFeed
+from .channels import Broadcast, VoiceOut, WebFeed
 from .controller import Controller
 from .local import LocalBrain
 from .ollama import Ollama
@@ -210,6 +210,8 @@ def main() -> None:
         threading.Thread(target=_loop, args=(bot.work_once, stop, 5, f"исполнитель {i + 1}"), daemon=True).start()
     threading.Thread(target=_loop, args=(bot.check_alerts, stop, 30, "контролёр"), daemon=True).start()
     web = JarvisWeb(bot, feed, ROOT / "data" / "tmp")
+    if tg and tg_owner and settings.get("telegram", {}).get("voice_replies", True):
+        bc.voice = VoiceOut(tg, tg_owner, speech=web.speech)   # ответы в Telegram ещё и голосом JARVIS
     web.on_pill = lambda: open_pill(f"http://127.0.0.1:{PORT}/")
     web.projects_dir = vault / "Проекты" if vault.exists() else None   # 3D-офис: что идёт по проектам
     bot.telegram_on = tg is not None

@@ -10,6 +10,7 @@ import json
 import urllib.error
 import urllib.parse
 import urllib.request
+import uuid
 from pathlib import Path
 
 LIMIT = 4000  # Telegram режет сообщения длиннее 4096 символов
@@ -50,6 +51,29 @@ class Telegram:
             last = self.call("sendMessage", chat_id=chat_id, text=text[i:i + LIMIT],
                              reply_to_message_id=reply_to if i == 0 else None)
         return last
+
+    def send_voice(self, chat_id, ogg: bytes, reply_to: int | None = None) -> dict:
+        """Голосовое JARVIS (OGG/Opus) — файл отправляется формой multipart, как требует Telegram."""
+        boundary = "jarvis" + uuid.uuid4().hex
+        parts = []
+        fields = {"chat_id": str(chat_id)}
+        if reply_to:
+            fields["reply_to_message_id"] = str(reply_to)
+        for k, v in fields.items():
+            parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="{k}"\r\n\r\n{v}\r\n'.encode())
+        parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="voice"; filename="jarvis.ogg"\r\n'
+                     f"Content-Type: audio/ogg\r\n\r\n".encode() + ogg + b"\r\n")
+        body = b"".join(parts) + f"--{boundary}--\r\n".encode()
+        req = urllib.request.Request(self._base + "sendVoice", data=body,
+                                     headers={"Content-Type": f"multipart/form-data; boundary={boundary}"})
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout + 30) as r:
+                res = json.loads(r.read())
+        except urllib.error.HTTPError as e:
+            res = json.loads(e.read() or b"{}")
+        if not res.get("ok"):
+            raise TelegramError(f"sendVoice: {res.get('description', 'ошибка')}")
+        return res["result"]
 
     def download(self, file_id: str, dest: Path) -> Path:
         path = self.call("getFile", file_id=file_id)["file_path"]

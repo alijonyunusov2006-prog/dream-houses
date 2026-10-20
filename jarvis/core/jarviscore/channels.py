@@ -10,7 +10,9 @@ from __future__ import annotations
 
 import json
 import logging
+import queue
 import shutil
+import subprocess
 import threading
 from datetime import datetime
 from pathlib import Path
@@ -55,12 +57,68 @@ class WebFeed:
             return [dict(i) for i in self.items if i["id"] > after]
 
 
+SILENT = ("🎙", "Принял, задача", "Минуту, сэр", "Принял ответ")   # служебное — только текстом
+
+
+def to_ogg(wav: bytes) -> bytes:
+    """WAV → OGG/Opus для голосового Telegram (ffmpeg)."""
+    exe = shutil.which("ffmpeg") or "ffmpeg"
+    r = subprocess.run([exe, "-loglevel", "error", "-i", "pipe:0", "-c:a", "libopus", "-b:a", "32k",
+                        "-ac", "1", "-f", "ogg", "pipe:1"], input=wav, capture_output=True, timeout=60,
+                       creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    if r.returncode != 0 or not r.stdout:
+        raise RuntimeError("ffmpeg: " + r.stderr.decode("utf-8", "replace")[:200])
+    return r.stdout
+
+
+class VoiceOut:
+    """Голосовые ответы JARVIS в Telegram: по порядку, в своём потоке; сбой голоса не мешает тексту."""
+
+    def __init__(self, tg, chat: int, speech, to_ogg=to_ogg):
+        self.tg, self.chat, self.speech, self.to_ogg = tg, chat, speech, to_ogg
+        self.q: queue.Queue = queue.Queue(maxsize=20)
+        self._t = threading.Thread(target=self._run, daemon=True, name="jarvis-voice-out")
+        self._t.start()
+
+    @staticmethod
+    def wanted(text: str) -> bool:
+        return bool(text and text.strip()) and not text.lstrip().startswith(SILENT)
+
+    def put(self, web_id: int, reply_to: int | None) -> None:
+        try:
+            self.q.put_nowait((web_id, reply_to))
+        except queue.Full:
+            log.warning("очередь голосовых переполнена — ответ только текстом")
+
+    def stop(self, timeout: float = 5) -> None:
+        self.q.put(None)
+        self._t.join(timeout)
+
+    def _run(self) -> None:
+        while True:
+            item = self.q.get()
+            if item is None:
+                return
+            web_id, reply_to = item
+            try:
+                wav = self.speech(web_id)          # тот же голос и кэш, что в окне JARVIS
+                if wav:
+                    ogg = self.to_ogg(wav)
+                    self.tg.send_voice(self.chat, ogg, reply_to=reply_to)
+                    log.info("голосовое ушло в Telegram: сообщение %s, %d КБ", web_id, len(ogg) // 1024)
+                else:
+                    log.warning("голос не готов — сообщение %s ушло только текстом", web_id)
+            except Exception:
+                log.exception("голосовое в Telegram не ушло — текст уже там")
+
+
 class Broadcast:
     def __init__(self, web: WebFeed, tg=None, tg_chat: int | None = None):
         self.web, self.tg, self.tg_chat = web, tg, tg_chat
         self._web_to_tg: dict[int, int] = {}
         self._tg_to_web: dict[int, int] = {}
         self.lock = threading.Lock()
+        self.voice: VoiceOut | None = None        # app.py: голосовые ответы в Telegram
 
     def link(self, web_id: int, tg_id: int) -> None:
         with self.lock:
@@ -76,6 +134,8 @@ class Broadcast:
                 sent = self.tg.send(self.tg_chat, text, reply_to=self._web_to_tg.get(reply_to))
                 if sent.get("message_id"):
                     self.link(res["message_id"], sent["message_id"])
+                if self.voice and VoiceOut.wanted(text):
+                    self.voice.put(res["message_id"], None)
             except Exception:
                 log.exception("в Telegram не ушло — в окне сообщение есть")
         return res

@@ -54,3 +54,64 @@ def test_web_voice_file_is_moved_not_downloaded(tmp_path):
     b = Broadcast(WebFeed())
     out = b.download(f"web:{src}", tmp_path / "tmp" / "voice.webm")
     assert out.read_bytes() == b"x" and not src.exists()
+
+
+# --- голосовые ответы в Телеграм (2026-10-21) ---
+def test_voice_follows_text_but_not_for_service_lines(tmp_path):
+    import threading
+    from jarviscore.channels import Broadcast, VoiceOut, WebFeed
+
+    class TG:
+        def __init__(self):
+            self.texts, self.voices, self.done = [], [], threading.Event()
+        def send(self, chat, text, reply_to=None):
+            self.texts.append(text); return {"message_id": len(self.texts)}
+        def send_voice(self, chat, ogg, reply_to=None):
+            self.voices.append(ogg); self.done.set(); return {"message_id": 99}
+
+    tg = TG()
+    feed = WebFeed(tmp_path / "f.jsonl")
+    bc = Broadcast(feed, tg, 42)
+    spoken = []
+    bc.voice = VoiceOut(tg, 42, speech=lambda mid: spoken.append(mid) or b"WAV", to_ogg=lambda wav: b"OGG" + wav)
+    bc.send(42, "🎙 Расслышал: привет")
+    bc.send(42, "Принял, задача №5. Сейчас скажу, что понял.")
+    bc.send(42, "Добрый вечер, сэр.")
+    assert tg.done.wait(5)
+    bc.voice.stop()
+    assert tg.voices == [b"OGGWAV"] and len(spoken) == 1 and len(tg.texts) == 3
+
+
+def test_voice_failure_never_breaks_text(tmp_path):
+    from jarviscore.channels import Broadcast, VoiceOut, WebFeed
+
+    class TG:
+        def __init__(self): self.texts = []
+        def send(self, chat, text, reply_to=None):
+            self.texts.append(text); return {"message_id": 1}
+        def send_voice(self, *a, **k): raise RuntimeError("сеть")
+
+    tg = TG()
+    bc = Broadcast(WebFeed(tmp_path / "f.jsonl"), tg, 42)
+    bc.voice = VoiceOut(tg, 42, speech=lambda mid: None, to_ogg=lambda w: w)   # голос недоступен
+    bc.send(42, "Добрый вечер, сэр.")
+    bc.voice.stop()
+    assert tg.texts == ["Добрый вечер, сэр."]
+
+
+def test_telegram_send_voice_is_multipart(monkeypatch):
+    from jarviscore import telegram as T
+    seen = {}
+
+    class R:
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def read(self): return b'{"ok": true, "result": {"message_id": 7}}'
+
+    def fake(req, timeout=None):
+        seen["ct"], seen["body"], seen["url"] = req.get_header("Content-type"), req.data, req.full_url
+        return R()
+    monkeypatch.setattr(T.urllib.request, "urlopen", fake)
+    res = T.Telegram("123:abc").send_voice(42, b"OGGDATA")
+    assert res["message_id"] == 7 and seen["url"].endswith("/sendVoice")
+    assert "multipart/form-data" in seen["ct"] and b"OGGDATA" in seen["body"] and b'name="chat_id"' in seen["body"]

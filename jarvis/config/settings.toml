@@ -38,6 +38,7 @@ default_allowed_tools = ["Read", "Edit", "Write", "Glob", "Grep", "Bash"]
 [telegram]
 escalation_minutes = 10                # нет ответа на срочный вопрос → позвонить (когда будут звонки)
 report_hour = 8                        # утренний дайджест
+voice_replies = true                   # ответы в Телеграме ещё и голосовым (голос ESpeech); false — только текст
 
 [printers]
 # Имена ресурсов планировщика и способ управления. Секреты (IP, коды) — в .env.
