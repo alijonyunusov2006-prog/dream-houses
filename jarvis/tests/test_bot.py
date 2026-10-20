@@ -132,7 +132,7 @@ def test_greeting_gives_briefing_not_a_task(tmp_path):
     assert len(ctl.sched.tasks) == n                             # приветствие — не задача
     text = tg.sent[-1][1]
     assert "сэр" in text and "№1" in text and "ждут вашего решения" in text.lower()
-    assert "1 в очереди" in text and "Сегодня сделано: 1" in text
+    assert "В очереди: 1" in text and "Сделано сегодня, 1: «Старое»" in text
 
 
 @pytest.mark.parametrize("hour, word", [(3, "ночи"), (8, "утро"), (14, "день"), (20, "вечер"), (23, "ночи")])
@@ -370,3 +370,118 @@ def test_executor_raises_limit_on_subscription_limit(monkeypatch, tmp_path):
     t = Controller(Scheduler(), tmp_path / "t.json").new_task("x")
     with pytest.raises(LimitReached):
         ex.understand(t)
+
+
+class AgentClaude(FakeClaude):
+    """Разбор, который выбирает исполнителя."""
+    def __init__(self, agent, **kw):
+        super().__init__(**kw)
+        self.agent = agent
+
+    def agents(self):
+        return ["archviz", "developer", "secretary"]
+
+    def understand(self, task):
+        info = super().understand(task)
+        info["agent"] = self.agent
+        return info
+
+
+def test_understand_assigns_known_agent_and_names_it_in_russian(tmp_path):
+    bot, tg, ctl = make(tmp_path, claude=AgentClaude("ArchViz "))
+    bot.handle(msg("Сделай рендер гостиной"))
+    bot.work_once()
+    t = ctl.sched.tasks["1"]
+    assert t.checkpoint["agent"] == "archviz"
+    assert any("Делает: 3D-визуализатор" in s[1] for s in tg.sent)
+
+
+def test_understand_rejects_made_up_agent(tmp_path):
+    bot, tg, ctl = make(tmp_path, claude=AgentClaude("superman"))
+    bot.handle(msg("Сделай что-нибудь"))
+    bot.work_once()
+    assert ctl.sched.tasks["1"].checkpoint["agent"] == "jarvis"
+    assert not any("Делает:" in s[1] for s in tg.sent)
+
+
+# --- разговор без задач (2026-10-21: «ты здесь?», «Конец.», «не надо, номер 14» становились задачами) ---
+def test_presence_answers_without_task(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    bot.handle(msg("Джарвис, ты здесь?"))
+    assert "сэр" in tg.sent[-1][1] and ctl.sched.tasks == {}
+
+
+def test_single_word_noise_is_not_a_task(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    bot.handle(msg("Конец."))
+    assert ctl.sched.tasks == {} and "Не понял" in tg.sent[-1][1]
+
+
+def test_repeat_says_last_reply_again(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    bot.handle(msg("я дома"))
+    first = tg.sent[-1][1]
+    bot.handle(msg("повтори"))
+    assert tg.sent[-1][1] == first and ctl.sched.tasks == {}
+
+
+def test_stop_with_number_cancels_that_task(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    bot.handle(msg("Сделай список дел"))
+    bot.handle(msg("Не надо, номер 1, слушай меня"))
+    assert ctl.sched.tasks["1"].checkpoint.get("cancelled") and "№1" in tg.sent[-1][1]
+
+
+def test_stop_without_number_cancels_latest_open(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    bot.handle(msg("Сделай список дел"))
+    bot.handle(msg("Сделай второй список"))
+    bot.handle(msg("стоп"))
+    assert ctl.sched.tasks["2"].checkpoint.get("cancelled") and not ctl.sched.tasks["1"].checkpoint.get("cancelled")
+
+
+def test_stop_with_nothing_open(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    bot.handle(msg("не надо"))
+    assert ctl.sched.tasks == {} and "ничего" in tg.sent[-1][1]
+
+
+def test_question_gets_short_answer_without_report_ceremony(tmp_path):
+    class Q(FakeClaude):
+        def ask(self, task):
+            return SimpleNamespace(ok=True, result="В папке 4 файла, сэр.", session_id="s")
+    bot, tg, ctl = make(tmp_path, claude=Q())
+    bot.handle(msg("Сколько файлов в папке образцы?"))
+    assert not any("Принял, задача" in s[1] for s in tg.sent)
+    bot.work_once()
+    assert tg.sent[-1][1] == "В папке 4 файла, сэр."
+    assert not any("Вот что я понял" in s[1] for s in tg.sent)
+    assert ctl.sched.tasks["1"].state.value == "done"
+
+
+def test_session_limit_is_russian_pauses_all_and_resumes_at_reset(tmp_path):
+    from jarviscore.bot import LimitReached, limit_until
+
+    class Limited(FakeClaude):
+        def understand(self, task):
+            raise LimitReached("You've hit your session limit · resets 10:10pm (Asia/Dushanbe)")
+    bot, tg, ctl = make(tmp_path, claude=Limited())
+    bot.handle(msg("Сделай список дел"))
+    bot.handle(msg("Сделай второй список"))
+    bot.work_once()
+    text = tg.sent[-1][1]
+    assert "22:10" in text and "limit" not in text.lower() and "лимит" in text
+    n = len(tg.sent)
+    bot.work_once()                                    # вторую задачу не трогаем до сброса и не пишем снова
+    assert len(tg.sent) == n and ctl.sched.tasks["2"].state.value == "pending"
+    assert "22:10" in bot.briefing()
+    u = limit_until("resets 10:10pm (Asia/Dushanbe)").astimezone()
+    assert (u.hour, u.minute) == (22, 10)
+
+
+def test_briefing_names_what_was_done(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    bot.handle(msg("Сделай список дел"))
+    bot.work_once(); bot.work_once()
+    b = bot.briefing()
+    assert "список дел" in b.lower() and "Сделано сегодня" in b

@@ -100,6 +100,19 @@ def answer(query: str, roots: list[Path]) -> str:
     if not hits:
         return "В моих записях ничего не нашёл, сэр. Скажите иначе или дайте задание — поищу глубже."
     out = ["Вот что нашёл в записях, сэр:"]
-    for h in hits:
-        out.append(f"• {h.line}\n  ({h.file.name}, строка {h.lineno})")
+    for h in hits[:3]:
+        out.append("• " + _plain(h.line))
     return "\n".join(out)
+
+
+def _plain(line: str, limit: int = 220) -> str:
+    """Строка заметки без разметки: таблицы, звёздочки, ссылки [[…]], пути в `…` — читать и слушать по-человечески."""
+    t = re.sub(r"\[\[([^\]|]+)\|?([^\]]*)\]\]", lambda m: m.group(2) or m.group(1), line)
+    t = re.sub(r"`[^`]*`", "", t)
+    t = re.sub(r"^\s*\|?\s*\d{4}-\d{2}-\d{2}\s*\|", "", t)          # дата в первой колонке таблицы решений
+    t = re.sub(r"\|\s*[\w-]+\s*\|\s*$", "", t)                      # ярлык в последней колонке
+    t = t.replace("|", " — ")
+    t = re.sub(r"[*_#>]+", "", t)
+    t = re.sub(r"\s*—\s*(—\s*)+", " — ", t)
+    t = re.sub(r"\s+", " ", t).strip(" —-")
+    return t if len(t) <= limit else t[: limit - 1].rstrip() + "…"

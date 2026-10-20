@@ -14,6 +14,7 @@ import threading
 import time
 import tomllib
 import webbrowser
+from datetime import datetime
 from pathlib import Path
 
 from .bot import ROOT, ClaudeExecutor, JarvisBot, load_env
@@ -210,6 +211,8 @@ def main() -> None:
     threading.Thread(target=_loop, args=(bot.check_alerts, stop, 30, "контролёр"), daemon=True).start()
     web = JarvisWeb(bot, feed, ROOT / "data" / "tmp")
     web.on_pill = lambda: open_pill(f"http://127.0.0.1:{PORT}/")
+    web.projects_dir = vault / "Проекты" if vault.exists() else None   # 3D-офис: что идёт по проектам
+    bot.telegram_on = tg is not None
     serve(web, PORT)
     try:
         voice = start_voice(settings)
@@ -220,8 +223,13 @@ def main() -> None:
         threading.Thread(target=telegram_loop, args=(tg, bot, feed, bc, stop), daemon=True).start()
 
     url = f"http://127.0.0.1:{PORT}/"
-    bc.send(owner, "JARVIS на связи. Пишите или говорите задание." +
-            ("" if tg_owner else "\n(Telegram пока не подключён — см. docs/БОТ-JARVIS.md)"))
+    hello = ROOT / "data" / "hello.txt"                     # «на связи» — раз в день, а не при каждом перезапуске
+    today = datetime.now().date().isoformat()
+    if not hello.exists() or hello.read_text(encoding="utf-8").strip() != today:
+        bc.send(owner, "JARVIS на связи, сэр. Скажите «Джарвис» — и задание." +
+                ("" if tg_owner else " Телеграм пока не подключён."))
+        hello.parent.mkdir(parents=True, exist_ok=True)
+        hello.write_text(today, encoding="utf-8")
     print(f"JARVIS запущен: {url}  — это окно не закрывайте.", flush=True)
     if os.environ.get("JARVIS_NO_WINDOW") != "1":
         open_window(url)

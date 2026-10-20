@@ -23,11 +23,20 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+from . import office
 from .controller import STATE_RU
 from .planner import State
 from .wake import find_wake
 
 log = logging.getLogger("jarvis.web")
+CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline'; "
+       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+       "font-src https://fonts.gstatic.com; connect-src 'self'; media-src 'self' blob:; "
+       "frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
+OFFICE_CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; "
+              "img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; "
+              "frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
 PAGE = Path(__file__).with_name("web") / "index.html"
 MAX_VOICE = 25 * 1024 * 1024
 
@@ -44,6 +53,15 @@ class JarvisWeb:
         self._hear_lock = threading.Lock()
         self.tts_url = "http://127.0.0.1:8766"
         self.on_pill = None                      # app.py подставляет открытие окна «сверху»
+        root = Path(__file__).resolve().parents[2]
+        self.agents_dir = root / ".claude" / "agents"          # кто есть в офисе агентов
+        self.projects_dir: Path | None = None                  # Obsidian Vault/Проекты — app.py подставляет
+        self.office_page = root / "docs" / "office3d" / "index.html"
+        self.machine = office.Machine(self.tts_url)
+
+    def office(self) -> dict:
+        """Живые данные 3D-офиса: агенты, проекты, здоровье ПК."""
+        return office.snapshot(self.bot, self.agents_dir, self.projects_dir, self.machine)
 
     def hear(self, audio: bytes, now: float | None = None) -> dict:
         """Фраза из режима «слушать «Джарвис»». Без зова — выбрасываем, нигде не сохраняя."""
@@ -154,18 +172,14 @@ def make_handler(app: JarvisWeb, port: int):
         def log_message(self, fmt, *args):  # без шума в консоли; ошибки — в журнал
             log.debug(fmt, *args)
 
-        def _reply(self, code: int, body: bytes = b"", ctype: str = "application/json; charset=utf-8"):
+        def _reply(self, code: int, body: bytes = b"", ctype: str = "application/json; charset=utf-8", csp: str = CSP):
             self.send_response(code)
             self.send_header("Content-Type", ctype)
             self.send_header("Content-Length", str(len(body)))
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("X-Frame-Options", "DENY")
-            self.send_header("Content-Security-Policy",
-                             "default-src 'self'; script-src 'self' 'unsafe-inline'; "
-                             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-                             "font-src https://fonts.gstatic.com; connect-src 'self'; media-src 'self' blob:; "
-                             "frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
+            self.send_header("Content-Security-Policy", csp)
             self.end_headers()
             self.wfile.write(body)
 
@@ -189,6 +203,10 @@ def make_handler(app: JarvisWeb, port: int):
                 mid = (parse_qs(url.query).get("id") or ["0"])[0]
                 audio = app.speech(int(mid)) if mid.isdigit() else None
                 return self._reply(200, audio, "audio/wav") if audio else self._json(503, {"error": "голос недоступен"})
+            if url.path == "/office":                               # 3D-офис: три.js с jsDelivr
+                return self._reply(200, app.office_page.read_bytes(), "text/html; charset=utf-8", OFFICE_CSP)
+            if url.path == "/api/office":
+                return self._json(200, app.office())
             if url.path == "/api/state":
                 after = int((parse_qs(url.query).get("after") or ["0"])[0] or 0)
                 return self._json(200, app.state(after))

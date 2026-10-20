@@ -40,3 +40,12 @@ def test_secrets_never_returned_and_service_dirs_skipped(tmp_path):
 def test_word_forms_match_by_stem(tmp_path):
     write(tmp_path / "x.md", "Голос Джарвиса делаем через Qwen3-TTS\n")
     assert search("какой голос у джарвиса", [tmp_path])[0].line.startswith("Голос")
+
+
+def test_answer_is_plain_text_without_tables_and_file_names(tmp_path):
+    from jarviscore.memory import answer
+    (tmp_path / "decided.md").write_text(
+        "| 2026-10-20 | **Голос JARVIS — ESpeech** (эталон `obrazcy/x.wav`). Выбрал [[голос|на слух]] | голос |\n", encoding="utf-8")
+    a = answer("вспомни, что решили про голос", [tmp_path])
+    assert "ESpeech" in a and "|" not in a and "**" not in a and "decided.md" not in a and "`" not in a
+    assert "на слух" in a

@@ -93,3 +93,15 @@ def test_summary_lists_open_tasks_with_state_in_russian(tmp_path):
     text = c.summary()
     assert "№1" in text and "в очереди" in text
     assert "№2" in text and "ждёт вашего ответа" in text
+
+
+def test_reminders_stop_after_two(tmp_path):
+    from datetime import timedelta
+    from jarviscore.controller import Controller
+    from jarviscore.planner import Scheduler
+    ctl = Controller(Scheduler(), tmp_path / "t.json", escalation_min=0)
+    ctl.remind_every_min = 0
+    t = ctl.new_task("x")
+    ctl.ask(t.id, "вопрос?")
+    sent = [a for _ in range(5) for a in ctl.check()]
+    assert len([a for a in sent if a.kind == "escalate"]) == 2

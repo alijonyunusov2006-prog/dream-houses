@@ -29,6 +29,7 @@ STATE_RU = {
     State.FAILED: "не получилось",
 }
 OPEN = (State.PENDING, State.RUNNING, State.PAUSED, State.BLOCKED, State.WAITING_HUMAN)
+MAX_REMINDERS = 2          # одно и то же напоминание — не больше двух раз (урок 2026-10-21: «Конец.» ждёт 130 мин)
 
 
 def _now() -> datetime:
@@ -102,17 +103,24 @@ class Controller:
 
     # --- проверка ------------------------------------------------------------
     def _due(self, t: Task, kind: str, now: datetime) -> bool:
+        if t.checkpoint.get("alerts_n", {}).get(kind, 0) >= MAX_REMINDERS:   # не надоедать: два раза и хватит
+            return False
         last = t.checkpoint.get("alerts", {}).get(kind)
         return last is None or now - datetime.fromisoformat(last) >= timedelta(minutes=self.remind_every_min)
 
     def _mark(self, t: Task, kind: str, now: datetime) -> None:
         t.checkpoint.setdefault("alerts", {})[kind] = now.isoformat()
+        n = t.checkpoint.setdefault("alerts_n", {})
+        n[kind] = n.get(kind, 0) + 1
 
     def unmark(self, alert: Alert) -> None:
         """Тревога не дошла до владельца — снять отметку, чтобы следующая проверка повторила её."""
         t = self.sched.tasks.get(alert.task_id)
         if t:
             t.checkpoint.get("alerts", {}).pop(alert.kind, None)
+            n = t.checkpoint.get("alerts_n", {})
+            if n.get(alert.kind):
+                n[alert.kind] -= 1                     # недошедшее напоминание не считается
 
     def check(self, now: datetime | None = None) -> list[Alert]:
         now = now or _now()
