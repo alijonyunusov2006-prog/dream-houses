@@ -31,7 +31,7 @@ _NAME = re.compile(r"^name:\s*(\S+)", re.M)
 _WORKED = re.compile(r"\*\*Работали:\*\*\s*([\d-]+)(?:\s*—\s*([\d-]+))?(?:\s*\((\d+)\s*дн)?")
 _WHERE = re.compile(r"\*\*Где на диске:\*\*\s*(.+)")
 _SUMMARY = re.compile(r"^>\s*(.+)$", re.M)
-_DONE_WORDS = re.compile(r"работа закончена|всё готово|сдан[оа]?\b|завершен", re.I)
+_DONE_WORDS = re.compile(r"работа закончена|дело закончено|всё готово|всё сделано|сдан[оа]?\b|завершен[оа]?", re.I)
 QUIET_DAYS = 14          # дольше не трогали — «стоит»
 
 
@@ -138,7 +138,7 @@ def load_projects(projects_dir: Path | None, now: datetime | None = None) -> lis
         letters = re.findall(r"[A-Za-zА-Яа-яЁё]", nxt)
         if letters and sum(c.isascii() for c in letters) / len(letters) > 0.5:
             nxt = ""                                     # запись на английском — владелец её не прочтёт
-        state = "done" if _DONE_WORDS.search(nxt[:200]) else "active"
+        state = "done" if _DONE_WORDS.search(nxt) else "active"
         try:
             if state == "active" and last and (now - datetime.fromisoformat(last)).days > QUIET_DAYS:
                 state = "quiet"
