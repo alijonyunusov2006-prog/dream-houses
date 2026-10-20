@@ -26,7 +26,7 @@ from .controller import Controller
 from .planner import State, Task
 from . import memory
 from .memory import is_recall
-from .wake import is_greeting
+from .wake import find_wake, is_greeting
 
 ROOT = Path(__file__).resolve().parents[2]          # .../jarvis
 log = logging.getLogger("jarvis.bot")
@@ -106,6 +106,9 @@ class JarvisBot:
             return self.tg.send(self.owner, self.ctl.summary())
         if text.startswith("/cancel"):
             return self._cancel(text.removeprefix("/cancel").strip())
+        called, rest = find_wake(text)          # «Джарвис, …» текстом — имя срезаем, как и в голосе
+        if called and rest:
+            text = rest
         if is_recall(text):
             return self.tg.send(self.owner, memory.answer(text, self.memory_roots))
         if is_greeting(text):

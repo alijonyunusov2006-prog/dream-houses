@@ -167,6 +167,18 @@ def test_morning_report_retried_if_sending_failed(tmp_path):
     assert bot.maybe_morning(datetime(2026, 10, 20, 8, 6))               # не потерялся
 
 
+def test_typed_greeting_with_name_is_briefing_too(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    bot.handle(msg("Джарвис, я дома"))
+    assert "сэр" in tg.sent[-1][1] and ctl.sched.tasks == {}
+
+
+def test_typed_task_with_name_strips_the_name(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    bot.handle(msg("Джарвис, сделай список дел"))
+    assert ctl.sched.tasks["1"].title == "сделай список дел"
+
+
 def test_greeting_when_nothing_happened(tmp_path):
     bot, tg, ctl = make(tmp_path)
     bot.handle(msg("Привет"))
