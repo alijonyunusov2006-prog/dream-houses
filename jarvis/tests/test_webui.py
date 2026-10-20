@@ -104,6 +104,41 @@ def test_bare_wake_word_arms_for_next_phrase_only_briefly(tmp_path):
     assert app.hear(b"wav", now=260.0) == {"heard": False}       # ожидание истекло
 
 
+def test_jarvis_reply_is_spoken_by_voice_service_and_cached(tmp_path):
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+    import threading as th
+
+    calls = []
+
+    class FakeTTS(BaseHTTPRequestHandler):
+        def log_message(self, *a): pass
+
+        def do_POST(self):
+            calls.append(json.loads(self.rfile.read(int(self.headers["Content-Length"]))))
+            body = b"RIFF-voice"
+            self.send_response(200); self.send_header("Content-Length", str(len(body))); self.end_headers()
+            self.wfile.write(body)
+
+    srv = HTTPServer(("127.0.0.1", 0), FakeTTS)
+    th.Thread(target=srv.serve_forever, daemon=True).start()
+    app, ctl, feed = make_app(tmp_path)
+    app.tts_url = f"http://127.0.0.1:{srv.server_address[1]}"
+    owner_id = feed.add_owner("привет")
+    jid = feed.send(0, "Слушаю, сэр.")["message_id"]
+    assert app.speech(owner_id) is None                      # озвучиваем только ответы JARVIS
+    assert app.speech(jid) == b"RIFF-voice"
+    assert app.speech(jid) == b"RIFF-voice" and len(calls) == 1   # второй раз — из кэша
+    assert calls[0]["text"] == "Слушаю, сэр."
+    srv.shutdown()
+
+
+def test_voice_service_down_is_not_an_error(tmp_path):
+    app, ctl, feed = make_app(tmp_path)
+    app.tts_url = "http://127.0.0.1:9"                       # никто не слушает
+    jid = feed.send(0, "Добрый вечер, сэр.")["message_id"]
+    assert app.speech(jid) is None
+
+
 def test_post_without_jarvis_header_is_refused(web):
     base, ctl, _ = web
     code, _ = call(base + "/api/send", {"text": "удали всё"})        # так могла бы попытаться чужая страница

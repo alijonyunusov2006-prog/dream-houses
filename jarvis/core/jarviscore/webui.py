@@ -10,8 +10,10 @@ Host этого компьютера (защита от подмены адре�
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
+import urllib.request
 import re
 import threading
 import time
@@ -39,6 +41,7 @@ class JarvisWeb:
         self._n = 0
         self._armed_until = 0.0
         self._hear_lock = threading.Lock()
+        self.tts_url = "http://127.0.0.1:8766"
 
     def hear(self, audio: bytes, now: float | None = None) -> dict:
         """Фраза из режима «слушать «Джарвис»». Без зова — выбрасываем, нигде не сохраняя."""
@@ -91,6 +94,27 @@ class JarvisWeb:
         threading.Thread(target=self.bot.handle, args=(self._message(mid, reply_to=reply_to, voice=str(path)),),
                          daemon=True).start()
         return mid
+
+    def speech(self, msg_id: int) -> bytes | None:
+        """Ответ JARVIS его голосом: служба голоса на ПК (golos/jarvis_tts_server.py). Озвученное — в кэш."""
+        item = next((m for m in self.feed.since(msg_id - 1) if m["id"] == msg_id and m["who"] == "jarvis"), None)
+        if not item:
+            return None
+        text = item["text"]
+        cache = self.tmp_dir.parent / "tts" / (hashlib.sha1(text.encode("utf-8")).hexdigest()[:16] + ".wav")
+        if cache.exists():
+            return cache.read_bytes()
+        req = urllib.request.Request(self.tts_url + "/speak", data=json.dumps({"text": text}).encode("utf-8"),
+                                     headers={"X-Jarvis": "1", "Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r:
+                audio = r.read()
+        except Exception:
+            log.warning("служба голоса недоступна — окно прочитает голосом браузера")
+            return None
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        cache.write_bytes(audio)
+        return audio
 
     def state(self, after: int) -> dict:
         today = datetime.now().astimezone().date()
@@ -157,6 +181,10 @@ def make_handler(app: JarvisWeb, port: int):
             if m and (PAGE.parent / f"{m.group(1)}.js").is_file():
                 return self._reply(200, (PAGE.parent / f"{m.group(1)}.js").read_bytes(),
                                    "application/javascript; charset=utf-8")
+            if url.path == "/api/tts":
+                mid = (parse_qs(url.query).get("id") or ["0"])[0]
+                audio = app.speech(int(mid)) if mid.isdigit() else None
+                return self._reply(200, audio, "audio/wav") if audio else self._json(503, {"error": "голос недоступен"})
             if url.path == "/api/state":
                 after = int((parse_qs(url.query).get("after") or ["0"])[0] or 0)
                 return self._json(200, app.state(after))

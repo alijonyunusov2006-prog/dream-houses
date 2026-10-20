@@ -186,8 +186,22 @@ function chime(freqs, dur = 0.1) {
     o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur * 2.6);
   });
 }
-function say(text) {
-  if (!(hudOn || $("speak").checked) || !("speechSynthesis" in window)) return;
+let voiceAudio = null;
+async function say(m) {                                    // голос JARVIS (служба на ПК), запасной — голос браузера
+  if (!(hudOn || $("speak").checked)) return;
+  try {
+    const r = await fetch("/api/tts?id=" + m.id);
+    if (r.ok) {
+      voiceAudio?.pause(); speechSynthesis.cancel();
+      voiceAudio = new Audio(URL.createObjectURL(await r.blob()));
+      voiceAudio.onplay = () => { speaking = true; }; voiceAudio.onended = voiceAudio.onpause = () => { speaking = false; };
+      return await voiceAudio.play();
+    }
+  } catch (e) { /* служба голоса молчит — читаем браузером */ }
+  sayBrowser(m.text);
+}
+function sayBrowser(text) {
+  if (!("speechSynthesis" in window)) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text.replace(/[•#*`]/g, "").slice(0, 700)); u.lang = "ru-RU";
   const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith("ru")); if (v) u.voice = v;
@@ -262,7 +276,7 @@ async function poll() {
     let fresh = false;
     for (const m of s.feed) {
       const isNew = m.id > initialId; addMsg(m, isNew); lastId = Math.max(lastId, m.id);
-      if (m.who === "jarvis" && isNew) { fresh = true; flash = 1; say(m.text); }
+      if (m.who === "jarvis" && isNew) { fresh = true; flash = 1; say(m); }
     }
     for (const [id, el] of rendered) renderActions(el, id);
     renderSide(s.stats);
@@ -298,7 +312,7 @@ $("text").addEventListener("input", () => { $("err").textContent = ""; });
 async function toggleMic() {
   if (recording) { mediaRec.stop(); return; }
   try {
-    if (speaking) speechSynthesis.cancel();
+    if (speaking) { speechSynthesis.cancel(); voiceAudio?.pause(); }
     const stream = await navigator.mediaDevices.getUserMedia({audio: true});
     actx = actx || new AudioContext(); analyser = actx.createAnalyser(); analyser.fftSize = 256;
     actx.createMediaStreamSource(stream).connect(analyser);
@@ -387,7 +401,7 @@ if ($("listen").checked) earStart();
 function setHud(on) {
   hudOn = on; $("hud").classList.toggle("on", on);
   if (on) { sizeBp($("hudbp")); $("hudsay").textContent = "Слушаю тебя. Нажми на кольцо или зажми пробел."; $("hudyou").textContent = ""; chime([392, 523, 784], .09); }
-  else speechSynthesis.cancel();
+  else { speechSynthesis.cancel(); voiceAudio?.pause(); }
 }
 $("toHud").onclick = () => setHud(true); $("hudexit").onclick = () => setHud(false);
 $("toMini").onclick = () => {

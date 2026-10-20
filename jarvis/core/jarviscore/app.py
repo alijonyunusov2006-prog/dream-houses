@@ -86,6 +86,22 @@ def _from_telegram(u: dict, tg, bot: JarvisBot, feed: WebFeed, bc: Broadcast) ->
         log.exception("сообщение %s", u.get("update_id"))
 
 
+def start_voice(settings: dict):
+    """Служба голоса JARVIS (отдельное окружение в C:\\Jarvis\\golos). Нет её — окно читает голосом браузера."""
+    sp = settings.get("speech", {})
+    py = Path(sp.get("tts_python", r"C:\Jarvis\golos\.venv\Scripts\python.exe"))
+    script = Path(sp.get("tts_script", r"C:\Jarvis\golos\jarvis_tts_server.py"))
+    if already_running(8766):
+        return None
+    if not (py.exists() and script.exists()):
+        log.warning("служба голоса не найдена (%s) — будет голос браузера", script)
+        return None
+    flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+    log_file = open(ROOT / "data" / "logs" / "voice.log", "ab")
+    return subprocess.Popen([str(py), str(script)], cwd=str(script.parent), stdout=log_file, stderr=log_file,
+                            creationflags=flags)
+
+
 def already_running(port: int = PORT) -> bool:
     import socket
 
@@ -131,6 +147,7 @@ def main() -> None:
         threading.Thread(target=_loop, args=(bot.work_once, stop, 5, f"исполнитель {i + 1}"), daemon=True).start()
     threading.Thread(target=_loop, args=(bot.check_alerts, stop, 30, "контролёр"), daemon=True).start()
     serve(JarvisWeb(bot, feed, ROOT / "data" / "tmp"), PORT)
+    voice = start_voice(settings)
     if tg:
         threading.Thread(target=telegram_loop, args=(tg, bot, feed, bc, stop), daemon=True).start()
 
@@ -145,6 +162,9 @@ def main() -> None:
             time.sleep(1)
     except KeyboardInterrupt:
         stop.set()
+    finally:
+        if voice:
+            voice.terminate()
 
 
 if __name__ == "__main__":
