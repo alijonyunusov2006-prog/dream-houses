@@ -2,7 +2,7 @@
 
 Телеграм подписывает данные запуска (initData) ключом бота — подделать подпись без ключа нельзя.
 Проверяем по правилам Телеграма: HMAC-SHA256, ключ = HMAC("WebAppData", ключ_бота); плюс номер
-пользователя = владелец и подпись не старше суток.
+пользователя = владелец и подпись не старше 2 часов.
 https://core.telegram.org/bots/webapps#validating-data-received-via-the-mini-app
 """
 
@@ -14,7 +14,7 @@ import json
 import time
 from urllib.parse import parse_qsl
 
-MAX_AGE = 24 * 3600
+MAX_AGE = 2 * 3600          # подпись живёт 2 часа (ревью безопасности: меньше вред, если утечёт); дольше — переоткрыть окно
 
 
 def check(init_data: str, bot_token: str, owner_id: int | None, now: float | None = None,
@@ -38,7 +38,7 @@ def check(init_data: str, bot_token: str, owner_id: int | None, now: float | Non
         user = json.loads(pairs.get("user", "{}"))
     except (ValueError, json.JSONDecodeError):
         return False
-    if age < -300 or age > max_age:          # из будущего (часы сбиты сильнее 5 мин) или старше суток
+    if age < -300 or age > max_age:          # из будущего (часы сбиты сильнее 5 мин) или старше срока
         return False
     return user.get("id") == int(owner_id)
 

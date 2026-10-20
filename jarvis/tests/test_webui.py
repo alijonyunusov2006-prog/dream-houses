@@ -214,7 +214,7 @@ def remote(tmp_path):
     app.public_host, app.tg_token, app.owner_id = "abc.trycloudflare.com", "1:TOKEN", 777
     opened = []
     app.on_pill = lambda: opened.append("pill")
-    server = serve(app, port)
+    server = serve(app, port, remote=True)   # дверь только для туннеля
     fields = {"auth_date": str(int(_t.time())), "user": json.dumps({"id": 777})}
     yield f"http://127.0.0.1:{port}", app, sign(fields, "1:TOKEN"), sign({**fields, "user": json.dumps({"id": 5})}, "1:TOKEN"), opened
     server.shutdown()
@@ -268,7 +268,37 @@ def test_tunnel_closed_unless_enabled_and_wrong_host_rejected(remote):
     assert rcall(base, "/")[0] == 403 and rcall(base, "/api/state?after=0", good)[0] == 403
 
 
-def test_local_request_through_tunnel_is_not_treated_as_local(remote):
+def test_remote_door_always_needs_signature_even_with_local_host(remote):
     base, app, good, _, opened = remote
-    code, _ = rcall(base, "/api/state?after=0", host=base.split("//")[1])   # Host «127.0.0.1», но пришёл через туннель
+    code, _ = rcall(base, "/api/state?after=0", host=base.split("//")[1], tunnel=False)   # без признаков туннеля
     assert code == 401
+
+
+def test_window_door_rejects_anything_that_came_through_a_proxy(web):
+    base, _, _ = web
+    for h in ("Cf-Ray", "Cdn-Loop", "X-Forwarded-For", "Forwarded", "Via", "Cf-Connecting-Ip"):
+        req = urllib.request.Request(base + "/api/state?after=0", headers={h: "x"})
+        try:
+            urllib.request.urlopen(req, timeout=10)
+            code = 200
+        except urllib.error.HTTPError as e:
+            code = e.code
+        assert code == 403, h
+
+
+def test_bad_content_length_is_rejected(web):
+    import http.client
+    base, _, port = web
+    for bad in ("-1", "abc"):
+        c = http.client.HTTPConnection("127.0.0.1", port, timeout=10)
+        c.putrequest("POST", "/api/send")
+        c.putheader("X-Jarvis", "1"); c.putheader("Content-Length", bad)
+        c.endheaders()
+        assert c.getresponse().status == 400
+        c.close()
+
+
+def test_server_does_not_reveal_python_version(web):
+    base, _, _ = web
+    with urllib.request.urlopen(base + "/", timeout=10) as r:
+        assert "Python" not in (r.headers.get("Server") or "")

@@ -173,10 +173,19 @@ def stage(t) -> int:
     return 0
 
 
-def make_handler(app: JarvisWeb, port: int):
+PROXY_HEADERS = ("Cf-Connecting-Ip", "Cf-Ray", "Cdn-Loop", "Cf-Visitor", "X-Forwarded-For", "X-Forwarded-Host",
+                 "X-Forwarded-Proto", "Forwarded", "Via", "True-Client-Ip", "X-Real-Ip")
+
+
+def make_handler(app: JarvisWeb, port: int, remote: bool = False):
+    """remote=False — окно на этом ПК (8765): через посредника (туннель) не пускает вовсе.
+    remote=True — отдельная дверь только для туннеля (8767): подпись владельца нужна всегда, окна ПК не открываются."""
     allowed_hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
 
     class Handler(BaseHTTPRequestHandler):
+        timeout = 30                            # зависшее соединение не держит поток вечно
+        server_version, sys_version = "JARVIS", ""   # не выдавать версию Python наружу
+
         def log_message(self, fmt, *args):  # без шума в консоли; ошибки — в журнал
             log.debug(fmt, *args)
 
@@ -196,16 +205,13 @@ def make_handler(app: JarvisWeb, port: int):
             self._reply(code, json.dumps(data, ensure_ascii=False).encode())
 
         def _host_ok(self) -> bool:
-            """Свой компьютер: адрес 127.0.0.1 и запрос пришёл не через туннель."""
-            return self.headers.get("Host", "") in allowed_hosts and not self._via_tunnel()
-
-        def _via_tunnel(self) -> bool:
-            return bool(self.headers.get("Cf-Connecting-Ip") or self.headers.get("X-Forwarded-For"))
+            """Свой компьютер: дверь окна (не туннельная), адрес 127.0.0.1 и ни одного признака посредника."""
+            return (not remote and self.headers.get("Host", "") in allowed_hosts
+                    and not any(self.headers.get(h) for h in PROXY_HEADERS))
 
         def _remote_ok(self) -> bool:
-            """Запрос из Телеграма через туннель: только на наш публичный адрес и только когда он включён."""
-            host = self.headers.get("Host", "")
-            return bool(app.public_host) and self._via_tunnel() and host in (app.public_host, *allowed_hosts)
+            """Туннельная дверь: только когда туннель включён и только на его адрес."""
+            return remote and bool(app.public_host) and self.headers.get("Host", "") in (app.public_host, *allowed_hosts)
 
         def _tg_ok(self) -> bool:
             """Подпись Телеграма: открыл именно владелец (tgauth.check)."""
@@ -279,7 +285,12 @@ def make_handler(app: JarvisWeb, port: int):
                     return self._json(401, {"error": "только владелец"})
                 if urlparse(self.path).path in ("/api/pill", "/api/office/open"):   # окна на ПК с телефона не открываем
                     return self._json(403, {"error": "только на компьютере"})
-            size = int(self.headers.get("Content-Length") or 0)
+            try:
+                size = int(self.headers.get("Content-Length") or 0)
+            except ValueError:
+                return self._json(400, {"error": "неверная длина"})
+            if size < 0:
+                return self._json(400, {"error": "неверная длина"})
             if size > MAX_VOICE:
                 return self._json(413, {"error": "слишком большой файл"})
             body = self.rfile.read(size)
@@ -316,7 +327,11 @@ def make_handler(app: JarvisWeb, port: int):
     return Handler
 
 
-def serve(app: JarvisWeb, port: int = 8765) -> ThreadingHTTPServer:
-    server = ThreadingHTTPServer(("127.0.0.1", port), make_handler(app, port))
+REMOTE_PORT = 8767     # дверь только для туннеля (окно в Телеграме); на 8765 через посредника не пускают
+
+
+def serve(app: JarvisWeb, port: int = 8765, remote: bool = False) -> ThreadingHTTPServer:
+    server = ThreadingHTTPServer(("127.0.0.1", port), make_handler(app, port, remote))
+    server.daemon_threads = True
     threading.Thread(target=server.serve_forever, daemon=True).start()
     return server

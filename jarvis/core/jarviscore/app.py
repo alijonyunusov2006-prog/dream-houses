@@ -167,7 +167,9 @@ def start_phone(settings: dict, web, tg, tg_owner, token: str):
         set_menu(tg, tg_owner, url)
         log.info("окно JARVIS в Телеграме: кнопка «JARVIS» обновлена")
     try:
-        return start_tunnel(Path(ph.get("cloudflared", r"C:\Jarvis\tools\cloudflared.exe")), PORT, on_url)
+        from .webui import REMOTE_PORT
+        serve(web, REMOTE_PORT, remote=True)          # отдельная дверь: только подпись владельца, окна ПК закрыты
+        return start_tunnel(Path(ph.get("cloudflared", r"C:\Jarvis\tools\cloudflared.exe")), REMOTE_PORT, on_url)
     except Exception:
         log.exception("туннель не запустился — окно в Телеграме недоступно, остальное работает")
         return None
