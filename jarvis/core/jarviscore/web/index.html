@@ -297,7 +297,7 @@ async function poll() {
     let fresh = false;
     for (const m of s.feed) {
       const isNew = m.id > initialId; addMsg(m, isNew); lastId = Math.max(lastId, m.id);
-      if (m.who === "jarvis" && isNew) { fresh = true; flash = 1; say(m); if (PILL) { $("pilltext").textContent = m.text.split("\n")[0].slice(0, 90); moodHold = Date.now() + 8000; } }
+      if (m.who === "jarvis" && isNew) { fresh = true; flash = 1; if (!m.text.startsWith("🎙")) say(m);   // «Расслышал: …» — только на экране, вслух не повторяем ваши слова if (PILL) { $("pilltext").textContent = m.text.split("\n")[0].slice(0, 90); moodHold = Date.now() + 8000; } }
     }
     for (const [id, el] of rendered) renderActions(el, id);
     renderSide(s.stats);
