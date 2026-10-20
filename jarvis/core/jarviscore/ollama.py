@@ -9,7 +9,7 @@ class Ollama:
         self.url, self.model, self.fast_model, self.timeout = url.rstrip("/"), model, fast_model, timeout
 
     def _chat(self, model: str, messages: list[dict], timeout: float) -> str:
-        body = json.dumps({"model": model, "messages": messages, "stream": False,
+        body = json.dumps({"model": model, "messages": messages, "stream": False, "think": False,   # без «размышлений»: иначе 4b-модель молчит 20+ с
                            "options": {"temperature": 0.3, "num_predict": 300}}).encode()
         req = urllib.request.Request(self.url + "/api/chat", data=body, headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(req, timeout=timeout) as r:
