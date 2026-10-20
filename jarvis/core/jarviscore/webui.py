@@ -23,7 +23,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from . import office
+from . import office, tgauth
 from .controller import STATE_RU
 from .planner import State
 from .wake import find_wake
@@ -33,6 +33,8 @@ CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline'; "
        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
        "font-src https://fonts.gstatic.com; connect-src 'self'; media-src 'self' blob:; "
        "frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
+# окно в Телеграме (мини-приложение): только свои скрипты; показывать внутри веб-версии Телеграма можно
+REMOTE_CSP = CSP.replace("frame-ancestors 'none'", "frame-ancestors https://web.telegram.org https://*.telegram.org")
 CDN_THREE = b"https://cdn.jsdelivr.net/npm/three@0.170.0/"
 VENDOR = (Path(__file__).parent / "web" / "vendor" / "three").resolve()    # three 0.170.0 с npm, лицензия MIT
 OFFICE_CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline'; "
@@ -61,6 +63,9 @@ class JarvisWeb:
         self.projects_dir: Path | None = None                  # Obsidian Vault/Проекты — app.py подставляет
         self.office_page = root / "docs" / "office3d" / "index.html"
         self.machine = office.Machine(self.tts_url)
+        self.public_host: str | None = None     # адрес туннеля для Телеграма (app.py); None — снаружи закрыто
+        self.tg_token = ""                       # ключ бота — проверять подпись Телеграма
+        self.owner_id: int | None = None         # номер чата владельца — пускаем только его
 
     def office(self) -> dict:
         """Живые данные 3D-офиса: агенты, проекты, здоровье ПК."""
@@ -181,7 +186,8 @@ def make_handler(app: JarvisWeb, port: int):
             self.send_header("Content-Length", str(len(body)))
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
-            self.send_header("X-Frame-Options", "DENY")
+            if csp is not REMOTE_CSP:
+                self.send_header("X-Frame-Options", "DENY")
             self.send_header("Content-Security-Policy", csp)
             self.end_headers()
             self.wfile.write(body)
@@ -190,7 +196,20 @@ def make_handler(app: JarvisWeb, port: int):
             self._reply(code, json.dumps(data, ensure_ascii=False).encode())
 
         def _host_ok(self) -> bool:
-            return self.headers.get("Host", "") in allowed_hosts
+            """Свой компьютер: адрес 127.0.0.1 и запрос пришёл не через туннель."""
+            return self.headers.get("Host", "") in allowed_hosts and not self._via_tunnel()
+
+        def _via_tunnel(self) -> bool:
+            return bool(self.headers.get("Cf-Connecting-Ip") or self.headers.get("X-Forwarded-For"))
+
+        def _remote_ok(self) -> bool:
+            """Запрос из Телеграма через туннель: только на наш публичный адрес и только когда он включён."""
+            host = self.headers.get("Host", "")
+            return bool(app.public_host) and self._via_tunnel() and host in (app.public_host, *allowed_hosts)
+
+        def _tg_ok(self) -> bool:
+            """Подпись Телеграма: открыл именно владелец (tgauth.check)."""
+            return tgauth.check(self.headers.get("X-Tg-Init", ""), app.tg_token, app.owner_id)
 
         def do_GET(self):
             try:
@@ -203,11 +222,29 @@ def make_handler(app: JarvisWeb, port: int):
                     pass                                         # клиент уже ушёл
 
         def _get(self):
-            if not self._host_ok():
-                return self._json(403, {"error": "чужой адрес"})
             url = urlparse(self.path)
+            if not self._host_ok():
+                if not self._remote_ok():
+                    return self._json(403, {"error": "чужой адрес"})
+                return self._get_remote(url)
             if url.path == "/":
                 return self._reply(200, PAGE.read_bytes(), "text/html; charset=utf-8")
+            return self._get_common(url)
+
+        def _get_remote(self, url):
+            """Телефон через Телеграм: страница и её скрипты — без данных; всё остальное — только с подписью владельца."""
+            if url.path == "/":
+                page = PAGE.read_bytes().replace(b"<head>", b'<head><script src="/tgweb.js"></script>', 1)
+                return self._reply(200, page, "text/html; charset=utf-8", REMOTE_CSP)
+            if re.fullmatch(r"/[a-z]+\.js", url.path) or url.path == "/favicon.ico":
+                return self._get_common(url)
+            if url.path in ("/office", "/api/office") or url.path.startswith("/vendor/"):
+                return self._json(404, {"error": "офис — только на компьютере"})
+            if not self._tg_ok():
+                return self._json(401, {"error": "только владелец"})
+            return self._get_common(url)
+
+        def _get_common(self, url):
             m = re.fullmatch(r"/([a-z]+)\.js", url.path)            # только скрипты окна, без папок и «..»
             if m and (PAGE.parent / f"{m.group(1)}.js").is_file():
                 return self._reply(200, (PAGE.parent / f"{m.group(1)}.js").read_bytes(),
@@ -234,8 +271,14 @@ def make_handler(app: JarvisWeb, port: int):
             self._json(404, {"error": "нет такой страницы"})
 
         def do_POST(self):
-            if not self._host_ok() or self.headers.get("X-Jarvis") != "1":
+            local = self._host_ok()
+            if self.headers.get("X-Jarvis") != "1" or not (local or self._remote_ok()):
                 return self._json(403, {"error": "запрещено"})
+            if not local:
+                if not self._tg_ok():
+                    return self._json(401, {"error": "только владелец"})
+                if urlparse(self.path).path in ("/api/pill", "/api/office/open"):   # окна на ПК с телефона не открываем
+                    return self._json(403, {"error": "только на компьютере"})
             size = int(self.headers.get("Content-Length") or 0)
             if size > MAX_VOICE:
                 return self._json(413, {"error": "слишком большой файл"})

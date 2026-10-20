@@ -196,3 +196,79 @@ def test_every_3d_module_the_office_imports_is_on_this_pc():
         for rel in re.findall(r"from ['\"](\.{1,2}/[^'\"]+)['\"]", f.read_text(encoding="utf-8")):
             todo.append(f.parent / rel)
     assert len(seen) >= 8
+
+
+# --- окно JARVIS в Телеграме через туннель: только владелец по подписи Телеграма ---
+@pytest.fixture
+def remote(tmp_path):
+    import time as _t
+    from jarviscore.tgauth import sign
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        port = s.getsockname()[1]
+    feed = WebFeed()
+    ctl = Controller(Scheduler(), tmp_path / "tasks.json")
+    bot = JarvisBot(Broadcast(feed), ctl, NoClaude(), None, owner_chat=0,
+                    ideas_dir=tmp_path / "ideas", tmp_dir=tmp_path / "tmp")
+    app = JarvisWeb(bot, feed, tmp_path / "tmp")
+    app.public_host, app.tg_token, app.owner_id = "abc.trycloudflare.com", "1:TOKEN", 777
+    opened = []
+    app.on_pill = lambda: opened.append("pill")
+    server = serve(app, port)
+    fields = {"auth_date": str(int(_t.time())), "user": json.dumps({"id": 777})}
+    yield f"http://127.0.0.1:{port}", app, sign(fields, "1:TOKEN"), sign({**fields, "user": json.dumps({"id": 5})}, "1:TOKEN"), opened
+    server.shutdown()
+
+
+def rcall(base, path, init=None, data=None, host="abc.trycloudflare.com", tunnel=True):
+    h = {"Host": host}
+    if tunnel:
+        h["Cf-Connecting-Ip"] = "1.2.3.4"
+    if init:
+        h["X-Tg-Init"] = init
+    if data is not None:
+        h.update({"X-Jarvis": "1", "Content-Type": "application/json"})
+    req = urllib.request.Request(base + path, data=json.dumps(data).encode() if data is not None else None, headers=h)
+    try:
+        with urllib.request.urlopen(req, timeout=10) as r:
+            return r.status, r.read()
+    except urllib.error.HTTPError as e:
+        return e.code, e.read()
+
+
+def test_phone_page_opens_without_data_and_loads_telegram_script(remote):
+    base, *_ = remote
+    code, body = rcall(base, "/")
+    assert code == 200 and b"/tgweb.js" in body
+    code, _ = rcall(base, "/tgweb.js")
+    assert code == 200
+
+
+def test_phone_data_only_for_owner_signature(remote):
+    base, app, good, other, _ = remote
+    assert rcall(base, "/api/state?after=0")[0] == 401                 # без подписи
+    assert rcall(base, "/api/state?after=0", other)[0] == 401          # другой человек
+    assert rcall(base, "/api/state?after=0", good + "x")[0] == 401     # испорченная подпись
+    assert rcall(base, "/api/state?after=0", good)[0] == 200
+    assert rcall(base, "/api/send", other, {"text": "удали всё"})[0] == 401
+    code, _ = rcall(base, "/api/send", good, {"text": "Джарвис, ты здесь?"})
+    assert code == 200
+
+
+def test_phone_cannot_open_windows_or_office_on_pc(remote):
+    base, app, good, _, opened = remote
+    assert rcall(base, "/api/pill", good, {})[0] == 403 and opened == []
+    assert rcall(base, "/office", good)[0] == 404 and rcall(base, "/api/office", good)[0] == 404
+
+
+def test_tunnel_closed_unless_enabled_and_wrong_host_rejected(remote):
+    base, app, good, _, _ = remote
+    assert rcall(base, "/", host="evil.example.com")[0] == 403
+    app.public_host = None
+    assert rcall(base, "/")[0] == 403 and rcall(base, "/api/state?after=0", good)[0] == 403
+
+
+def test_local_request_through_tunnel_is_not_treated_as_local(remote):
+    base, app, good, _, opened = remote
+    code, _ = rcall(base, "/api/state?after=0", host=base.split("//")[1])   # Host «127.0.0.1», но пришёл через туннель
+    assert code == 401

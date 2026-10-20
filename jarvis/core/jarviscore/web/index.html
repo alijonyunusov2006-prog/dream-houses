@@ -121,6 +121,12 @@ body.mini #minicore{display:block}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:1100px){body{overflow:auto}.app{grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto;height:auto}
   .stage{border-right:none;border-bottom:1px solid var(--rule)} #core{width:280px} #side{border-left:none;border-top:1px solid var(--rule)} #feed{max-height:60vh} #summary{display:none}}
+/* телефон (и окно в Телеграме): шапка в две строки, ничего не вылезает за край */
+@media (max-width:640px){header{flex-wrap:wrap;gap:8px 12px;padding:10px 14px;height:auto}
+  header .switch{font-size:12px} #clock{display:none} #core{width:min(280px,72vw)} .msg{max-width:100%}
+  html,body{overflow-x:hidden}}
+/* внутри Телеграма — только то, что работает с телефона: окна «Сверху» и «Офис» живут на компьютере */
+html.tg #toMini, html.tg #toOffice{display:none}
 </style>
 </head>
 <body>
@@ -178,6 +184,17 @@ body.mini #minicore{display:block}
 <script src="/reactor.js"></script>
 <script>
 const H = {"X-Jarvis": "1"};
+// Открыто внутри Телеграма (мини-приложение): каждый запрос несёт подпись Телеграма — JARVIS пускает только владельца
+const TGA = (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) ? Telegram.WebApp : null;
+if (TGA) {
+  const f0 = window.fetch.bind(window);
+  window.fetch = (u, o = {}) => f0(u, Object.assign({}, o, {headers: Object.assign({}, o.headers || {}, {"X-Tg-Init": TGA.initData})}));
+  try { TGA.ready(); TGA.expand(); if (TGA.disableVerticalSwipes) TGA.disableVerticalSwipes(); if (TGA.setHeaderColor) TGA.setHeaderColor("#000000"); } catch (e) {}
+  document.documentElement.classList.add("tg");
+}
+const TOUCH = !!TGA || matchMedia("(pointer: coarse)").matches;   // телефон: пробела нет — подсказки без него
+if (TOUCH) document.addEventListener("DOMContentLoaded", () => document.querySelectorAll(".hint, .hudhint")
+  .forEach(el => { el.textContent = el.textContent.replace(" или зажми пробел", ""); }));
 const $ = id => document.getElementById(id);
 const STAGES = ["принял", "понимаю", "делаю", "проверка", "отчёт"];
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -297,7 +314,7 @@ async function poll() {
     let fresh = false;
     for (const m of s.feed) {
       const isNew = m.id > initialId; addMsg(m, isNew); lastId = Math.max(lastId, m.id);
-      if (m.who === "jarvis" && isNew) { fresh = true; flash = 1; if (!m.text.startsWith("🎙")) say(m);   // «Расслышал: …» — только на экране, вслух не повторяем ваши слова if (PILL) { $("pilltext").textContent = m.text.split("\n")[0].slice(0, 90); moodHold = Date.now() + 8000; } }
+      if (m.who === "jarvis" && isNew) { fresh = true; flash = 1; if (!m.text.startsWith("🎙")) say(m);   /* «Расслышал: …» — только на экране, вслух не повторяем ваши слова */ if (PILL) { $("pilltext").textContent = m.text.split("\n")[0].slice(0, 90); moodHold = Date.now() + 8000; } }
     }
     for (const [id, el] of rendered) renderActions(el, id);
     renderSide(s.stats);
@@ -414,6 +431,7 @@ async function earSend(chunks) {
     if (r.heard) { flash = 1; chime(r.armed ? [784, 988] : [660]); if (!r.armed) pending = true; poll(); }
   } catch (e) { /* связь пропала — следующий опрос покажет ошибку */ }
 }
+if (TGA) $("listen").checked = false;   // в телефоне — не слушать постоянно (батарея); говорить кнопкой или кольцом
 try { const lv = localStorage.getItem("listen"); if (lv !== null) $("listen").checked = lv === "1"; } catch (e) {}   // по умолчанию слушает
 $("listen").onchange = () => { try { localStorage.setItem("listen", $("listen").checked ? "1" : "0"); } catch (e) {} $("listen").checked ? earStart() : earStop(); };
 if ($("listen").checked) earStart();
@@ -449,7 +467,7 @@ if (PILL) {
 /* виды окна */
 function setHud(on) {
   hudOn = on; $("hud").classList.toggle("on", on);
-  if (on) { sizeBp($("hudbp")); $("hudsay").textContent = "Слушаю тебя. Нажми на кольцо или зажми пробел."; $("hudyou").textContent = ""; chime([392, 523, 784], .09); }
+  if (on) { sizeBp($("hudbp")); $("hudsay").textContent = TOUCH ? "Слушаю тебя. Нажми на кольцо и говори." : "Слушаю тебя. Нажми на кольцо или зажми пробел."; $("hudyou").textContent = ""; chime([392, 523, 784], .09); }
   else { speechSynthesis.cancel(); voiceAudio?.pause(); }
 }
 $("toHud").onclick = () => setHud(true); $("hudexit").onclick = () => setHud(false);
