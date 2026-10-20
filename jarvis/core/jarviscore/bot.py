@@ -168,7 +168,7 @@ class JarvisBot:
         live = [t for t in self.ctl.open_tasks() if not t.checkpoint.get("cancelled")]
         if not live:
             return self.say("Хорошо, сэр. Сейчас я ничего не делаю.")
-        t = max(live, key=lambda x: x.created_at)
+        t = max(live, key=lambda x: (x.created_at, int(x.id) if x.id.isdigit() else 0))   # одно время — по номеру
         self._stop(t, "отменено владельцем")
         self.say(f"Хорошо, сэр, остановил последнюю: №{t.id} «{t.title[:60]}».")
 
