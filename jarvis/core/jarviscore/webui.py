@@ -216,6 +216,8 @@ def make_handler(app: JarvisWeb, port: int):
                 mid = (parse_qs(url.query).get("id") or ["0"])[0]
                 audio = app.speech(int(mid)) if mid.isdigit() else None
                 return self._reply(200, audio, "audio/wav") if audio else self._json(503, {"error": "голос недоступен"})
+            if url.path == "/favicon.ico":              # браузер просит значок сам — отвечаем «нет», без ошибки в консоли
+                return self._reply(204)
             if url.path == "/office":                  # 3D-офис; библиотека 3D — своя, с этого ПК, не из интернета
                 page = app.office_page.read_bytes().replace(CDN_THREE, b"/vendor/three/")
                 return self._reply(200, page, "text/html; charset=utf-8", OFFICE_CSP)

@@ -176,3 +176,23 @@ def test_office_uses_local_3d_library_not_internet(web):
     assert code == 404
     code, data = call(base + "/api/office")
     assert code == 200 and b'"agents"' in data
+
+
+def test_every_3d_module_the_office_imports_is_on_this_pc():
+    """Офис импортирует модули three — каждый (и всё, что они тянут дальше) должен лежать в web/vendor/three."""
+    import re
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    vendor = root / "core" / "jarviscore" / "web" / "vendor" / "three"
+    page = (root / "docs" / "office3d" / "index.html").read_text(encoding="utf-8")
+    todo = [vendor / "examples" / "jsm" / m for m in re.findall(r"from ['\"]three/addons/([^'\"]+)['\"]", page)]
+    seen = set()
+    while todo:
+        f = todo.pop().resolve()
+        if f in seen:
+            continue
+        assert f.is_file(), f"нет модуля {f.relative_to(vendor)}"
+        seen.add(f)
+        for rel in re.findall(r"from ['\"](\.{1,2}/[^'\"]+)['\"]", f.read_text(encoding="utf-8")):
+            todo.append(f.parent / rel)
+    assert len(seen) >= 8
