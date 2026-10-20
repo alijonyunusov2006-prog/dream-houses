@@ -1889,10 +1889,36 @@ function sayParse(raw) {
   const r = byId[hit.id]; return { kind, id: r.id, r, what: w, due: due || 'не указан — поставлю на завтра', to: r.role + ' · мои агенты, пом. ' + r.code + ' · ' + ((deptOf(r.id) || {}).name || ''), via: 'Очередь JARVIS на ПК → агент «' + r.role + '»' };
 }
 let sayPending = null;
+/* живой режим: то же, что сказать в окне JARVIS — он ответит «Вот что я понял», рискованное — только после «да» */
+async function sayLive(text) {
+  const card = $('#say-card'), go = $('#say-go');
+  go.disabled = true;
+  try {
+    const r = await fetch('/api/send', { method: 'POST', headers: { 'X-Jarvis': '1', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }) });
+    if (!r.ok) throw new Error(r.status);
+    const sent = (await r.json()).id || 0;
+    card.hidden = false;
+    card.innerHTML = '<div class="eyebrow">Передал JARVIS</div><p style="margin:4px 0 0">«' + esc(text) + '»</p>' +
+      '<p class="note" id="say-reply" style="margin:6px 0 0">Жду ответа… Рискованное — удаление, деньги, сообщения людям — только после вашего «да».</p>';
+    $('#say-in').value = '';
+    for (let i = 0; i < 20; i++) {                 /* первый ответ JARVIS — прямо здесь, до 10 секунд */
+      await new Promise((ok) => setTimeout(ok, 500));
+      const s = await (await fetch('/api/state?after=' + sent)).json();
+      const m = (s.feed || []).find((x) => x.who === 'jarvis');
+      if (m) { const el = $('#say-reply'); if (el) el.textContent = 'JARVIS: ' + m.text.split('\n').slice(0, 4).join(' · '); break; }
+    }
+    setTimeout(() => { card.hidden = true; }, 15000);
+  } catch (err) {
+    card.hidden = false;
+    card.innerHTML = '<div class="eyebrow">Не передал</div><p style="margin:4px 0 0">JARVIS не ответил. Проверьте, что он запущен, и скажите задание в его окне.</p>';
+  } finally { go.disabled = false; }
+}
 $('#say').addEventListener('submit', (e) => {
   e.preventDefault();
   const raw = $('#say-in').value.trim(), card = $('#say-card');
   $('#say-honest').hidden = true;
+  if (LIVE.on && raw.length >= 3) { sayLive(raw); return; }   /* живой режим: задание уходит настоящему JARVIS */
   if (raw.length < 3) { card.hidden = false; card.innerHTML = '<div class="eyebrow">Вот что я понял</div><p style="margin:4px 0 0">Напишите, что нужно сделать и кому.</p>'; return; }
   const r = sayParse(raw); sayPending = r;
   card.hidden = false;
@@ -2260,8 +2286,10 @@ function goLive() {
     '<p class="note" style="margin-top:4px">Подключится вместе с DH OS: задачи сотрудникам, просрочки и заявки по статусам. Сейчас JARVIS их не видит, поэтому здесь пусто — без выдуманных цифр.</p>';
   $('#feed-pause').hidden = true;
   const fl = $('#feed-live'); fl.textContent = 'Живые данные · задачи и отчёты агентов'; fl.classList.add('ok');
-  $('#say-hint').innerHTML = 'Попробуйте: <a href="#say-in" class="say-ex" id="say-ex2" role="button">«Дай менеджеру задачу обзвонить три новые заявки до 18:00»</a>. Это пример разбора: задача никуда не уходит. Настоящие задачи — в окне JARVIS.';
-  $('#say-ex2').addEventListener('click', (e) => { e.preventDefault(); $('#say-in').value = 'Дай менеджеру задачу обзвонить три новые заявки до 18:00'; $('#say').requestSubmit(); });
+  $('#say-in').maxLength = 1000;
+  $('#say-in').placeholder = 'Например: придумай три идеи для поста про макеты';
+  $('#say-hint').innerHTML = 'Задание уходит JARVIS по-настоящему — как в его окне. Пример: <a href="#say-in" class="say-ex" id="say-ex2" role="button">«Придумай три идеи для поста про архитектурные макеты»</a> (щелчок только вписывает текст).';
+  $('#say-ex2').addEventListener('click', (e) => { e.preventDefault(); $('#say-in').value = 'Придумай три идеи для поста про архитектурные макеты'; $('#say-in').focus(); });
   if (tour.on) tourStop();
 }
 function applyLive(d) {
