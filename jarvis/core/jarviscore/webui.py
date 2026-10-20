@@ -33,9 +33,11 @@ CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline'; "
        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
        "font-src https://fonts.gstatic.com; connect-src 'self'; media-src 'self' blob:; "
        "frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
-OFFICE_CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+CDN_THREE = b"https://cdn.jsdelivr.net/npm/three@0.170.0/"
+VENDOR = (Path(__file__).parent / "web" / "vendor" / "three").resolve()    # three 0.170.0 с npm, лицензия MIT
+OFFICE_CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline'; "
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; "
-              "img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; "
+              "img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; "
               "frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
 PAGE = Path(__file__).with_name("web") / "index.html"
 MAX_VOICE = 25 * 1024 * 1024
@@ -214,8 +216,14 @@ def make_handler(app: JarvisWeb, port: int):
                 mid = (parse_qs(url.query).get("id") or ["0"])[0]
                 audio = app.speech(int(mid)) if mid.isdigit() else None
                 return self._reply(200, audio, "audio/wav") if audio else self._json(503, {"error": "голос недоступен"})
-            if url.path == "/office":                               # 3D-офис: три.js с jsDelivr
-                return self._reply(200, app.office_page.read_bytes(), "text/html; charset=utf-8", OFFICE_CSP)
+            if url.path == "/office":                  # 3D-офис; библиотека 3D — своя, с этого ПК, не из интернета
+                page = app.office_page.read_bytes().replace(CDN_THREE, b"/vendor/three/")
+                return self._reply(200, page, "text/html; charset=utf-8", OFFICE_CSP)
+            m = re.fullmatch(r"/vendor/three/((?:[a-z0-9_-]+/){0,4}[A-Za-z0-9_.-]+\.js)", url.path)
+            if m and ".." not in m.group(1):
+                f = (VENDOR / m.group(1)).resolve()
+                if f.is_file() and VENDOR in f.parents:
+                    return self._reply(200, f.read_bytes(), "application/javascript; charset=utf-8", OFFICE_CSP)
             if url.path == "/api/office":
                 return self._json(200, app.office())
             if url.path == "/api/state":

@@ -161,3 +161,18 @@ def test_empty_message_is_rejected(web):
     base, _, _ = web
     code, _ = call(base + "/api/send", {"text": "   "}, {"X-Jarvis": "1"})
     assert code == 400
+
+
+def test_office_uses_local_3d_library_not_internet(web):
+    base, _, _ = web
+    req = urllib.request.Request(base + "/office")
+    with urllib.request.urlopen(req, timeout=10) as r:
+        body, csp = r.read(), r.headers.get("Content-Security-Policy", "")
+    assert b"cdn.jsdelivr.net/npm/three" not in body and b"/vendor/three/build/three.module.js" in body
+    assert "jsdelivr" not in csp
+    code, body = call(base + "/vendor/three/build/three.module.js")
+    assert code == 200 and b"REVISION" in body
+    code, _ = call(base + "/vendor/three/../../webui.py")
+    assert code == 404
+    code, data = call(base + "/api/office")
+    assert code == 200 and b'"agents"' in data
