@@ -147,6 +147,32 @@ def _from_telegram(u: dict, tg, bot: JarvisBot, feed: WebFeed, bc: Broadcast) ->
         log.exception("сообщение %s", u.get("update_id"))
 
 
+def start_phone(settings: dict, web, tg, tg_owner, token: str):
+    """JARVIS в Телеграме как приложение (решение владельца: [phone] enabled). Выключено — кнопка «JARVIS» снята."""
+    from urllib.parse import urlparse
+    from .phone import set_menu, start_tunnel
+    web.tg_token, web.owner_id = token, tg_owner          # проверка подписи Телеграма — только владелец
+    if not (tg and tg_owner):
+        return None
+    ph = settings.get("phone", {})
+    if not ph.get("enabled"):
+        try:
+            set_menu(tg, tg_owner, None)
+        except Exception:
+            log.warning("кнопку меню бота не сбросил (нет связи?)")
+        return None
+
+    def on_url(url: str) -> None:
+        web.public_host = urlparse(url).hostname
+        set_menu(tg, tg_owner, url)
+        log.info("окно JARVIS в Телеграме: кнопка «JARVIS» обновлена")
+    try:
+        return start_tunnel(Path(ph.get("cloudflared", r"C:\Jarvis\tools\cloudflared.exe")), PORT, on_url)
+    except Exception:
+        log.exception("туннель не запустился — окно в Телеграме недоступно, остальное работает")
+        return None
+
+
 def start_voice(settings: dict):
     """Служба голоса JARVIS (отдельное окружение в C:\\Jarvis\\golos). Нет её — окно читает голосом браузера."""
     sp = settings.get("speech", {})
@@ -224,6 +250,7 @@ def main() -> None:
         voice = None
     if tg:
         threading.Thread(target=telegram_loop, args=(tg, bot, feed, bc, stop), daemon=True).start()
+    tunnel = start_phone(settings, web, tg, tg_owner, token)
 
     url = f"http://127.0.0.1:{PORT}/"
     hello = ROOT / "data" / "hello.txt"                     # «на связи» — раз в день, а не при каждом перезапуске
@@ -246,6 +273,8 @@ def main() -> None:
     finally:
         if voice:
             voice.terminate()
+        if tunnel:
+            tunnel.terminate()
 
 
 if __name__ == "__main__":

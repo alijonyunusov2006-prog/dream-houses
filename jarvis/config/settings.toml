@@ -75,3 +75,8 @@ report_daily = true                    # «⚡ Свет за сутки: … к�
 
 [window]
 pill_on_start = true                   # при запуске открывать живой JARVIS «сверху» (поверх всех окон)
+
+[phone]
+# JARVIS в Телеграме как приложение (кнопка «JARVIS» в боте). Нужен туннель Cloudflare — включает владелец.
+enabled = false
+cloudflared = "C:/Jarvis/tools/cloudflared.exe"
