@@ -94,7 +94,7 @@
 
   /* фон «чертежи»: рисуется один раз в отдельный слой */
   function blueprint(W, H, seed = 7) {
-    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const c = document.createElement("canvas"); c.width = Math.max(1, W); c.height = Math.max(1, H);
     const g = c.getContext("2d");
     let s = seed; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
     g.strokeStyle = "rgba(90,190,230,.10)"; g.lineWidth = 1;

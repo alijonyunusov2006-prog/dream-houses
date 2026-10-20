@@ -410,7 +410,8 @@ $("toMini").onclick = () => {
 };
 
 /* реактор: рисуется во всех видах */
-function sizeBp(c) { c.width = c.clientWidth; c.height = c.clientHeight; const g = c.getContext("2d"); g.drawImage(Reactor.blueprint(c.width, c.height), 0, 0); }
+function sizeBp(c) { if (!c.clientWidth || !c.clientHeight) return;           // окно ещё без размера (свёрнуто) — нарисуем при изменении размера
+  c.width = c.clientWidth; c.height = c.clientHeight; const g = c.getContext("2d"); g.drawImage(Reactor.blueprint(c.width, c.height), 0, 0); }
 sizeBp($("bp")); addEventListener("resize", () => { sizeBp($("bp")); if (hudOn) sizeBp($("hudbp")); });
 const T0 = Date.now();
 function frame() {
