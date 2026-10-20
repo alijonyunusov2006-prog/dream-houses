@@ -43,6 +43,7 @@ class JarvisWeb:
         self._armed_until = 0.0
         self._hear_lock = threading.Lock()
         self.tts_url = "http://127.0.0.1:8766"
+        self.on_pill = None                      # app.py подставляет открытие окна «сверху»
 
     def hear(self, audio: bytes, now: float | None = None) -> dict:
         """Фраза из режима «слушать «Джарвис»». Без зова — выбрасываем, нигде не сохраняя."""
@@ -208,6 +209,10 @@ def make_handler(app: JarvisWeb, port: int):
                     if not text:
                         return self._json(400, {"error": "пустое сообщение"})
                     return self._json(200, {"id": app.send_text(text, data.get("reply_to"))})
+                if url.path == "/api/pill":
+                    if app.on_pill:
+                        app.on_pill()
+                    return self._json(200, {"ok": bool(app.on_pill)})
                 if url.path == "/api/hear":
                     if not body:
                         return self._json(400, {"error": "пустая запись"})

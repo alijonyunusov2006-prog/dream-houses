@@ -39,9 +39,67 @@ def open_window(url: str) -> None:
     """Отдельное окно без адресной строки (Edge есть в любой Windows), иначе — обычный браузер."""
     edge = shutil.which("msedge") or r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
     try:
-        subprocess.Popen([edge, f"--app={url}", "--window-size=1280,820"])
+        subprocess.Popen([edge, f"--app={url}", "--start-maximized", f"--user-data-dir={ROOT / 'data' / 'edge-main'}"])   # свой профиль: размер окна слушается
     except OSError:
         webbrowser.open(url)
+
+
+PILL_W, PILL_H = 420, 64
+
+
+def open_pill(url: str, width: int = PILL_W, height: int = PILL_H) -> None:
+    """Живой JARVIS «сверху»: маленькое окно вверху экрана по центру, поверх всех окон."""
+    edge = shutil.which("msedge") or r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+    try:
+        import ctypes
+        sw = ctypes.windll.user32.GetSystemMetrics(0)
+    except Exception:
+        sw = 1920
+    left = max(0, (sw - width) // 2)
+    try:
+        subprocess.Popen([edge, f"--app={url}?mode=pill", f"--window-size={width},{height}",
+                          f"--window-position={left},8", f"--user-data-dir={ROOT / 'data' / 'edge-pill'}"])   # отдельный профиль: не прилипает к главному окну
+    except OSError:
+        webbrowser.open(url + "?mode=pill")
+        return
+    threading.Thread(target=_pin_on_top, args=("JARVIS",), daemon=True).start()
+
+
+def _pin_on_top(title: str, tries: int = 60, max_height: int = 120) -> None:
+    """Через Windows: среди окон с таким заголовком взять МАЛЕНЬКОЕ (таблетку) и закрепить поверх остальных.
+
+    У главного окна и у таблетки заголовок одинаковый («JARVIS»), поэтому ищем по высоте окна.
+    """
+    try:
+        import ctypes
+        from ctypes import wintypes
+        u = ctypes.windll.user32
+        proc = ctypes.WINFUNCTYPE(ctypes.c_bool, wintypes.HWND, wintypes.LPARAM)
+
+        def find():
+            found = []
+
+            def cb(h, _):
+                n = u.GetWindowTextLengthW(h)
+                buf = ctypes.create_unicode_buffer(n + 1)
+                u.GetWindowTextW(h, buf, n + 1)
+                if buf.value == title and u.IsWindowVisible(h):
+                    r = wintypes.RECT()
+                    u.GetWindowRect(h, ctypes.byref(r))
+                    if 0 < r.bottom - r.top <= max_height:
+                        found.append(h)
+                return True
+            u.EnumWindows(proc(cb), 0)
+            return found
+
+        for _ in range(tries):
+            for h in find():
+                u.SetWindowPos(h, -1, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0040)   # HWND_TOPMOST, NOMOVE|NOSIZE|SHOWWINDOW
+                return
+            time.sleep(0.25)
+        log.warning("окно «сверху» не найдено — закрепить не удалось")
+    except Exception:
+        log.exception("не удалось закрепить окно сверху")
 
 
 def telegram_loop(tg, bot: JarvisBot, feed: WebFeed, bc: Broadcast, stop: threading.Event) -> None:
@@ -146,7 +204,9 @@ def main() -> None:
     for i in range(parallel):
         threading.Thread(target=_loop, args=(bot.work_once, stop, 5, f"исполнитель {i + 1}"), daemon=True).start()
     threading.Thread(target=_loop, args=(bot.check_alerts, stop, 30, "контролёр"), daemon=True).start()
-    serve(JarvisWeb(bot, feed, ROOT / "data" / "tmp"), PORT)
+    web = JarvisWeb(bot, feed, ROOT / "data" / "tmp")
+    web.on_pill = lambda: open_pill(f"http://127.0.0.1:{PORT}/")
+    serve(web, PORT)
     try:
         voice = start_voice(settings)
     except Exception:
@@ -161,6 +221,8 @@ def main() -> None:
     print(f"JARVIS запущен: {url}  — это окно не закрывайте.", flush=True)
     if os.environ.get("JARVIS_NO_WINDOW") != "1":
         open_window(url)
+        if settings.get("window", {}).get("pill_on_start", True):
+            threading.Timer(3.0, open_pill, args=(url,)).start()      # живой JARVIS сверху — тоже сразу
     try:
         while True:
             time.sleep(1)

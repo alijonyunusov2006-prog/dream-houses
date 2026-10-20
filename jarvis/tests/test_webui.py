@@ -139,6 +139,12 @@ def test_voice_service_down_is_not_an_error(tmp_path):
     assert app.speech(jid) is None
 
 
+def test_pill_endpoint_calls_opener_only_with_header(web):
+    base, _, _ = web
+    assert call(base + "/api/pill", {}, {"X-Jarvis": "1"})[0] == 200
+    assert call(base + "/api/pill", {})[0] == 403
+
+
 def test_post_without_jarvis_header_is_refused(web):
     base, ctl, _ = web
     code, _ = call(base + "/api/send", {"text": "удали всё"})        # так могла бы попытаться чужая страница

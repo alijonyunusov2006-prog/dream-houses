@@ -59,7 +59,9 @@ multicolor = "none"
 stt_model = "large-v3"                 # faster-whisper; на слабом ПК — "medium"
 stt_language = "ru"
 tts_engine = "qwen3-tts"               # qwen3-tts (основной, GPU) | chatterbox (запасной, GPU) | piper (CPU, когда GPU занят)
-tts_fallback = "piper"                 # только бесплатные локальные движки — решение владельца
+tts_fallback = "piper"
+tts_python = "C:/Jarvis/golos/ru/.venv/Scripts/python.exe"      # служба голоса: Piper, русский «Денис» (без акцента, CC0)
+tts_script = "C:/Jarvis/golos/jarvis_tts_server.py"
 wake_word = "джарвис"
 voice = ""                             # выбранный голос: имя образца из data/voices/samples (выбирает владелец)
 
@@ -69,3 +71,6 @@ tariff = "business"                    # ПК стоит в студии (вла
 base_watts = 60                        # плата, память, диски, вентиляторы — добавка к замерам GPU и CPU
 report_daily = true                    # «⚡ Свет за сутки: … кВт·ч ≈ … сомони» в утреннем отчёте
 
+
+[window]
+pill_on_start = true                   # при запуске открывать живой JARVIS «сверху» (поверх всех окон)
