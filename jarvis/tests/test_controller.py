@@ -105,3 +105,12 @@ def test_reminders_stop_after_two(tmp_path):
     ctl.ask(t.id, "вопрос?")
     sent = [a for _ in range(5) for a in ctl.check()]
     assert len([a for a in sent if a.kind == "escalate"]) == 2
+
+
+def test_long_title_is_cut_on_a_whole_word(tmp_path):
+    from jarviscore.controller import Controller
+    from jarviscore.planner import Scheduler
+    ctl = Controller(Scheduler(), tmp_path / "t.json")
+    t = ctl.new_task("придумай три коротких названия для рилс про архитектурные макеты студии")
+    assert t.title.endswith("…") and not t.title.endswith("ма…") and len(t.title) <= 61
+    assert ctl.new_task("коротко").title == "коротко"

@@ -66,7 +66,10 @@ class Controller:
     def new_task(self, text: str, *, source: str = "text", priority: int = 3,
                  deadline: datetime | None = None, now: datetime | None = None) -> Task:
         now = now or _now()
-        title = " ".join(text.split())[:60]
+        title = " ".join(text.split())
+        if len(title) > 60:                        # режем по целому слову: «…про архитектурные макеты», а не «…ма»
+            cut = title[:60]
+            title = (cut[: cut.rfind(" ")] if " " in cut[20:] else cut).rstrip(" ,.;:—-") + "…"
         t = Task(id=self._next_id(), title=title, priority=priority, deadline=deadline,
                  resources=[], checkpoint={"text": text, "source": source, "answers": []},
                  created_at=now, updated_at=now)
