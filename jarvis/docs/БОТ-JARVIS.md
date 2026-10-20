@@ -41,7 +41,7 @@
    вписать `OWNER_CHAT_ID=…` → перезапустить. Ключ никому не присылать.
 2. **Включать ПК с телефона**: BIOS → «Power On By PCI-E» = Enabled, «Restore AC Power Loss» = Power On
    (заодно обновить BIOS до 3202). Сказать мне модель роутера.
-3. **Автозапуск JARVIS при включении ПК** — сказать «да», сделаю.
+3. ~~Автозапуск~~ — включён 20.10.2026: ярлык JARVIS в папке «Автозагрузка» (Win+R → `shell:startup`). Отключить — удалить этот ярлык.
 
 ## Где что лежит
 - Код: `core/jarviscore/` (bot, controller, webui, app, wake, memory, stt), окно — `core/jarviscore/web/`.
