@@ -21,6 +21,7 @@ REPEAT = re.compile(r"^\s*(?:повтори\w*|ещ[её]\s+раз|что\s+ты
 STATUS = re.compile(r"^\s*(?:что\s+(?:ты\s+)?(?:сейчас\s+)?делаешь|чем\s+(?:ты\s+)?(?:сейчас\s+)?занят|"
                     r"какие\s+(?:у\s+нас\s+|у\s+тебя\s+)?задачи|что\s+в\s+работе|что\s+(?:ты\s+)?(?:уже\s+)?сделал\w*|"
                     r"что\s+сделано|статус|отч[её]т)\b", re.I)
+OFFICE = re.compile(r"^\s*(?:покажи|открой|включи|давай)\s+(?:мне\s+)?(?:3d[\s-]?|тр[её]хмерный\s+)?офис", re.I)
 ABILITIES = re.compile(r"^\s*(?:что\s+(?:ты\s+)?(?:умеешь|можешь)|помощь|справка|как\s+тобой\s+пользоваться)\b", re.I)
 NUMBER = re.compile(r"(?:номер|№|задач\w*)\s*(\d+)|\b(\d+)\b", re.I)
 
@@ -35,7 +36,7 @@ QUESTION_WORD = re.compile(r"^\s*(?:что|как|где|когда|почему
 
 @dataclass(frozen=True)
 class Intent:
-    kind: str                     # presence|thanks|repeat|status|abilities|stop|noise|question|work
+    kind: str                     # presence|thanks|repeat|status|abilities|office|stop|noise|question|work
     number: str | None = None     # для stop: «номер 14»
 
 
@@ -45,7 +46,7 @@ def classify(text: str) -> Intent:
         m = NUMBER.search(t)
         return Intent("stop", (m.group(1) or m.group(2)) if m else None)
     for kind, rx in (("presence", PRESENCE), ("thanks", THANKS), ("repeat", REPEAT),
-                     ("status", STATUS), ("abilities", ABILITIES)):
+                     ("status", STATUS), ("abilities", ABILITIES), ("office", OFFICE)):
         if rx.match(t):
             return Intent(kind)
     words = re.findall(r"[а-яёa-z]+", t.lower())
@@ -68,6 +69,7 @@ ABILITIES_TEXT = (
     "Счёт, перевод, время — мгновенно, на вашей видеокарте.\n"
     "«Вспомни, что мы решили про…» — найду во втором мозге.\n"
     "«Идея: …» — запишу.\n"
+    "«Покажи офис» — 3D-офис: кто из агентов работает, что идёт по проектам.\n"
     "«Я дома» или «что нового» — доклад. «Повтори» — скажу ещё раз. «Стоп» или «не надо, номер 5» — отменю.\n"
     "Рискованное — удаление, деньги, сообщения людям — только после вашего «да»."
 )

@@ -485,3 +485,11 @@ def test_briefing_names_what_was_done(tmp_path):
     bot.work_once(); bot.work_once()
     b = bot.briefing()
     assert "список дел" in b.lower() and "Сделано сегодня" in b
+
+
+def test_show_office_by_voice(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    opened = []
+    bot.on_office = lambda: opened.append(1)
+    bot.handle(msg("Джарвис, покажи офис"))
+    assert opened and "офис" in tg.sent[-1][1] and ctl.sched.tasks == {}

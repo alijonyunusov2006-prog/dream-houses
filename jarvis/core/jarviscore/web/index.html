@@ -133,6 +133,7 @@ body.mini #minicore{display:block}
     <div class="spacer"></div>
     <button class="mode main" id="toHud" title="Полноэкранный режим: говоришь — он отвечает голосом">Режим Джарвиса</button>
     <button class="mode" id="toMini" title="Живой JARVIS сверху, поверх всех окон">Сверху</button>
+    <button class="mode" id="toOffice" title="3D-офис: кто из агентов работает, что идёт по проектам">Офис</button>
     <label class="switch" title="Окно слушает микрофон и реагирует, только когда фраза начинается с «Джарвис». Остальное сразу выбрасывается."><input type="checkbox" id="listen" checked> Слушать «Джарвис»</label>
     <label class="switch"><input type="checkbox" id="speak" checked> Читать ответы вслух</label>
     <label class="switch"><input type="checkbox" id="sound" checked> Звуки</label>
@@ -452,6 +453,7 @@ function setHud(on) {
   else { speechSynthesis.cancel(); voiceAudio?.pause(); }
 }
 $("toHud").onclick = () => setHud(true); $("hudexit").onclick = () => setHud(false);
+$("toOffice").onclick = async () => { try { await fetch("/api/office/open", {method: "POST", headers: H}); } catch (e) { $("err").textContent = "Не смог открыть офис."; } };
 $("toMini").onclick = async () => { try { await fetch("/api/pill", {method: "POST", headers: H}); } catch (e) { $("err").textContent = "Не смог открыть JARVIS сверху."; } };
 
 /* реактор: рисуется во всех видах */

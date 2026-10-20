@@ -64,6 +64,7 @@ class JarvisBot:
         self.last_said = ""                        # для «повтори»
         self.paused_until: datetime | None = None  # лимит подписки: до этого времени задачи не начинаем
         self.telegram_on = False
+        self.on_office = None                      # app.py: открыть 3D-офис окном
 
     def say(self, text: str, **kw):
         """Всё, что JARVIS говорит владельцу, — через одно место (Telegram + окно), последнее помним для «повтори»."""
@@ -151,6 +152,11 @@ class JarvisBot:
             return self.say(self.last_said or "Я пока ничего не говорил, сэр.")
         if k == "status":
             return self.say(self.briefing())
+        if k == "office":
+            if self.on_office:
+                self.on_office()
+                return self.say("Открываю офис, сэр.")
+            return self.say("Офис открывается кнопкой «Офис» в окне JARVIS, сэр.")
         if k == "abilities":
             return self.say(ABILITIES_TEXT)
         if k == "stop":

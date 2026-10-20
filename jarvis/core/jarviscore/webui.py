@@ -53,6 +53,7 @@ class JarvisWeb:
         self._hear_lock = threading.Lock()
         self.tts_url = "http://127.0.0.1:8766"
         self.on_pill = None                      # app.py подставляет открытие окна «сверху»
+        self.on_office = None                    # app.py: открыть 3D-офис отдельным окном
         root = Path(__file__).resolve().parents[2]
         self.agents_dir = root / ".claude" / "agents"          # кто есть в офисе агентов
         self.projects_dir: Path | None = None                  # Obsidian Vault/Проекты — app.py подставляет
@@ -231,6 +232,10 @@ def make_handler(app: JarvisWeb, port: int):
                     if app.on_pill:
                         app.on_pill()
                     return self._json(200, {"ok": bool(app.on_pill)})
+                if url.path == "/api/office/open":
+                    if app.on_office:
+                        app.on_office()
+                    return self._json(200, {"ok": bool(app.on_office)})
                 if url.path == "/api/hear":
                     if not body:
                         return self._json(400, {"error": "пустая запись"})

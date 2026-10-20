@@ -213,6 +213,7 @@ def main() -> None:
     web.on_pill = lambda: open_pill(f"http://127.0.0.1:{PORT}/")
     web.projects_dir = vault / "Проекты" if vault.exists() else None   # 3D-офис: что идёт по проектам
     bot.telegram_on = tg is not None
+    web.on_office = bot.on_office = lambda: open_window(f"http://127.0.0.1:{PORT}/office")
     serve(web, PORT)
     try:
         voice = start_voice(settings)
