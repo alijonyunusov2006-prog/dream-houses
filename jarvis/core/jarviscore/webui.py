@@ -13,8 +13,9 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
-import urllib.request
+import os
 import re
+import urllib.request
 import threading
 import time
 from datetime import datetime
@@ -34,7 +35,7 @@ MAX_VOICE = 25 * 1024 * 1024
 class JarvisWeb:
     """Связка окна с ботом: что пришло из окна → бот; что показать → лента и задачи."""
 
-    ARMED_SEC = 10          # позвали без команды («Джарвис!») — столько секунд ждём команду без имени
+    ARMED_SEC = 6           # позвали без команды («Джарвис!») — столько секунд ждём команду без имени (коротко: чтобы ТВ рядом не стал командой)
 
     def __init__(self, bot, feed, tmp_dir: Path):
         self.bot, self.feed, self.tmp_dir = bot, feed, Path(tmp_dir)
@@ -61,8 +62,8 @@ class JarvisWeb:
         if not found:
             return {"heard": False}
         if not command:
-            self._armed_until = now + self.ARMED_SEC
             self.bot.tg.send(self.bot.owner, "Слушаю, сэр.")
+            self._armed_until = now + self.ARMED_SEC
             return {"heard": True, "armed": True}
         self._armed_until = 0.0
         self.send_text(command, None)
@@ -113,7 +114,9 @@ class JarvisWeb:
             log.warning("служба голоса недоступна — окно прочитает голосом браузера")
             return None
         cache.parent.mkdir(parents=True, exist_ok=True)
-        cache.write_bytes(audio)
+        part = cache.with_name(f"{cache.stem}.{threading.get_ident()}.part")
+        part.write_bytes(audio)
+        os.replace(part, cache)                 # атомарно: недописанный звук никто не получит
         return audio
 
     def state(self, after: int) -> dict:

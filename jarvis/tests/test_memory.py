@@ -29,6 +29,14 @@ def test_search_ignores_stopwords_and_empty(tmp_path):
     assert search("", [tmp_path]) == []
 
 
+def test_secrets_never_returned_and_service_dirs_skipped(tmp_path):
+    write(tmp_path / "keys.md", "Пароль от бота Qabat: qwerty123\nТокен Qabat = 7777:AAAAAAAAAAAAAAAAAAAAAAAAA\n")
+    write(tmp_path / ".obsidian" / "x.md", "Qabat настройки обсидиана\n")
+    write(tmp_path / "ok.md", "Qabat — бот для клиентов\n")
+    hits = search("Qabat", [tmp_path])
+    assert [h.file.name for h in hits] == ["ok.md"]
+
+
 def test_word_forms_match_by_stem(tmp_path):
     write(tmp_path / "x.md", "Голос Джарвиса делаем через Qwen3-TTS\n")
     assert search("какой голос у джарвиса", [tmp_path])[0].line.startswith("Голос")

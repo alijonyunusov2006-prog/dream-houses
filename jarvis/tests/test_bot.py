@@ -159,6 +159,14 @@ def test_recall_answers_from_notes_without_task(tmp_path):
     assert "паузе" in tg.sent[-1][1] and ctl.sched.tasks == {}
 
 
+def test_morning_report_retried_if_sending_failed(tmp_path):
+    bot, tg, ctl = make(tmp_path, tg=FakeTG(fail_on="Утренний"))
+    with pytest.raises(ConnectionError):
+        bot.maybe_morning(datetime(2026, 10, 20, 8, 5))
+    bot.tg.fail_on = None
+    assert bot.maybe_morning(datetime(2026, 10, 20, 8, 6))               # не потерялся
+
+
 def test_greeting_when_nothing_happened(tmp_path):
     bot, tg, ctl = make(tmp_path)
     bot.handle(msg("Привет"))

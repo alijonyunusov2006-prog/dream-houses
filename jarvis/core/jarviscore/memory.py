@@ -3,11 +3,17 @@
 Без облака и без нейросети: строки .md, где встречается больше всего слов вопроса (по основам слов —
 «цены»/«цену», «Джарвис»/«Джарвиса» совпадают). Мгновенно и бесплатно. Позже можно заменить на
 поиск по смыслу (mem0), интерфейс тот же: search(запрос, папки) → находки.
+
+Бережно: не больше 4000 файлов и 5 секунд, файлы до 1 МБ, служебные папки пропускаем, файлы OneDrive
+«только в облаке» не трогаем (иначе начнут скачиваться). Строки с паролями и ключами в ответ не попадают.
 """
 
 from __future__ import annotations
 
+import os
 import re
+import stat
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -17,6 +23,10 @@ STOP = {"что", "мы", "про", "о", "об", "в", "во", "на", "и", "�
         "какой", "какая", "какие", "решили", "говорили", "обсуждали", "вспомни", "напомни", "найди", "памяти",
         "где", "лежит", "лежат", "мне", "я", "ты", "он", "за", "для", "же", "ли", "не", "то"}
 WORD = re.compile(r"[a-zа-яё0-9]+", re.I)
+SECRET = re.compile(r"парол|password|passwd|токен|token|secret|секрет|api[_ ]?key|ключ\s*(?:api|бота|доступа)|=\s*\S{20,}", re.I)
+SKIP_DIRS = {".obsidian", ".git", ".trash", "node_modules", "graphify-out", ".venv", "__pycache__"}
+MAX_BYTES = 1_000_000
+CLOUD_ONLY = 0x400000 | 0x1000        # RECALL_ON_DATA_ACCESS | OFFLINE (OneDrive «только в облаке»)
 
 
 @dataclass(frozen=True)
@@ -40,18 +50,36 @@ def _terms(text: str) -> set[str]:
     return {_stem(w) for w in WORD.findall(text or "") if w.lower() not in STOP and len(w) > 1}
 
 
-def search(query: str, roots: list[Path], limit: int = 5, max_files: int = 4000) -> list[Hit]:
+def _md_files(root: Path):
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS and not d.startswith(".")]
+        for name in filenames:
+            if name.endswith(".md"):
+                yield Path(dirpath) / name
+
+
+def _readable(f: Path) -> bool:
+    try:
+        st = f.stat()
+    except OSError:
+        return False
+    return st.st_size <= MAX_BYTES and not (getattr(st, "st_file_attributes", 0) & CLOUD_ONLY)
+
+
+def search(query: str, roots: list[Path], limit: int = 5, max_files: int = 4000, max_sec: float = 5.0) -> list[Hit]:
     terms = _terms(query)
     if not terms:
         return []
     hits: list[Hit] = []
-    seen = 0
-    for root in roots:
-        root = Path(root)
+    seen, deadline = 0, time.monotonic() + max_sec
+    for root in map(Path, roots):
         if not root.exists():
             continue
-        for f in root.rglob("*.md"):
-            if any(part.startswith(".") for part in f.parts) or (seen := seen + 1) > max_files:
+        for f in _md_files(root):
+            seen += 1
+            if seen > max_files or time.monotonic() > deadline:
+                break
+            if not _readable(f):
                 continue
             try:
                 lines = f.read_text(encoding="utf-8", errors="ignore").splitlines()
@@ -59,7 +87,7 @@ def search(query: str, roots: list[Path], limit: int = 5, max_files: int = 4000)
                 continue
             for i, line in enumerate(lines, 1):
                 found = terms & _terms(line)
-                if found:
+                if found and not SECRET.search(line):
                     score = len(found) / len(terms) + (0.2 if f.stem.lower() in ("decided", "always", "always-ask") else 0)
                     hits.append(Hit(f, i, line.strip()[:300], score))
     hits.sort(key=lambda h: (-h.score, len(h.line)))

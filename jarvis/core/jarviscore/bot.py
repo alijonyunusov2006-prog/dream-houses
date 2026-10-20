@@ -139,9 +139,9 @@ class JarvisBot:
         mark = self.tmp_dir.parent / "morning.txt"
         if now.hour < self.report_hour or (mark.exists() and mark.read_text().strip() == now.date().isoformat()):
             return False
+        self.tg.send(self.owner, "Утренний доклад.\n" + self.briefing(now))   # сначала отправить, потом отметить
         mark.parent.mkdir(parents=True, exist_ok=True)
         mark.write_text(now.date().isoformat())
-        self.tg.send(self.owner, "Утренний доклад.\n" + self.briefing(now))
         return True
 
     def briefing(self, now: datetime | None = None) -> str:
@@ -234,7 +234,9 @@ class JarvisBot:
 
     def _advance(self, t: Task) -> None:
         try:
-            if t.checkpoint.pop("executing", False):     # прошлый запуск оборвался (выключение, сбой)
+            with self.lock:
+                interrupted = t.checkpoint.pop("executing", False)
+            if interrupted:                               # прошлый запуск оборвался (выключение, сбой)
                 with self.lock:
                     self._ask_yes(t, "retry", "прошлый запуск прервался посередине, часть работы могла быть сделана. "
                                               "Повторить с начала?")

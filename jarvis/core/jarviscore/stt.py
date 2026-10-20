@@ -11,6 +11,7 @@ import logging
 import os
 import subprocess
 import sys
+import threading
 from pathlib import Path
 
 log = logging.getLogger(__name__)
@@ -33,6 +34,7 @@ class Transcriber:
         self.model_name, self.language, self.cpu_model = model, language, cpu_model
         self._model = None
         self.device = ""
+        self._lock = threading.Lock()      # одна модель — одна фраза за раз (слух окна + голосовые Telegram)
 
     def _load(self, device: str):
         from faster_whisper import WhisperModel  # тяжёлый импорт — только когда пришло голосовое
@@ -51,6 +53,10 @@ class Transcriber:
 
     def transcribe(self, path: Path | str) -> str:
         audio = decode(path)
+        with self._lock:
+            return self._transcribe(audio)
+
+    def _transcribe(self, audio) -> str:
         if self._model is None or self.device == "cuda":
             try:
                 if self._model is None:

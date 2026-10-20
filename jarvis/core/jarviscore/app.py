@@ -147,7 +147,11 @@ def main() -> None:
         threading.Thread(target=_loop, args=(bot.work_once, stop, 5, f"исполнитель {i + 1}"), daemon=True).start()
     threading.Thread(target=_loop, args=(bot.check_alerts, stop, 30, "контролёр"), daemon=True).start()
     serve(JarvisWeb(bot, feed, ROOT / "data" / "tmp"), PORT)
-    voice = start_voice(settings)
+    try:
+        voice = start_voice(settings)
+    except Exception:
+        log.exception("служба голоса не запустилась — будет голос браузера")
+        voice = None
     if tg:
         threading.Thread(target=telegram_loop, args=(tg, bot, feed, bc, stop), daemon=True).start()
 
