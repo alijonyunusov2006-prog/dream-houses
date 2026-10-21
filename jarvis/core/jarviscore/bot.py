@@ -135,6 +135,10 @@ class JarvisBot:
         intent = classify(text)
         if intent.kind == "work":
             t = self.ctl.new_task(text, source=source)
+            if self.paused_until and _now() < self.paused_until:     # лимит: честно — записал и когда начну
+                at = self.paused_until.astimezone()
+                return self.say(f"Записал, задача №{t.id}. Сейчас лимит подписки — начну сам в {at:%H:%M}. "
+                                f"Не нужна — скажите «стоп».")
             return self.say(f"Принял, задача №{t.id}. Сейчас скажу, что понял.")
         if intent.kind == "question":           # короткий ответ без «Вот что я понял» и отчёта на пять пунктов
             t = self.ctl.new_task(text, source=source)
@@ -162,6 +166,15 @@ class JarvisBot:
             return self.say(ABILITIES_TEXT)
         if k == "stop":
             return self._stop_by_word(intent.number)
+        if k == "stop_all":
+            live = [t for t in self.ctl.open_tasks() if not t.checkpoint.get("cancelled")]
+            for t in live:
+                self._stop(t, "отменено владельцем")
+            return self.say(f"Хорошо, сэр, остановил всё: {len(live)}." if live else "Хорошо, сэр. Сейчас я ничего не делаю.")
+        if k == "hush":
+            return self.say("Молчу, сэр.")          # окно обрывает голос само, увидев «замолчи»
+        if k == "rude":
+            return self.say("Понял, сэр, я ошибся. Скажите коротко, что сделать, — или «стоп», и я всё остановлю.")
         # noise: одно слово или обрывок — переспросить, а не заводить задачу
         return self.say(f"Не понял, сэр: «{text.strip(' .!?')}». Скажите, что сделать.")
 

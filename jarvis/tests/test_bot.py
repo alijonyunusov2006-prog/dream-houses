@@ -524,3 +524,28 @@ def test_limit_during_execute_resumes_without_retry_question(tmp_path):
     bot.paused_until = None; t.checkpoint.pop("not_before")      # «сброс наступил»
     bot.work_once()
     assert t.state.value == "done" and not any("Повторить" in s[1] for s in tg.sent)
+
+
+def test_cancel_all_and_hush(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    bot.handle(msg("Сделай список дел")); bot.handle(msg("Сделай второй список"))
+    bot.handle(msg("отмени всё"))
+    assert all(t.checkpoint.get("cancelled") for t in ctl.sched.tasks.values()) and "2" in tg.sent[-1][1]
+    bot.handle(msg("замолчи"))
+    assert len(ctl.sched.tasks) == 2 and "Молчу" in tg.sent[-1][1]
+
+
+def test_rude_is_answered_calmly_without_task(tmp_path):
+    bot, tg, ctl = make(tmp_path)
+    bot.handle(msg("ты тупой"))
+    assert ctl.sched.tasks == {} and "сэр" in tg.sent[-1][1]
+
+
+def test_work_during_limit_is_honest(tmp_path):
+    from datetime import timedelta
+    from jarviscore.bot import _now
+    bot, tg, ctl = make(tmp_path)
+    bot.paused_until = _now() + timedelta(hours=1)
+    bot.handle(msg("Сделай список дел"))
+    text = tg.sent[-1][1]
+    assert "№1" in text and "лимит" in text.lower() and "начну" in text

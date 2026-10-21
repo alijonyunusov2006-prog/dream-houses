@@ -40,3 +40,29 @@ def test_no_false_talk_on_real_work(text, kind):
 def test_number_only_with_word_or_alone():
     assert classify("Стоп, рендер 4К").number is None
     assert classify("отмени 7").number == "7"
+
+
+# --- «стоп» в любой форме (владелец 21.10: «говорю стоп — не слушается, заводит №14, №15») ---
+@pytest.mark.parametrize("text,number", [
+    ("да стоп же", None), ("Стоп, я сказал!", None), ("стоп сучка", None), ("ну стоп", None),
+    ("Джарвис стоп", None), ("хватит уже", None), ("остановись", None), ("прекрати", None),
+    ("отменяю 14", "14"), ("отменяю задачу 15", "15"), ("отмени задачу номер 16", "16"),
+    ("слушай, не надо", None), ("я сказал стоп", None),
+])
+def test_stop_in_any_form(text, number):
+    i = classify(text)
+    assert i.kind == "stop" and i.number == number, (text, i)
+
+
+@pytest.mark.parametrize("text", ["отмени всё", "отмени все задачи", "стоп всё", "отменяю все"])
+def test_cancel_all(text):
+    assert classify(text).kind == "stop_all"
+
+
+@pytest.mark.parametrize("text", ["замолчи", "тихо", "помолчи", "не говори", "заткнись"])
+def test_hush(text):
+    assert classify(text).kind == "hush"
+
+
+def test_rude_words_alone_are_not_tasks():
+    assert classify("сучка").kind in ("noise", "rude") and classify("ты тупой").kind == "rude"
