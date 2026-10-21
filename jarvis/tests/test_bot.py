@@ -549,3 +549,57 @@ def test_work_during_limit_is_honest(tmp_path):
     bot.handle(msg("Сделай список дел"))
     text = tg.sent[-1][1]
     assert "№1" in text and "лимит" in text.lower() and "начну" in text
+
+
+# --- 21.10.2026: Клод Код вышел из аккаунта — №24…№28 «не получилось… Повторить?» с английской ошибкой ---
+class AuthDown(FakeClaude):
+    def understand(self, task):
+        from jarviscore.bot import AuthRequired
+        raise AuthRequired("Failed to authenticate: OAuth session expired and could not be refreshed")
+
+
+def test_logged_out_claude_is_said_once_in_russian_and_tasks_wait(tmp_path):
+    bot, tg, ctl = make(tmp_path, claude=AuthDown())
+    bot.auth_ok = lambda: False
+    bot.handle(msg("Сделай список дел"))
+    bot.work_once()
+    said = [s[1] for s in tg.sent]
+    assert any("вышел из аккаунта" in s for s in said)
+    assert not any("Повторить" in s or "Failed" in s for s in said)
+    assert ctl.sched.tasks["1"].state.value in ("pending", "paused")
+    n = len(tg.sent)
+    bot.handle(msg("Сделай второй список"))
+    assert "вышел из аккаунта" in tg.sent[-1][1] and "№2" in tg.sent[-1][1]
+    bot.work_once(); bot.work_once()
+    assert len(tg.sent) == n + 1                       # никаких новых «не получилось»
+
+
+def test_after_login_tasks_continue_by_themselves(tmp_path):
+    claude = AuthDown()
+    bot, tg, ctl = make(tmp_path, claude=claude)
+    bot.auth_ok = lambda: False
+    bot.handle(msg("Сделай список дел"))
+    bot.work_once()
+    claude.understand = FakeClaude.understand.__get__(claude)   # вошли — Клод снова работает
+    bot.auth_ok = lambda: True
+    bot._auth_checked_at = None
+    bot.work_once(); bot.work_once()
+    assert ctl.sched.tasks["1"].state.value == "done"
+    assert any("Вход восстановлен" in s[1] for s in tg.sent)
+
+
+def test_bare_yes_answers_the_only_waiting_question(tmp_path):
+    bot, tg, ctl = make(tmp_path, claude=FakeClaude(needs_owner=True))
+    bot.handle(msg("Удали старые рендеры"))
+    bot.work_once()
+    assert ctl.sched.tasks["1"].state.value == "waiting_human"
+    bot.handle(msg("да"))                               # без ответа на сообщение
+    assert ctl.sched.tasks["1"].checkpoint.get("approved") and len(ctl.sched.tasks) == 1
+
+
+def test_talking_about_task_number_answers_that_task(tmp_path):
+    bot, tg, ctl = make(tmp_path, claude=FakeClaude(questions=["Какие теги?"]))
+    bot.handle(msg("Сделай список дел"))
+    bot.work_once()
+    bot.handle(msg("Я про первое задание — теги нужны по проектам, задание номер 1"))
+    assert len(ctl.sched.tasks) == 1 and "по проектам" in " ".join(ctl.sched.tasks["1"].checkpoint.get("answers", []))

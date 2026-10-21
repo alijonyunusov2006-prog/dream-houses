@@ -17,7 +17,7 @@ import webbrowser
 from datetime import datetime
 from pathlib import Path
 
-from .bot import ROOT, ClaudeExecutor, JarvisBot, load_env
+from .bot import ROOT, ClaudeExecutor, JarvisBot, claude_logged_in, load_env
 from .channels import Broadcast, VoiceOut, WebFeed
 from .controller import Controller
 from .local import LocalBrain
@@ -243,6 +243,10 @@ def main() -> None:
     web.on_pill = lambda: open_pill(f"http://127.0.0.1:{PORT}/")
     web.projects_dir = vault / "Проекты" if vault.exists() else None   # 3D-офис: что идёт по проектам
     bot.telegram_on = tg is not None
+    if not claude_logged_in():                       # Claude Code вышел из аккаунта — сказать сразу, а не после провала
+        bot.auth_down = True
+        bot._auth_checked_at = datetime.now().astimezone()
+        bot.say(bot.AUTH_TEXT)
     web.on_office = bot.on_office = lambda: open_window(f"http://127.0.0.1:{PORT}/office")
     serve(web, PORT)
     try:

@@ -41,11 +41,33 @@ IDEA = re.compile(r"^\s*(идея|запомни идею)\s*[:,.\-—]?\s*", re
 YES = re.compile(r"^\s*(да|ага|делай|давай|ок|ok|хорошо|разрешаю|повтори)(\s*,?\s*(делай|давай|можно))?[\s.!]*$", re.I)
 NO = re.compile(r"^\s*(нет|не надо|отмена|стоп|не делай)\b", re.I)
 LIMIT_PAUSE_MIN = 60
+# «задание 24», «задачу №21», «номер 25», «24-е задание», «про 23-ю задачу»
+TASK_REF = re.compile(r"(?:задани\w*|задач\w*|номер|№)\s*№?\s*(\d+)|(\d+)\s*-?\s*(?:[ео]е|ю|я|ое)?\s+(?:задани|задач)", re.I)
+AUTH_CHECK_SEC = 120          # вышел из аккаунта — проверять вход не чаще раза в 2 минуты
 SECRET_ENV = ("TELEGRAM_BOT_TOKEN",)
 
 
 class LimitReached(RuntimeError):
     """Лимит подписки Claude или дневной порог — ждать, а не повторять."""
+
+
+class AuthRequired(RuntimeError):
+    """Claude Code на ПК вышел из аккаунта: задачи ждут, пока владелец войдёт (`claude auth login`)."""
+
+
+def claude_logged_in() -> bool:
+    """`claude auth status` — вошёл ли Claude Code в аккаунт. Не тратит лимиты."""
+    import shutil
+    import subprocess
+    exe = shutil.which("claude")
+    if not exe:
+        return False
+    try:
+        out = subprocess.run([exe, "auth", "status"], capture_output=True, text=True, timeout=30,
+                             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).stdout
+        return bool(json.loads(out).get("loggedIn"))
+    except Exception:
+        return False
 
 
 def _now() -> datetime:
@@ -64,6 +86,9 @@ class JarvisBot:
         self.last_said = ""                        # для «повтори»
         self.paused_until: datetime | None = None  # лимит подписки: до этого времени задачи не начинаем
         self._limit_said: datetime | None = None   # когда последний раз говорили про лимит
+        self.auth_down = False                     # Claude Code вышел из аккаунта — задачи ждут входа
+        self.auth_ok = claude_logged_in            # проверка входа (в тестах подменяется)
+        self._auth_checked_at: datetime | None = None
         self.telegram_on = False
         self.on_office = None                      # app.py: открыть 3D-офис окном
 
@@ -113,6 +138,9 @@ class JarvisBot:
         waiting = self.ctl.waiting_for_reply_to(reply_to) if reply_to else None
         if waiting:
             return self._on_answer(waiting, text)
+        waiting = self._answer_without_reply(text)   # голосом не «ответишь на сообщение» — понимаем по смыслу
+        if waiting:
+            return self._on_answer(waiting, text)
         if text in ("/start", "/help"):
             return self.say(HELP)
         if text.startswith("/tasks"):
@@ -135,6 +163,9 @@ class JarvisBot:
         intent = classify(text)
         if intent.kind == "work":
             t = self.ctl.new_task(text, source=source)
+            if self.auth_down:                                      # вышли из аккаунта: честно — записал и почему ждём
+                return self.say(f"Записал, задача №{t.id}. Но Claude Code вышел из аккаунта — начну, как только "
+                                f"войдёте (claude auth login в Терминале). Не нужна — скажите «стоп».")
             if self.paused_until and _now() < self.paused_until:     # лимит: честно — записал и когда начну
                 at = self.paused_until.astimezone()
                 return self.say(f"Записал, задача №{t.id}. Сейчас лимит подписки — начну сам в {at:%H:%M}. "
@@ -145,6 +176,29 @@ class JarvisBot:
             t.checkpoint.update(kind="question", ready=True, agent="jarvis")
             return self.say("Минуту, сэр, уточняю." + self._limit_note())
         return self._talk(intent, text)
+
+    def _waiting(self) -> list[Task]:
+        return sorted((t for t in self.ctl.open_tasks()
+                       if t.state is State.WAITING_HUMAN and not t.checkpoint.get("cancelled")),
+                      key=lambda t: t.updated_at)
+
+    def _answer_without_reply(self, text: str) -> Task | None:
+        """Ответ на вопрос задачи без «ответа на сообщение» (голосом так не сделать, 21.10.2026):
+        «я про 24-е задание…», «задание номер 21» — к этой задаче; голое «да»/«нет» — к последней,
+        что ждёт «да или нет»."""
+        waiting = self._waiting()
+        if not waiting:
+            return None
+        m = TASK_REF.search(text)
+        if m:
+            t = self.ctl.sched.tasks.get(m.group(1) or m.group(2))
+            if t in waiting:
+                return t
+        if YES.match(text) or NO.match(text):
+            confirm = [t for t in waiting if t.checkpoint.get("confirm")]
+            if confirm:
+                return confirm[-1]
+        return None
 
     def _talk(self, intent, text: str) -> None:
         """Разговор без задач — мгновенно и бесплатно."""
@@ -300,9 +354,26 @@ class JarvisBot:
             return f" Лимит подписки Claude до {self.paused_until.astimezone():%H:%M} — задачи подождут."
         return ""
 
+    def _auth_back(self, now: datetime) -> bool:
+        """Вышли из аккаунта — раз в 2 минуты спрашиваем `claude auth status`; вошли — продолжаем сами."""
+        if not self.auth_down:
+            return True
+        if self._auth_checked_at and (now - self._auth_checked_at).total_seconds() < AUTH_CHECK_SEC:
+            return False
+        self._auth_checked_at = now
+        if not self.auth_ok():
+            return False
+        self.auth_down = False
+        waiting = [t for t in self.ctl.open_tasks() if not t.checkpoint.get("cancelled")]
+        self.say(f"Вход восстановлен, сэр. Продолжаю задачи: {len(waiting)}." if waiting
+                 else "Вход восстановлен, сэр. Можно давать задания.")
+        return True
+
     def _next(self) -> Task | None:
         now = _now()
         if self.paused_until and now < self.paused_until:   # лимит: не долбим подписку, ждём сброса
+            return None
+        if not self._auth_back(now):                        # вышел из аккаунта: ждём входа, не тратим попытки
             return None
         for t in self.ctl.sched.runnable():
             nb = t.checkpoint.get("not_before")
@@ -338,6 +409,9 @@ class JarvisBot:
                 self._understand(t)
             if t.checkpoint.get("ready") and self._live(t):
                 self._execute(t)
+        except AuthRequired as e:
+            with self.lock:
+                self._pause_for_auth(t, str(e))
         except (LimitReached, BudgetExceeded) as e:
             with self.lock:
                 t.checkpoint.pop("executing", None)   # лимит — не обрыв: после сброса продолжим сами, без «повторить?»
@@ -361,6 +435,22 @@ class JarvisBot:
             else:
                 self._stop(t, res.result[:300])
                 self.say("Не смог ответить, сэр. Скажите иначе или дайте задание — разберусь подробно.")
+
+    AUTH_TEXT = ("Сэр, Claude Code на компьютере вышел из аккаунта — без этого я не могу выполнять задания. "
+                 "Войдите заново: откройте Терминал и введите claude auth login — откроется браузер, войдите "
+                 "своим аккаунтом Claude. Задачи я сохранил и продолжу сам, как только вход появится.")
+
+    def _pause_for_auth(self, t: Task, why: str) -> None:
+        """Вышли из аккаунта: задача снова в очередь (без «повторить?»), владельцу — один раз и по-русски."""
+        log.warning("Claude Code вышел из аккаунта: %s", why[:300])
+        if self._live(t):
+            t.checkpoint.pop("executing", None)
+            t.state = State.PENDING
+            t.touch()
+        if not self.auth_down:
+            self.auth_down = True
+            self._auth_checked_at = _now()
+            self.say(self.AUTH_TEXT)
 
     def _pause_for_limit(self, t: Task, why: str, budget: bool = False) -> None:
         """Лимит подписки: все задачи ждут сброса (время берём из сообщения Claude), владельцу — по-русски, один раз."""
@@ -441,6 +531,11 @@ def _is_limit(text: str) -> bool:
                           r"limit · resets|лимит", text or "", re.I))
 
 
+def _is_auth(text: str) -> bool:
+    return bool(re.search(r"failed to authenticate|oauth session expired|not logged in|please run /login|"
+                          r"invalid api key|authentication_error|401", text or "", re.I))
+
+
 def _short(title: str, n: int = 60) -> str:
     t = re.sub(r"\s+", " ", title).strip(" .")
     return t if len(t) <= n else t[: n - 1].rstrip() + "…"
@@ -517,6 +612,8 @@ class ClaudeExecutor:
         res = claude_runner.run(prompt, self.root, task_id=task_id, env=env, disallowed_tools=self.HIDDEN,
                                 cost_log=self.root / "data" / "logs" / "costs.jsonl",
                                 daily_budget_usd=self.s.get("budget", {}).get("daily_usd_equivalent"), **kw)
+        if not res.ok and _is_auth(res.result):
+            raise AuthRequired(res.result[:200])
         if not res.ok and _is_limit(res.result):
             raise LimitReached(res.result[:200])
         return res
