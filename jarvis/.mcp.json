@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "dhos": {
+      "type": "http",
+      "url": "https://dh-os-dh-a16d.vercel.app/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ${DHOS_AGENT_KEY}"
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+# Настройки конкретной машины. Накладываются поверх config/settings.toml.
+# Имя файла = имя компьютера в Windows ($env:COMPUTERNAME). Для ноутбука — свой файл.
+
+[machine]
+name = "Alijon"
+role = "main"                          # main — основной ПК; laptop — ноутбук
+cpu = "Intel i9-13900K"
+ram_gb = 64
+gpu = "NVIDIA RTX 3090"
+gpu_vram_gb = 24
+
+[paths]
+work = "C:/Work"                       # ежедневные рабочие файлы студии (SSD)
+projects_root = "C:/Projects"          # проекты, которые делает JARVIS
+archive = "D:/Archive"                 # холодный архив (HDD, появится через ~10 дней)
+ai_models = "C:/Work/AI"               # Ollama, whisper, голос — на SSD
+
+[capabilities]
+render = true                          # тяжёлый рендер и модели — здесь
+printers = ["bambu-p1s", "creality-k1"]
+archicad = true
+max3ds = true

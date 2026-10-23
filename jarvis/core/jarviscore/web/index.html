@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JARVIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Golos+Text:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#020c14; --ink2:#061826; --rule:#0f3346; --rule2:#1b5570;
+  --cy:#00e5ff; --cy-dim:#2aa7c9; --paper:#e6fbff; --mute:#6c93a6; --amber:#ffb02e; --red:#ff5a6a;
+  --display:"Rajdhani","Segoe UI",sans-serif; --text:"Golos Text",sans-serif; --dim:"IBM Plex Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ink);color:var(--paper);font:15px/1.6 var(--text)}
+body{overflow:hidden;background:radial-gradient(1000px 700px at 28% 50%,rgba(0,229,255,.10),transparent 65%),var(--ink)}
+#bp{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;opacity:.9}
+.app{position:relative;display:grid;grid-template-columns:minmax(400px,40%) 1fr 320px;grid-template-rows:60px 1fr;height:100vh}
+header{grid-column:1/-1;display:flex;align-items:center;gap:22px;padding:0 24px;border-bottom:1px solid var(--rule);background:rgba(2,12,20,.6);backdrop-filter:blur(8px)}
+.brand{font:700 22px var(--display);letter-spacing:.3em;color:var(--paper);text-shadow:0 0 18px rgba(0,229,255,.6)}
+#summary{color:var(--mute);font-size:14px}
+#summary b{color:var(--paper);font-weight:500} #summary .wait{color:var(--amber)}
+.spacer{flex:1}
+.mode{border:1px solid var(--rule2);background:rgba(0,229,255,.06);color:var(--paper);border-radius:999px;padding:7px 16px;font:600 14px var(--display);letter-spacing:.08em;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.mode:hover{border-color:var(--cy);box-shadow:0 0 18px -4px var(--cy)}
+.mode.main{background:var(--cy);color:var(--ink);border-color:var(--cy)}
+.switch{display:flex;align-items:center;gap:8px;color:var(--mute);font-size:13px;cursor:pointer;user-select:none}
+.switch input{appearance:none;width:30px;height:16px;border-radius:8px;background:var(--rule);position:relative;cursor:pointer;margin:0;transition:background .2s}
+.switch input::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--mute);transition:transform .2s,background .2s}
+.switch input:checked{background:var(--cy-dim)} .switch input:checked::after{transform:translateX(14px);background:var(--paper)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+#clock{font:400 13px var(--dim);color:var(--mute)}
+.stage{position:relative;border-right:1px solid var(--rule);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px}
+#core{width:min(100%,460px);aspect-ratio:1;cursor:pointer}
+#status{font:600 17px var(--display);letter-spacing:.12em;color:var(--cy);min-height:26px;text-align:center;text-shadow:0 0 12px rgba(0,229,255,.6)}
+.hint{font-size:13px;color:var(--mute);text-align:center;max-width:36ch}
+main{display:flex;flex-direction:column;min-height:0;background:rgba(2,12,20,.55)}
+#feed{flex:1;overflow-y:auto;padding:26px 32px;display:flex;flex-direction:column;gap:16px}
+.msg{max-width:68ch;white-space:pre-wrap;word-wrap:break-word}
+.msg.jarvis{border-left:2px solid var(--cy-dim);padding:2px 0 2px 14px}
+.msg.owner{align-self:flex-end;text-align:right;padding:2px 14px 2px 0;border-right:2px solid var(--amber)}
+.msg .t{font:400 12px var(--dim);color:var(--mute);margin-top:4px}
+.msg.ask{border-left-color:var(--amber)}
+.acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.acts:empty{display:none}
+.btn{border:1px solid var(--rule2);background:transparent;color:var(--paper);border-radius:4px;padding:6px 14px;cursor:pointer;font:500 13px var(--text)}
+.btn:hover{border-color:var(--cy)}
+.btn.yes{background:var(--amber);border-color:var(--amber);color:var(--ink)}
+.composer{padding:14px 32px 20px;border-top:1px solid var(--rule)}
+#replybar{display:none;font-size:13px;color:var(--amber);margin-bottom:8px}
+#replybar button{background:none;border:none;color:var(--mute);cursor:pointer;font:inherit;text-decoration:underline}
+.row{display:flex;gap:10px}
+textarea{flex:1;resize:none;height:52px;background:var(--ink2);border:1px solid var(--rule);border-radius:4px;color:var(--paper);padding:14px 16px;font:inherit}
+textarea::placeholder{color:var(--mute)} textarea:focus{outline:none;border-color:var(--cy)}
+#mic{border:1px solid var(--cy);background:rgba(0,229,255,.08);color:var(--paper);border-radius:4px;padding:0 16px;font:500 14px var(--text);cursor:pointer}
+#mic.rec{background:var(--red);border-color:var(--red)}
+#send{border:none;background:var(--cy);color:var(--ink);border-radius:4px;padding:0 20px;font:600 14px var(--text);cursor:pointer}
+#err{font-size:13px;color:var(--red);min-height:18px;margin-top:6px}
+#side{border-left:1px solid var(--rule);overflow-y:auto;padding:22px 20px;background:rgba(2,12,20,.55)}
+#side h2{font:700 16px var(--display);letter-spacing:.14em;margin:0 0 14px;color:var(--paper)}
+.sheet{border:1px solid var(--rule2);margin-bottom:12px;background:rgba(6,24,38,.8)}
+.sheet .top{display:grid;grid-template-columns:52px 1fr;border-bottom:1px solid var(--rule)}
+.sheet .no{font:700 22px var(--display);color:var(--cy);border-right:1px solid var(--rule);display:flex;align-items:center;justify-content:center}
+.sheet .ti{padding:9px 12px;font-size:14px;line-height:1.45}
+.sheet .bot{display:grid;grid-template-columns:1fr auto;align-items:center;border-top:1px solid var(--rule)}
+.sheet .st{padding:7px 12px;font-size:12px;color:var(--mute)}
+.sheet .st.running{color:var(--cy)} .sheet .st.waiting_human{color:var(--amber)}
+.sheet .btn{border:none;border-left:1px solid var(--rule);border-radius:0;font-size:12px;color:var(--mute);padding:7px 12px}
+.chain{position:relative;height:44px;margin:6px 16px 2px}
+.chain .base,.chain .done{position:absolute;left:0;top:16px;height:1px;background:var(--rule2)}
+.chain .base{right:0} .chain .done{background:var(--cy);transition:width .8s}
+.tick{position:absolute;top:10px;width:1px;height:13px;background:var(--rule2)}
+.tick.on{background:var(--cy)}
+.tick.cur::after{content:"";position:absolute;left:-4px;top:2px;width:9px;height:9px;border:1px solid var(--cy);transform:rotate(45deg);animation:cur 1.4s ease-in-out infinite}
+@keyframes cur{50%{opacity:.25}}
+.tick span{position:absolute;top:16px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--mute);white-space:nowrap}
+.tick.on span{color:var(--paper)}
+.tick:first-child span{left:0;transform:none} .tick:last-child span{left:auto;right:0;transform:none}
+.empty{color:var(--mute);font-size:14px}
+/* режим «Джарвис» на весь экран */
+#hud{position:fixed;inset:0;z-index:10;background:radial-gradient(900px 700px at 50% 45%,rgba(0,90,120,.35),transparent 70%),#020a12;display:none;flex-direction:column;align-items:center;justify-content:center}
+#hud.on{display:flex;animation:hudin .6s cubic-bezier(.16,1,.3,1)}
+@keyframes hudin{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+#hudbp{position:absolute;inset:0;width:100%;height:100%}
+#hudcore{position:relative;width:min(70vh,80vw);aspect-ratio:1;cursor:pointer}
+#hudsay{position:relative;max-width:min(860px,90vw);min-height:3.2em;margin-top:10px;text-align:center;font:500 22px/1.5 var(--text);color:var(--paper);text-shadow:0 0 14px rgba(0,229,255,.45)}
+#hudyou{position:relative;max-width:min(860px,90vw);min-height:1.6em;text-align:center;font-size:15px;color:var(--amber)}
+#hudexit{position:absolute;top:18px;right:22px}
+.hudhint{position:absolute;bottom:18px;color:var(--mute);font-size:13px}
+/* режим «Сверху» — живой JARVIS поверх всех окон */
+body.pill{background:transparent;overflow:hidden}
+body.pill #bp,body.pill .app{display:none}
+#pill{display:none;position:fixed;inset:0;align-items:center;gap:12px;padding:6px 14px 6px 8px;background:rgba(2,12,20,.86);border:1px solid var(--rule2);border-radius:999px;backdrop-filter:blur(10px);cursor:pointer;user-select:none;-webkit-app-region:drag}
+body.pill #pill{display:flex}
+#pillcore{width:46px;height:46px;flex:none}
+#pilltext{flex:1;min-width:0;font:500 14px/1.3 var(--text);color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pillmood{font:400 11px var(--dim);color:var(--cy);letter-spacing:.12em;text-transform:uppercase}
+#pillmood.wait{color:var(--amber)} #pillmood.happy{color:#3dffa8}
+#pillmic{-webkit-app-region:no-drag;border:1px solid var(--cy);background:rgba(0,229,255,.1);color:var(--paper);border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:12px;flex:none}
+#pillmic.rec{background:var(--red);border-color:var(--red)}
+#pillopen{-webkit-app-region:no-drag;border:none;background:transparent;color:var(--mute);cursor:pointer;font-size:16px;flex:none}
+/* режим «Уголок» */
+body.mini .app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+body.mini main{min-width:0}
+body.mini,body.mini .app{height:100vh!important;overflow:hidden}
+body.mini #feed{max-height:none}
+body.mini .msg{max-width:100%}
+body.mini #send{display:none}
+body.mini .mode{padding:5px 12px;font-size:13px}
+body.mini textarea{height:46px;padding:11px 12px}
+body.mini header{padding:0 12px;gap:10px;height:auto;min-height:48px}
+body.mini header .switch,body.mini #clock,body.mini #summary,body.mini #toMini{display:none}
+body.mini .brand{font-size:16px}
+body.mini .stage{display:none} body.mini #side{display:none}
+body.mini #feed{padding:12px 14px;gap:10px;font-size:14px}
+body.mini .composer{padding:10px 12px 12px}
+body.mini #minicore{display:block}
+#minicore{display:none;width:44px;height:44px;cursor:pointer}
+::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-thumb{background:var(--rule2);border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:1100px){body{overflow:auto}.app{grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto;height:auto}
+  .stage{border-right:none;border-bottom:1px solid var(--rule)} #core{width:280px} #side{border-left:none;border-top:1px solid var(--rule)} #feed{max-height:60vh} #summary{display:none}}
+/* телефон (и окно в Телеграме): шапка в две строки, ничего не вылезает за край */
+@media (max-width:640px){header{flex-wrap:wrap;gap:8px 12px;padding:10px 14px;height:auto}
+  header .switch{font-size:12px} #clock{display:none} #core{width:min(280px,72vw)} .msg{max-width:100%}
+  html,body{overflow-x:hidden}}
+/* внутри Телеграма — только то, что работает с телефона: окна «Сверху» и «Офис» живут на компьютере */
+html.tg #toMini, html.tg #toOffice{display:none}
+</style>
+</head>
+<body>
+<canvas id="bp" aria-hidden="true"></canvas>
+<div class="app">
+  <header>
+    <canvas id="minicore" width="88" height="88" aria-label="Говорить"></canvas>
+    <div class="brand">JARVIS</div>
+    <div id="summary">Задач нет</div>
+    <div class="spacer"></div>
+    <button class="mode main" id="toHud" title="Полноэкранный режим: говоришь — он отвечает голосом">Режим Джарвиса</button>
+    <button class="mode" id="toMini" title="Живой JARVIS сверху, поверх всех окон">Сверху</button>
+    <button class="mode" id="toOffice" title="3D-офис: кто из агентов работает, что идёт по проектам">Офис</button>
+    <label class="switch" title="Окно слушает микрофон и реагирует, только когда фраза начинается с «Джарвис». Остальное сразу выбрасывается."><input type="checkbox" id="listen" checked> Слушать «Джарвис»</label>
+    <label class="switch"><input type="checkbox" id="speak" checked> Читать ответы вслух</label>
+    <label class="switch"><input type="checkbox" id="sound" checked> Звуки</label>
+    <div id="clock"></div>
+  </header>
+  <section class="stage" aria-label="Реактор JARVIS">
+    <canvas id="core" width="920" height="920" aria-label="Нажми и говори"></canvas>
+    <div id="status" role="status">На связи</div>
+    <div class="hint">Нажми на кольцо или зажми пробел и говори. «Идея: …» — запишу в заметки.</div>
+  </section>
+  <main>
+    <div id="feed" aria-live="polite"></div>
+    <div class="composer">
+      <div id="replybar">Отвечаешь на вопрос по задаче <span id="replyn"></span> · <button id="replyx">отменить</button></div>
+      <div class="row">
+        <textarea id="text" placeholder="Что сделать?" aria-label="Задание для JARVIS"></textarea>
+        <button id="mic" title="Говорить голосом">Говорить</button>
+        <button id="send">Отправить</button>
+      </div>
+      <div id="err"></div>
+    </div>
+  </main>
+  <aside id="side">
+    <h2>ЗАДАЧИ</h2>
+    <div id="tlist"><div class="empty">Пока пусто. Скажи или напиши, что сделать — задача появится здесь.</div></div>
+  </aside>
+</div>
+<div id="pill" title="Нажми — говори. Двойной щелчок — полный Джарвис">
+  <canvas id="pillcore" width="140" height="140" aria-hidden="true"></canvas>
+  <div><div id="pilltext">На связи, сэр.</div><div id="pillmood">спокоен</div></div>
+  <button id="pillmic" aria-label="Говорить">●</button>
+  <button id="pillopen" aria-label="Открыть JARVIS">⤢</button>
+</div>
+<div id="hud" role="dialog" aria-label="Режим Джарвиса">
+  <canvas id="hudbp" aria-hidden="true"></canvas>
+  <button class="mode" id="hudexit">Выйти · Esc</button>
+  <canvas id="hudcore" width="1100" height="1100" aria-label="Нажми и говори"></canvas>
+  <div id="hudsay"></div>
+  <div id="hudyou"></div>
+  <div class="hudhint">Нажми на кольцо или зажми пробел — говори. Ответ прозвучит вслух.</div>
+</div>
+<script src="/reactor.js"></script>
+<script>
+const H = {"X-Jarvis": "1"};
+// Открыто внутри Телеграма (мини-приложение): каждый запрос несёт подпись Телеграма — JARVIS пускает только владельца
+const TGA = (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) ? Telegram.WebApp : null;
+if (TGA) {
+  const f0 = window.fetch.bind(window);
+  window.fetch = (u, o = {}) => f0(u, Object.assign({}, o, {headers: Object.assign({}, o.headers || {}, {"X-Tg-Init": TGA.initData})}));
+  try { TGA.ready(); TGA.expand(); if (TGA.disableVerticalSwipes) TGA.disableVerticalSwipes(); if (TGA.setHeaderColor) TGA.setHeaderColor("#000000"); } catch (e) {}
+  document.documentElement.classList.add("tg");
+}
+const TOUCH = !!TGA || matchMedia("(pointer: coarse)").matches;   // телефон: пробела нет — подсказки без него
+if (TOUCH) document.addEventListener("DOMContentLoaded", () => document.querySelectorAll(".hint, .hudhint")
+  .forEach(el => { el.textContent = el.textContent.replace(" или зажми пробел", ""); }));
+const $ = id => document.getElementById(id);
+const STAGES = ["принял", "понимаю", "делаю", "проверка", "отчёт"];
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const MODE = new URLSearchParams(location.search).get("mode");
+const MINI = MODE === "mini", PILL = MODE === "pill";   // pill — живой JARVIS сверху, поверх всех окон
+if (PILL) document.body.classList.add("pill");
+if (MINI) { document.body.classList.add("mini"); document.getElementById("toHud").textContent = "Джарвис"; document.getElementById("text").placeholder = "Что сделать? Enter — отправить"; }
+let lastId = 0, initialId = Infinity, tasks = [], busy = false, replyTo = null, hudOn = false;
+let recording = false, mediaRec = null, chunks = [], flash = 0, level = 0, analyser = null, pending = false;
+const rendered = new Map();
+
+const tick = () => { $("clock").textContent = new Date().toLocaleString("ru-RU", {day: "numeric", month: "long", hour: "2-digit", minute: "2-digit"}); };
+tick(); setInterval(tick, 10000);
+for (const id of ["speak", "sound"]) {
+  try { const v = localStorage.getItem(id); if (v !== null) $(id).checked = v === "1"; } catch (e) {}
+  $(id).onchange = () => { try { localStorage.setItem(id, $(id).checked ? "1" : "0"); } catch (e) {} };
+}
+
+let actx = null;
+function chime(freqs, dur = 0.1) {
+  if (!$("sound").checked) return;
+  actx = actx || new AudioContext();
+  freqs.forEach((f, i) => {
+    const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i * dur;
+    o.type = "sine"; o.frequency.value = f;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.06, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur * 2.5);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur * 2.6);
+  });
+}
+let voiceAudio = null;
+async function say(m) {                                    // голос JARVIS (служба на ПК), запасной — голос браузера
+  if (!(hudOn || $("speak").checked)) return;
+  try {
+    const r = await fetch("/api/tts?id=" + m.id);
+    if (r.ok) {
+      voiceAudio?.pause(); speechSynthesis.cancel();
+      voiceAudio = new Audio(URL.createObjectURL(await r.blob()));
+      voiceAudio.onplay = () => { speaking = true; }; voiceAudio.onended = voiceAudio.onpause = () => { speaking = false; };
+      return await voiceAudio.play();
+    }
+  } catch (e) { /* служба голоса молчит — читаем браузером */ }
+  sayBrowser(m.text);
+}
+function sayBrowser(text) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/[•#*`]/g, "").slice(0, 700)); u.lang = "ru-RU";
+  const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith("ru")); if (v) u.voice = v;
+  u.onstart = () => { speaking = true; }; u.onend = () => { speaking = false; };
+  speechSynthesis.speak(u);
+}
+let speaking = false;
+function typeOut(el, text) {
+  if (REDUCED) { el.textContent = text; return; }
+  const step = Math.max(1, Math.ceil(text.length / 80)); let i = 0;
+  const run = () => { i = Math.min(text.length, i + step); el.textContent = text.slice(0, i); if (i < text.length) requestAnimationFrame(run); };
+  run();
+}
+const askInfo = id => tasks.find(t => t.ask_msg === id && t.state === "waiting_human") || null;
+function btn(label, cls, fn) { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; return b; }
+
+function renderActions(el, id) {
+  const box = el.querySelector(".acts"), t = askInfo(id);
+  el.classList.toggle("ask", !!t); box.replaceChildren();
+  if (!t) return;
+  if (t.confirm) box.append(btn("Да, делай", "yes", () => send("да", id)), btn("Нет", "", () => send("нет", id)));
+  box.append(btn("Ответить", "", () => setReply(id, t.id)));
+}
+function addMsg(m, animate) {
+  const el = document.createElement("div"); el.className = "msg " + m.who;
+  const body = document.createElement("div"), text = m.text.replace(/\*\*|`/g, "");
+  const acts = document.createElement("div"); acts.className = "acts";
+  const ts = document.createElement("div"); ts.className = "t"; ts.textContent = m.ts;
+  el.append(body, acts, ts); $("feed").append(el); rendered.set(m.id, el);
+  if (animate && m.who === "jarvis") typeOut(body, text); else body.textContent = text;
+  if (animate && hudOn) { if (m.who === "jarvis") typeOut($("hudsay"), text.slice(0, 400)); else $("hudyou").textContent = text; }
+}
+function chain(stage) {
+  const c = document.createElement("div"); c.className = "chain";
+  const base = document.createElement("div"); base.className = "base";
+  const done = document.createElement("div"); done.className = "done"; done.style.width = (stage / (STAGES.length - 1) * 100) + "%";
+  c.append(base, done);
+  STAGES.forEach((s, i) => {
+    const k = document.createElement("div"); k.className = "tick" + (i <= stage ? " on" : "") + (i === stage ? " cur" : "");
+    k.style.left = (i / (STAGES.length - 1) * 100) + "%";
+    const l = document.createElement("span"); l.textContent = s; k.append(l); c.append(k);
+  });
+  return c;
+}
+function plural(n, a, b, c) { const m = n % 10, h = n % 100; return m === 1 && h !== 11 ? a : m >= 2 && m <= 4 && (h < 12 || h > 14) ? b : c; }
+function renderSide(stats = {}) {
+  stats = {running: 0, waiting: 0, done_today: 0, ...stats};
+  const parts = [];
+  if (stats.running) parts.push(`<b>${stats.running}</b> в работе`);
+  if (stats.waiting) parts.push(`<b class="wait">${stats.waiting}</b> ${plural(stats.waiting, "ждёт", "ждут", "ждут")} тебя`);
+  if (stats.done_today) parts.push(`сегодня ${plural(stats.done_today, "сделана", "сделано", "сделано")} <b>${stats.done_today}</b>`);
+  $("summary").innerHTML = parts.length ? parts.join(", ") : "Задач нет";
+  const box = $("tlist"); box.replaceChildren();
+  if (!tasks.length) { box.innerHTML = '<div class="empty">Пока пусто. Скажи или напиши, что сделать — задача появится здесь.</div>'; return; }
+  for (const t of tasks) {
+    const el = document.createElement("article"); el.className = "sheet";
+    const top = document.createElement("div"); top.className = "top";
+    const no = document.createElement("div"); no.className = "no"; no.textContent = t.id;
+    const ti = document.createElement("div"); ti.className = "ti"; ti.textContent = t.title;
+    top.append(no, ti);
+    const bot = document.createElement("div"); bot.className = "bot";
+    const st = document.createElement("div"); st.className = "st " + t.state; st.textContent = t.state_ru[0].toUpperCase() + t.state_ru.slice(1);
+    bot.append(st, btn("Отменить", "", () => { if (confirm("Отменить задачу №" + t.id + "?")) send("/cancel " + t.id); }));
+    el.append(top, chain(t.stage), bot); box.append(el);
+  }
+}
+async function poll() {
+  try {
+    const s = await (await fetch("/api/state?after=" + lastId)).json();
+    tasks = s.tasks; busy = s.busy;
+    const f = $("feed"), atBottom = f.scrollHeight - f.scrollTop - f.clientHeight < 80;
+    let fresh = false;
+    for (const m of s.feed) {
+      const isNew = m.id > initialId; addMsg(m, isNew); lastId = Math.max(lastId, m.id);
+      if (m.who === "jarvis" && isNew) { fresh = true; flash = 1; if (m.text.startsWith("Молчу")) { voiceAudio?.pause(); speechSynthesis.cancel(); }   /* «замолчи» — оборвать голос сразу */
+        else if (!m.text.startsWith("🎙")) say(m);   /* «Расслышал: …» — только на экране, вслух не повторяем ваши слова */ if (PILL) { $("pilltext").textContent = m.text.split("\n")[0].slice(0, 90); moodHold = Date.now() + 8000; } }
+    }
+    for (const [id, el] of rendered) renderActions(el, id);
+    renderSide(s.stats);
+    if (fresh) { chime([988, 1319]); pending = false; }
+    if (fresh || atBottom) f.scrollTop = f.scrollHeight;
+    $("err").textContent = "";
+  } catch (e) { $("err").textContent = "Нет связи с JARVIS: открой ярлык JARVIS и не закрывай чёрное окно."; }
+  updateStatus();
+}
+function statusText() {
+  const w = tasks.find(t => t.state === "waiting_human"), r = tasks.find(t => t.state === "running");
+  return recording ? "Слушаю…" : r ? `Работаю над задачей №${r.id}` : pending ? "Принимаю задание…"
+    : w ? `Жду твоего ответа по задаче №${w.id}` : "На связи";
+}
+function updateStatus() { $("status").textContent = statusText(); }
+function setReply(id, taskId) { replyTo = id; $("replyn").textContent = "№" + taskId; $("replybar").style.display = "block"; $("text").focus(); }
+$("replyx").onclick = () => { replyTo = null; $("replybar").style.display = "none"; };
+async function send(text, reply = replyTo) {
+  text = (text || "").trim();
+  if (!text) { $("err").textContent = "Напиши задание — поле пустое."; $("text").focus(); return; }
+  try {
+    const r = await fetch("/api/send", {method: "POST", headers: {...H, "Content-Type": "application/json"}, body: JSON.stringify({text, reply_to: reply})});
+    if (!r.ok) throw new Error((await r.json()).error);
+    pending = true; chime([660]);
+    if (reply === replyTo) $("replyx").onclick();
+    poll();
+  } catch (e) { $("err").textContent = "Не отправилось: " + e.message; }
+}
+$("send").onclick = () => { const t = $("text").value; send(t); if (t.trim()) $("text").value = ""; };
+$("text").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("send").onclick(); } });
+$("text").addEventListener("input", () => { $("err").textContent = ""; });
+
+async function toggleMic() {
+  if (recording) { mediaRec.stop(); return; }
+  try {
+    if (speaking) { speechSynthesis.cancel(); voiceAudio?.pause(); }
+    const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+    actx = actx || new AudioContext(); analyser = actx.createAnalyser(); analyser.fftSize = 256;
+    actx.createMediaStreamSource(stream).connect(analyser);
+    mediaRec = new MediaRecorder(stream); chunks = [];
+    mediaRec.ondataavailable = e => chunks.push(e.data);
+    mediaRec.onstop = async () => {
+      recording = false; analyser = null; $("mic").classList.remove("rec"); $("mic").textContent = "Говорить";
+      stream.getTracks().forEach(t => t.stop());
+      try {
+        const r = await fetch("/api/voice" + (replyTo ? "?reply_to=" + replyTo : ""), {method: "POST", headers: H, body: new Blob(chunks, {type: "audio/webm"})});
+        if (!r.ok) throw new Error((await r.json()).error);
+        pending = true; chime([660, 520]); if (replyTo) $("replyx").onclick(); poll();
+      } catch (e) { $("err").textContent = "Голосовое не отправилось: " + e.message; }
+      updateStatus();
+    };
+    mediaRec.start(); recording = true; chime([520, 784]);
+    $("mic").classList.add("rec"); $("mic").textContent = "Стоп";
+    if (releaseEarly) { releaseEarly = false; setTimeout(() => recording && mediaRec.stop(), 300); }
+  } catch (e) { $("err").textContent = "Нет доступа к микрофону: разреши его в браузере (" + e.message + ")"; }
+  updateStatus();
+}
+$("mic").onclick = toggleMic; $("core").onclick = toggleMic; $("hudcore").onclick = toggleMic; $("minicore").onclick = toggleMic;
+
+let spaceHeld = false, releaseEarly = false;          // пробел — рация
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && hudOn) return setHud(false);
+  if (e.code !== "Space" || e.repeat || e.target.closest("textarea, button, input")) return;
+  e.preventDefault(); if (!recording) { spaceHeld = true; toggleMic(); }
+});
+document.addEventListener("keyup", e => {
+  if (e.code !== "Space" || !spaceHeld) return;
+  spaceHeld = false; if (recording) toggleMic(); else releaseEarly = true;
+});
+
+/* слово «Джарвис»: окно само режет речь на фразы и отправляет каждую на проверку зова */
+const ear = {stream: null, ctx: null, node: null, buf: [], pre: [], voiced: false, quiet: 0, len: 0, rate: 48000};
+const EAR = {on: 0.018, off: 0.010, endMs: 700, maxSec: 14, preSec: 0.4};
+async function earStart() {
+  try {
+    ear.stream = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true}});
+    ear.ctx = new AudioContext(); ear.rate = ear.ctx.sampleRate;
+    const src = ear.ctx.createMediaStreamSource(ear.stream);
+    ear.node = ear.ctx.createScriptProcessor(2048, 1, 1);
+    ear.node.onaudioprocess = e => earChunk(new Float32Array(e.inputBuffer.getChannelData(0)));
+    src.connect(ear.node); ear.node.connect(ear.ctx.destination);
+  } catch (e) { $("listen").checked = false; $("err").textContent = "Нет доступа к микрофону: " + e.message; }
+}
+function earStop() { ear.node?.disconnect(); ear.stream?.getTracks().forEach(t => t.stop()); ear.ctx?.close(); Object.assign(ear, {stream: null, ctx: null, node: null, buf: [], pre: [], voiced: false}); }
+function earChunk(x) {
+  if (recording || speaking) return;                       // не слушаем сами себя и ручную запись
+  const rms = Math.sqrt(x.reduce((s, v) => s + v * v, 0) / x.length), ms = x.length / ear.rate * 1000;
+  if (!ear.voiced) {
+    ear.pre.push(x); while (ear.pre.length * x.length > ear.rate * EAR.preSec) ear.pre.shift();
+    if (rms > EAR.on) { ear.voiced = true; ear.buf = [...ear.pre]; ear.len = 0; ear.quiet = 0; }
+    return;
+  }
+  ear.buf.push(x); ear.len += ms; level = Math.max(level, rms * 4);
+  ear.quiet = rms < EAR.off ? ear.quiet + ms : 0;
+  if (ear.quiet > EAR.endMs || ear.len > EAR.maxSec * 1000) {
+    const phrase = ear.buf; ear.voiced = false; ear.buf = []; ear.pre = [];
+    if (ear.len > 400) earSend(phrase);
+  }
+}
+function toWav(chunks, rate) {                               // моно 16 кГц, 16 бит
+  const all = new Float32Array(chunks.reduce((n, c) => n + c.length, 0)); let o = 0;
+  for (const c of chunks) { all.set(c, o); o += c.length; }
+  const k = rate / 16000, n = Math.floor(all.length / k), dv = new DataView(new ArrayBuffer(44 + n * 2));
+  const w = (p, s) => [...s].forEach((ch, i) => dv.setUint8(p + i, ch.charCodeAt(0)));
+  w(0, "RIFF"); dv.setUint32(4, 36 + n * 2, true); w(8, "WAVEfmt "); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true);
+  dv.setUint16(22, 1, true); dv.setUint32(24, 16000, true); dv.setUint32(28, 32000, true); dv.setUint16(32, 2, true);
+  dv.setUint16(34, 16, true); w(36, "data"); dv.setUint32(40, n * 2, true);
+  for (let i = 0; i < n; i++) dv.setInt16(44 + i * 2, Math.max(-1, Math.min(1, all[Math.floor(i * k)])) * 0x7fff, true);
+  return new Blob([dv], {type: "audio/wav"});
+}
+async function earSend(chunks) {
+  try {
+    const r = await (await fetch("/api/hear", {method: "POST", headers: H, body: toWav(chunks, ear.rate)})).json();
+    if (r.heard) { flash = 1; chime(r.armed ? [784, 988] : [660]); if (!r.armed) pending = true; poll(); }
+  } catch (e) { /* связь пропала — следующий опрос покажет ошибку */ }
+}
+if (TGA) $("listen").checked = false;   // в телефоне — не слушать постоянно (батарея); говорить кнопкой или кольцом
+try { const lv = localStorage.getItem("listen"); if (lv !== null) $("listen").checked = lv === "1"; } catch (e) {}   // по умолчанию слушает
+$("listen").onchange = () => { try { localStorage.setItem("listen", $("listen").checked ? "1" : "0"); } catch (e) {} $("listen").checked ? earStart() : earStop(); };
+if ($("listen").checked) earStart();
+
+/* «сверху»: настроение и короткая строка */
+let moodHold = 0;
+function pillUpdate() {
+  if (!PILL) return;
+  const w = tasks.find(t => t.state === "waiting_human"), r = tasks.find(t => t.state === "running");
+  const m = $("pillmood"); m.className = "";
+  if (recording) m.textContent = "слушаю…";
+  else if (speaking) m.textContent = "говорю";
+  else if (r || pending) m.textContent = "думаю…";
+  else if (w) { m.textContent = "жду твоего ответа"; m.className = "wait"; }
+  else if (Date.now() < moodHold) { m.textContent = "доволен"; m.className = "happy"; }
+  else m.textContent = ["спокоен", "на связи", "всё под контролем"][Math.floor(Date.now() / 20000) % 3];
+}
+if (PILL) {
+  // «поверх всех окон»: Edge сам держит окно «Документ в картинке» выше всех, снаружи Windows это запрещает
+  (async () => { try { if (!("documentPictureInPicture" in window)) return;
+    const pip = await documentPictureInPicture.requestWindow({width: 420, height: 64, disallowReturnToOpener: true});
+    [...document.styleSheets].forEach(s => { try { const st = document.createElement("style"); st.textContent = [...s.cssRules].map(r => r.cssText).join(""); pip.document.head.append(st); } catch (e) {} });
+    pip.document.body.className = "pill"; pip.document.body.append($("pill")); pip.document.title = "JARVIS";
+    pip.addEventListener("pagehide", () => window.close());
+  } catch (e) { /* не дали — остаёмся обычным окном */ } })();
+  $("pillmic").onclick = e => { e.stopPropagation(); toggleMic(); };
+  $("pillopen").onclick = e => { e.stopPropagation(); window.open("/?hud=1", "jarvis-main"); };
+  $("pill").ondblclick = () => window.open("/?hud=1", "jarvis-main");
+  $("pill").onclick = e => { if (e.target.id === "pill" || e.target.id === "pillcore" || e.target.closest("#pilltext, #pillmood")) toggleMic(); };
+  setInterval(pillUpdate, 500);
+}
+
+/* виды окна */
+function setHud(on) {
+  hudOn = on; $("hud").classList.toggle("on", on);
+  if (on) { sizeBp($("hudbp")); $("hudsay").textContent = TOUCH ? "Слушаю тебя. Нажми на кольцо и говори." : "Слушаю тебя. Нажми на кольцо или зажми пробел."; $("hudyou").textContent = ""; chime([392, 523, 784], .09); }
+  else { speechSynthesis.cancel(); voiceAudio?.pause(); }
+}
+$("toHud").onclick = () => setHud(true); $("hudexit").onclick = () => setHud(false);
+$("toOffice").onclick = async () => { try { await fetch("/api/office/open", {method: "POST", headers: H}); } catch (e) { $("err").textContent = "Не смог открыть офис."; } };
+$("toMini").onclick = async () => { try { await fetch("/api/pill", {method: "POST", headers: H}); } catch (e) { $("err").textContent = "Не смог открыть JARVIS сверху."; } };
+
+/* реактор: рисуется во всех видах */
+function sizeBp(c) { if (!c.clientWidth || !c.clientHeight) return;           // окно ещё без размера (свёрнуто) — нарисуем при изменении размера
+  c.width = c.clientWidth; c.height = c.clientHeight; const g = c.getContext("2d"); g.drawImage(Reactor.blueprint(c.width, c.height), 0, 0); }
+sizeBp($("bp")); addEventListener("resize", () => { sizeBp($("bp")); if (hudOn) sizeBp($("hudbp")); });
+const T0 = Date.now();
+function frame() {
+  const t = REDUCED ? 3 : (Date.now() - T0) / 1000;
+  if (analyser) { const a = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(a); level = level * .7 + a.reduce((x, y) => x + y, 0) / a.length / 255 * .3; } else level *= .9;
+  flash *= .95;
+  const st = {level: Math.max(level, speaking ? .15 + .1 * Math.abs(Math.sin(t * 9)) : 0), flash, work: busy || pending, listen: recording};
+  const c = hudOn ? $("hudcore") : PILL ? $("pillcore") : MINI ? $("minicore") : $("core");
+  const g = c.getContext("2d"); g.clearRect(0, 0, c.width, c.height);
+  Reactor.draw(g, c.width, c.height, (MINI || PILL) && !hudOn ? {...st, label: "J"} : st, t);
+  if (!REDUCED) requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+(async () => {
+  await poll(); initialId = lastId; $("feed").scrollTop = $("feed").scrollHeight; setInterval(poll, 1500);
+  const q = new URLSearchParams(location.search);
+  let startHud = q.get("hud") !== "0" && !MINI && !PILL;             // по умолчанию — режим Джарвиса; ?hud=0 — рабочий стол
+  try { if (localStorage.getItem("hud") === "0" && q.get("hud") !== "1") startHud = false; } catch (e) {}
+  if (startHud) setHud(true);
+})();
+</script>
+</body>
+</html>

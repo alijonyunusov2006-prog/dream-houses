@@ -1,0 +1,65 @@
+# Политика доступа JARVIS. Читается core/jarviscore/policy.py и хуками Claude Code.
+# Пути: %VAR% и ~ раскрываются. Команды: регулярные выражения Python.
+
+[paths]
+# Где JARVIS может писать без вопросов. Всё остальное — запрет.
+allowed = [
+  "C:/jarvis",
+  "C:/Projects",
+  "%USERPROFILE%/Documents/Jarvis",
+  "%TEMP%/jarvis",
+]
+
+[programs]
+# Что можно запускать без вопросов (имя exe без пути). Остальное — с подтверждением.
+allowed = [
+  "code", "code.cmd",
+  "3dsmax", "3dsmaxbatch",
+  "python", "py", "uv", "node", "npm", "npx", "git", "claude",
+  "explorer", "notepad", "powershell", "pwsh", "cmd",
+  "ffmpeg", "magick",
+  "bambu-studio", "obsidian",
+]
+
+[commands]
+# Никогда, даже с подтверждением.
+deny = [
+  '(?i)\bformat\b\s+[a-z]:',
+  '(?i)\brm\s+-rf\s+/(\s|$)',
+  '(?i)\b(rd|rmdir)\b.*\s/s.*\s[a-z]:\\\\?(\s|$)',
+  '(?i)remove-item.*-recurse.*\s[a-z]:\\\\?(\s|$)',
+  '(?i)\bdiskpart\b',
+  '(?i)reg\s+delete\s+hk(lm|cr)',
+]
+# С подтверждением (кнопка в Telegram / ответ в чате).
+ask = [
+  '(?i)\bshutdown\b|\brestart-computer\b|\bstop-computer\b',
+  '(?i)\brm\b|\bdel\b|\berase\b|remove-item|\brmdir\b',
+  '(?i)git\s+push\s+.*--force|git\s+reset\s+--hard|git\s+clean\s+-fd',
+  '(?i)npm\s+install\s+-g|pip\s+install|uv\s+pip\s+install|winget\s+install|choco\s+install',
+  '(?i)\bcurl\b.*\|\s*(sh|bash|iex)|irm\b.*\|\s*iex',
+  '(?i)send(_|-)?message|sendMessage|publish|post\s+to',
+  '(?i)\bpay\b|payment|invoice|оплат',
+  '(?i)\.env\b|credential|token|secret|password',
+]
+
+[deletion]
+# Правило владельца «три раза» (core/jarviscore/deletion.py, brain/10-rules/удаление.md).
+# Обычное — удалять после двух «да». Важное — не удалять, дать ссылку «удалите сами»;
+# удалить только на третью просьбу или после фразы «понимаю, что это важно, но разрешаю удалить» (со второго раза),
+# и всегда сначала резервная копия. Всё, что не путь (облако, CRM, репозитории), и всё вне [paths] — важное.
+window_hours = 24          # просьбы об одном и том же считаются в течение суток
+unlock_minutes = 15        # разрешение действует на одну команду 15 минут
+important = [
+  "C:/jarvis/brain*", "C:/jarvis/.env", "C:/jarvis/config*", "C:/jarvis/.git*", "C:/jarvis/skills*",
+  "C:/Projects/*/.git*", "C:/Projects/*/.env",
+  "%USERPROFILE%/Documents*", "%USERPROFILE%/Desktop*", "%USERPROFILE%/Pictures*", "%USERPROFILE%/Videos*",
+  "D:/Archive*",
+  # рабочие файлы владельца: 3ds Max, Archicad, чертежи, печать, фотошоп
+  "*.max", "*.pln", "*.pla", "*.dwg", "*.ifc", "*.3mf", "*.stl", "*.psd", "*.skp",
+  "repo:*", "branch:main", "branch:master", "vercel:*", "supabase:*", "crm:*", "dhos:*",
+  "telegram:*", "instagram:*", "google-drive:*",
+]
+ordinary = [
+  "%TEMP%/jarvis*", "C:/jarvis/data/tmp*", "C:/jarvis/data/cache*", "%USERPROFILE%/Documents/Jarvis/tmp*",
+]

@@ -1,0 +1,273 @@
+<title>Qabat</title>
+<meta name="description" content="Qabat — 3D-печать в Душанбе: лампы, вещи для дома, подарки, макеты и печать по вашей модели.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* Макет: печатная платформа. Слово-знак «печатается» слоями снизу вверх; ниже — что печатаем, как заказать, на чём печатаем, заявка. */
+  :root {
+    --bg: #eceeea;          /* платформа: холодный светлый */
+    --surface: #f7f8f5;
+    --ink: #141a22;         /* графит */
+    --muted: #586170;
+    --line: #cfd4cc;
+    --accent: #2b50e8;      /* синий PLA */
+    --accent-ink: #ffffff;
+    --accent-soft: #dfe5fb;
+    --ok: #2f7d4f;
+    --f-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+    --f-body: "Golos Text", "Segoe UI", system-ui, sans-serif;
+    --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+    --r: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1318; --surface: #161c23; --ink: #e7eaee; --muted: #9aa4b2; --line: #273039;
+      --accent: #7090ff; --accent-ink: #0b1020; --accent-soft: #1b2440; --ok: #6fc28f; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1318; --surface: #161c23; --ink: #e7eaee; --muted: #9aa4b2; --line: #273039;
+    --accent: #7090ff; --accent-ink: #0b1020; --accent-soft: #1b2440; --ok: #6fc28f; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--f-body); padding-inline: 16px; }
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  .mono { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+  header.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; }
+  .brand { font: 700 18px/1 var(--f-display); letter-spacing: .02em; text-decoration: none; }
+  .draft { font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em; color: var(--muted); border: 1px dashed var(--line); padding: 5px 9px; border-radius: 999px; }
+  nav.links { display: flex; gap: 18px; flex-wrap: wrap; }
+  nav.links a { text-decoration: none; color: var(--muted); font-size: 14px; }
+  nav.links a:hover { color: var(--ink); }
+
+  /* Герой */
+  .hero { padding-block: 40px 56px; border-bottom: 1px solid var(--line); }
+  .hero .mono { margin: 0 0 18px; }
+  .mark { position: relative; display: inline-block; margin: 0; font: 800 clamp(72px, 19vw, 230px)/.86 var(--f-display); letter-spacing: -.02em; }
+  .mark .layers {
+    display: block; color: transparent;
+    background: repeating-linear-gradient(to bottom, var(--ink) 0 5px, color-mix(in srgb, var(--ink) 55%, var(--bg)) 5px 6px);
+    -webkit-background-clip: text; background-clip: text;
+    animation: print 1.3s steps(26, end) both;
+  }
+  .mark .nozzle { position: absolute; left: -2%; right: -2%; height: 2px; background: var(--accent); bottom: 0; animation: nozzle 1.3s steps(26, end) both; }
+  @keyframes print { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+  @keyframes nozzle { from { bottom: 0; opacity: 1; } 96% { opacity: 1; } to { bottom: 100%; opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .mark .layers, .mark .nozzle { animation: none; } .mark .nozzle { display: none; } }
+  .lead { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px; margin-top: 28px; align-items: end; }
+  .lead h1 { margin: 0; font: 600 clamp(24px, 3.4vw, 36px)/1.2 var(--f-body); text-wrap: balance; max-width: 22ch; }
+  .lead p { margin: 0; color: var(--muted); max-width: 46ch; }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; border-radius: var(--r); padding: 12px 18px; font: 600 15px/1 var(--f-body); text-decoration: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn:hover { filter: brightness(1.05); }
+
+  section { padding-block: 56px; border-bottom: 1px solid var(--line); }
+  section h2 { margin: 0 0 8px; font: 700 clamp(22px, 3vw, 30px)/1.15 var(--f-display); letter-spacing: -.01em; text-wrap: balance; }
+  section .sub { margin: 0 0 28px; color: var(--muted); max-width: 60ch; }
+
+  /* Что печатаем */
+  .cats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+  .cat { background: var(--surface); padding: 22px; display: grid; gap: 8px; align-content: start; min-height: 168px; }
+  .cat h3 { margin: 0; font: 600 18px/1.3 var(--f-body); }
+  .cat p { margin: 0; color: var(--muted); font-size: 15px; }
+  .cat .tag { justify-self: start; font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em; padding: 4px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+  .cat.feature { background: var(--accent); color: var(--accent-ink); }
+  .cat.feature p { color: color-mix(in srgb, var(--accent-ink) 82%, transparent); }
+  .cat.feature .tag { background: color-mix(in srgb, var(--accent-ink) 18%, transparent); color: var(--accent-ink); }
+
+  /* Как заказать */
+  .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; counter-reset: s; list-style: none; margin: 0; padding: 0; }
+  .steps li { border-top: 2px solid var(--ink); padding-top: 14px; display: grid; gap: 6px; }
+  .steps li::before { counter-increment: s; content: "слой " counter(s); font-family: var(--f-mono); font-size: 12px; letter-spacing: .06em; color: var(--accent); text-transform: uppercase; }
+  .steps b { font-weight: 600; }
+  .steps span { color: var(--muted); font-size: 15px; }
+
+  /* Принтеры */
+  .machines { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .machine { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 22px; display: grid; gap: 14px; }
+  .machine h3 { margin: 0; font: 600 18px/1.3 var(--f-body); }
+  .spec { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; margin: 0; font-variant-numeric: tabular-nums; }
+  .spec dt { font-family: var(--f-mono); font-size: 12px; letter-spacing: .05em; color: var(--muted); text-transform: uppercase; padding-top: 2px; }
+  .spec dd { margin: 0; }
+  .volume { height: 120px; display: flex; align-items: end; gap: 10px; }
+  .cube { border: 1.5px solid var(--ink); background: repeating-linear-gradient(to top, var(--accent-soft) 0 3px, transparent 3px 6px); }
+  .materials { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  .chip { font-family: var(--f-mono); font-size: 12px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+
+  /* Заявка */
+  .order { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 32px; }
+  form { display: grid; gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 22px; }
+  label { display: grid; gap: 6px; font-size: 14px; color: var(--muted); }
+  input, select, textarea { font: 400 16px/1.4 var(--f-body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 11px 12px; width: 100%; }
+  textarea { min-height: 96px; resize: vertical; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .note { font-size: 14px; color: var(--muted); margin: 0; }
+  .done { border: 1px solid var(--ok); color: var(--ok); border-radius: 8px; padding: 12px; font-size: 15px; }
+
+  footer { padding-block: 28px 40px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
+
+  @media (max-width: 860px) {
+    .lead, .order { grid-template-columns: 1fr; }
+    .cats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    nav.links { display: none; }
+    .cats, .steps, .machines, .row { grid-template-columns: 1fr; }
+    .cat { min-height: 0; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#top">QABAT</a>
+    <nav class="links" aria-label="Разделы">
+      <a href="#catalog">Что печатаем</a>
+      <a href="#how">Как заказать</a>
+      <a href="#machines">Принтеры</a>
+      <a href="#order">Заявка</a>
+    </nav>
+    <span class="draft">черновик сайта</span>
+  </header>
+
+  <div class="hero" id="top">
+    <p class="mono">Душанбе · 3D-печать · қабат — «слой»</p>
+    <p class="mark" aria-label="Qabat"><span class="layers">QABAT</span><span class="nozzle" aria-hidden="true"></span></p>
+    <div class="lead">
+      <h1>Печатаем вещи слой за слоем: лампы, предметы для дома, подарки и детали по вашей модели.</h1>
+      <div>
+        <p>Пришлите фото, эскиз или готовый файл. Посчитаем цену по весу пластика и времени печати и напечатаем на своих принтерах.</p>
+        <div class="actions">
+          <a class="btn primary" href="#order">Оставить заявку</a>
+          <a class="btn" href="#catalog">Что печатаем</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="catalog">
+    <h2>Что печатаем</h2>
+    <p class="sub">Каталог из десяти изделий готовим к запуску. Печать по вашей модели и 3D-моделирование можно заказать уже сейчас.</p>
+    <div class="cats">
+      <article class="cat feature">
+        <span class="tag">своя линия</span>
+        <h3>Лампы «Чароғ»</h3>
+        <p>Настольные лампы с подсветкой внутри. Питание от USB-C, светодиоды, корпус из PETG.</p>
+      </article>
+      <article class="cat">
+        <span class="tag">для дома</span>
+        <h3>Предметы для дома</h3>
+        <p>Органайзеры, подставки, кашпо, держатели — по размеру вашего места.</p>
+      </article>
+      <article class="cat">
+        <span class="tag">подарки</span>
+        <h3>Подарки и сувениры</h3>
+        <p>Фигурки, именные вещи, партии к праздникам и для компаний.</p>
+      </article>
+      <article class="cat">
+        <span class="tag">архитектура</span>
+        <h3>Макеты и прототипы</h3>
+        <p>Архитектурные макеты, корпуса, детали для проверки формы до производства.</p>
+      </article>
+      <article class="cat">
+        <span class="tag">ваш файл</span>
+        <h3>Печать по вашей модели</h3>
+        <p>Принимаем STL, 3MF и OBJ. Проверим модель перед печатью.</p>
+      </article>
+      <article class="cat">
+        <span class="tag">с нуля</span>
+        <h3>3D-моделирование на заказ</h3>
+        <p>Нет файла — смоделируем по фото, эскизу или размерам.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="how">
+    <h2>Как заказать</h2>
+    <p class="sub">Четыре шага от идеи до готовой вещи.</p>
+    <ol class="steps">
+      <li><b>Пришлите идею</b><span>Фото, эскиз, размеры или файл модели.</span></li>
+      <li><b>Считаем цену</b><span>По весу пластика, времени печати и моделированию, если оно нужно.</span></li>
+      <li><b>Печатаем</b><span>На Bambu Lab P1S или Creality K1 — какой подходит по размеру и материалу.</span></li>
+      <li><b>Забираете</b><span>Самовывоз или доставка по Душанбе. Условия уточняем при заказе.</span></li>
+    </ol>
+  </section>
+
+  <section id="machines">
+    <h2>На чём печатаем</h2>
+    <p class="sub">Самая большая деталь за один раз ограничена рабочим объёмом принтера. Крупное печатаем частями и собираем.</p>
+    <div class="machines">
+      <article class="machine">
+        <h3>Bambu Lab P1S</h3>
+        <div class="volume" aria-hidden="true"><div class="cube" style="width:120px;height:120px"></div></div>
+        <dl class="spec">
+          <dt>Объём</dt><dd>256 × 256 × 256 мм</dd>
+          <dt>Подходит</dt><dd>точные детали, корпуса, макеты</dd>
+        </dl>
+      </article>
+      <article class="machine">
+        <h3>Creality K1</h3>
+        <div class="volume" aria-hidden="true"><div class="cube" style="width:103px;height:117px"></div></div>
+        <dl class="spec">
+          <dt>Объём</dt><dd>220 × 220 × 250 мм</dd>
+          <dt>Подходит</dt><dd>быстрые партии, сувениры</dd>
+        </dl>
+      </article>
+    </div>
+    <div class="materials" aria-label="Материалы">
+      <span class="chip">PLA — для дома и подарков</span>
+      <span class="chip">PETG — прочнее, держит тепло</span>
+    </div>
+  </section>
+
+  <section id="order">
+    <div class="order">
+      <div>
+        <h2>Оставить заявку</h2>
+        <p class="sub">Опишите, что нужно напечатать. Мы ответим и назовём цену.</p>
+        <p class="note">Instagram и Telegram Qabat скоро появятся здесь.</p>
+      </div>
+      <form id="order-form" novalidate>
+        <div class="row">
+          <label for="f-name">Имя<input id="f-name" name="name" autocomplete="name" required></label>
+          <label for="f-phone">Телефон<input id="f-phone" name="phone" type="tel" autocomplete="tel" placeholder="+992" required></label>
+        </div>
+        <label for="f-kind">Что нужно
+          <select id="f-kind" name="kind">
+            <option>Лампа «Чароғ»</option>
+            <option>Предмет для дома</option>
+            <option>Подарок или сувенир</option>
+            <option>Макет или прототип</option>
+            <option>Печать по моей модели</option>
+            <option>3D-моделирование</option>
+          </select>
+        </label>
+        <label for="f-text">Описание и размеры<textarea id="f-text" name="text" placeholder="Например: подставка под телефон, 12 см, белая"></textarea></label>
+        <button class="btn primary" type="submit">Отправить заявку</button>
+        <p class="note" id="f-hint">Это черновик сайта: заявки пока никуда не отправляются.</p>
+        <div class="done" id="f-done" hidden>Заявка записана в черновике. Когда подключим приём заявок, она будет уходить вам в Telegram.</div>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <span>QABAT · 3D-печать · Душанбе</span>
+    <span class="mono">слой за слоем</span>
+  </footer>
+</div>
+
+<script>
+  document.getElementById('order-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var ok = document.getElementById('f-name').value.trim() && document.getElementById('f-phone').value.trim();
+    var done = document.getElementById('f-done');
+    if (!ok) { done.hidden = false; done.textContent = 'Укажите имя и телефон, чтобы мы могли ответить.'; return; }
+    done.hidden = false;
+    done.textContent = 'Заявка записана в черновике. Когда подключим приём заявок, она будет уходить вам в Telegram.';
+  });
+</script>

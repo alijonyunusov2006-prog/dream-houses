@@ -1,0 +1,202 @@
+<title>Задачи JARVIS</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Archivo:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Список проектов сверху вниз: сводка → фильтр → карточка проекта со ступенями и заметкой владельца */
+:root{
+  --bg:#faf8f5; --surface:#ffffff; --layer:#f3efe9; --line:#e3ddd3;
+  --ink:#26221f; --earth:#4a433d; --muted:#6b625a;
+  --brand:#7d6549; --accent:#c4a675; --soft:#f2ebe0;
+  --you:#9c6119; --ok:#4a7c59;
+  --f-display:"Cormorant Garamond",Georgia,serif;
+  --f-ui:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1a1816; --surface:#211e1c; --layer:#2a2623; --line:#35302b;
+  --ink:#ece7df; --earth:#d3cabd; --muted:#a49a8e;
+  --brand:#c4a675; --accent:#c4a675; --soft:#2f2820;
+  --you:#d79a45; --ok:#6fb98a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1a1816; --surface:#211e1c; --layer:#2a2623; --line:#35302b;
+  --ink:#ece7df; --earth:#d3cabd; --muted:#a49a8e;
+  --brand:#c4a675; --accent:#c4a675; --soft:#2f2820;
+  --you:#d79a45; --ok:#6fb98a; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:860px;margin:0 auto;padding-block:32px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+.eyebrow{font-family:var(--f-ui);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--brand);font-weight:600}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(34px,6vw,48px);line-height:1.05;margin:6px 0 10px;text-wrap:balance}
+.lead{color:var(--earth);max-width:62ch;margin:0}
+.sum{display:flex;flex-wrap:wrap;gap:10px 28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding-block:14px}
+.sum div{display:grid}
+.sum b{font-family:var(--f-display);font-size:30px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.sum span{font-family:var(--f-ui);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.sum .y b{color:var(--you)}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--f-ui);font-size:13px;font-weight:500;border:1px solid var(--line);background:var(--surface);color:var(--earth);border-radius:999px;padding:7px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:focus-visible,.step input:focus-visible,textarea:focus-visible,.save:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.status{font-size:13px;color:var(--muted)}
+.proj{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 22px 18px;display:grid;gap:14px}
+.ph{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px}
+.ph h2{font-family:var(--f-display);font-weight:600;font-size:26px;margin:0;line-height:1.15;text-wrap:balance}
+.count{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:3px;background:var(--layer);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+.goal{margin:0;color:var(--earth);font-size:14px}
+ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.step{display:grid;grid-template-columns:22px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:0}
+.step input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--ok);cursor:pointer}
+.step .t{min-width:0}
+.step .t label{cursor:pointer;display:block}
+.step.done .t label{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.how{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.how code{font-family:var(--f-mono);font-size:12px;background:var(--layer);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+.who{display:inline-block;font-family:var(--f-ui);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;padding:2px 7px;border-radius:4px;margin-right:6px;vertical-align:1px}
+.who.you{background:var(--soft);color:var(--you)}
+.who.pc{background:var(--layer);color:var(--earth)}
+.who.jv{background:var(--layer);color:var(--brand)}
+.note{display:grid;gap:6px}
+.note label{font-family:var(--f-ui);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+textarea{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;min-height:64px;resize:vertical;width:100%;box-sizing:border-box}
+.nrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.save{font-family:var(--f-ui);font-size:13px;font-weight:600;background:var(--brand);color:var(--bg);border:0;border-radius:9px;padding:8px 16px;cursor:pointer}
+.save[disabled]{opacity:.45;cursor:default}
+.saved{font-size:13px;color:var(--ok)}
+.foot{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+.hide{display:none}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Dream House · JARVIS · 14 октября 2026</div>
+    <h1>Задачи JARVIS</h1>
+    <p class="lead">Все ваши задачи по шагам. Ставьте галочку, когда шаг сделан, и пишите комментарий внизу проекта: JARVIS читает отметки и комментарии и продолжает работу с того места.</p>
+  </header>
+
+  <div class="sum" aria-label="Сводка">
+    <div class="y"><b id="s-you">0</b><span>Ждут вас</span></div>
+    <div><b id="s-left">0</b><span>Шагов осталось</span></div>
+    <div><b id="s-done">0</b><span>Сделано</span></div>
+  </div>
+
+  <div class="filters" role="group" aria-label="Фильтр">
+    <button class="chip" id="f-all" aria-pressed="true">Все шаги</button>
+    <button class="chip" id="f-you" aria-pressed="false">Только мои</button>
+    <button class="chip" id="f-open" aria-pressed="false">Несделанные</button>
+  </div>
+  <div class="status" id="status">Загружаю отметки…</div>
+
+  <main id="list" style="display:grid;gap:18px"></main>
+
+  <p class="foot"><span class="who you">Вы</span>делаете сами ·
+    <span class="who pc">Claude на ПК</span>делает Claude на вашем компьютере по заданию ·
+    <span class="who jv">JARVIS</span>делаю я. Задания для ПК лежат в репозитории <code style="font-family:var(--f-mono);font-size:12px">dream-houses</code>, ветка <code style="font-family:var(--f-mono);font-size:12px">claude/ecstatic-lamport-r1psx4</code>.</p>
+</div>
+
+<script>
+const P = [
+ {id:"jarvis", t:"JARVIS на компьютере", goal:"Управлять мной голосом и через Telegram, несколько задач параллельно, звонки и будильник.", s:[
+  ["j1","you","Отправить Claude на ПК задание «изучить C:\\jarvis»","Файл <code>jarvis/brain/30-projects/jarvis/задание-пк-изучить.md</code>. Пока он только смотрит и ничего не меняет."],
+  ["j2","pc","Отчёт: что в C:\\jarvis работает, что установлено","Запишет в <code>brain/20-me/пк-инвентаризация.md</code> без секретов."],
+  ["j3","you","Ответить: компьютер в студии включён круглосуточно?","От этого зависят звонки, будильник и бот Qabat."],
+  ["j4","you","Ответить: ночью звонить только по «срочно» и для будильника или только будильник?",""],
+  ["j5","you","Ответить: сколько задач одновременно — советую 3",""],
+  ["j6","you","Найти ссылку на репозиторий для голоса, который вы давали другому агенту","Я его в памяти не нашёл. Пришлите ссылку или скажите Claude на ПК поискать в C:\\jarvis."],
+  ["j7","you","Создать бота JARVIS в BotFather (отдельный, личный)","Ключ бота в чат не присылать: вписать на ПК в <code>config/.env</code>."],
+  ["j8","pc","Голос: распознавание голосовых на ПК (faster-whisper, бесплатно)",""],
+  ["j9","pc","Окно JARVIS и рабочие столы: каждая задача в своём окне Claude Code",""],
+  ["j10","jv","Распределение лимитов и утренний отчёт по расходу","Подписку за 200 $ решаете вы после недели наблюдений."],
+  ["j11","you","Второй аккаунт Telegram «Jarvis»: добавить друг друга в контакты","Лучше чистый аккаунт без личных переписок."],
+  ["j12","pc","Звонки через второй аккаунт и будильник, пробный звонок",""]]},
+ {id:"ofis", t:"Офис рекламного агентства", goal:"Директор Мурод. 3 варианта планировки в Archicad, потом размеры по выбранному.", s:[
+  ["o1","you","Отправить Claude на ПК задание и дополнение","<code>задание-archicad.md</code> и <code>дополнение-archicad.md</code> в папке проекта."],
+  ["o2","you","Ответить, что за прямоугольник 800 × 1400 в общем кабинете",""],
+  ["o3","pc","Вариант 1 детально: план, 3D, вид от входа",""],
+  ["o4","you","Сказать «так нормально» по уровню деталей",""],
+  ["o5","pc","Варианты 2 и 3",""],
+  ["o6","you","Выбрать вариант",""],
+  ["o7","pc","Размеры на выбранном варианте, PDF в стиле Dream House",""]]},
+ {id:"insta", t:"Qabat · Instagram", goal:"Профиль оформлен, JARVIS ведёт посты и сторис сам и присылает отчёт.", s:[
+  ["i1","you","Создать Facebook на настоящее имя и страницу «Qabat»","Шаги — на странице «Настройка Instagram Qabat»."],
+  ["i2","you","Связать страницу с Instagram и подключить Windsor, написать «подключил»",""],
+  ["i3","you","Выбрать первую строку описания","Совет: «Печатаем на 3D-принтере по вашей идее»."],
+  ["i4","you","Отправить Claude на ПК задание по «Актуальному»","<code>qabat/prompts/aktualnoe-instagram.md</code>, сторис без цен."],
+  ["i5","you","Назначить цены (премиум, выше среднего)","До этого посты и сторис только без цен."],
+  ["i6","jv","План постов на неделю на ваше утверждение",""]]},
+ {id:"bot", t:"Qabat · бот для клиентов", goal:"Один бот: клиенты пишут, заявки приходят вам, вы можете ответить сами. Отвечает бесплатная модель на вашей видеокарте.", s:[
+  ["b1","you","В BotFather: /revoke, новый ключ вписать на ПК в QABAT_TG_BOT_TOKEN","Старый ключ остался в переписке, его нужно заменить."],
+  ["b2","you","«Да» на схему: бот + группа «Qabat — заявки» с темой на каждого клиента",""],
+  ["b3","pc","Поставить локальную модель на RTX 3090 и проверить ответы по-русски и по-таджикски","Бесплатно. Когда видеокарта занята рендером — лёгкая модель."],
+  ["b4","pc","Бот в Telegram: меню, заказ по шагам, передача вам",""],
+  ["b5","you","Проверить 10 пробных диалогов и сказать, что исправить",""],
+  ["b6","pc","Подключить Instagram Direct (после Facebook)","Нужен бесплатный туннель с ПК в интернет."]]},
+ {id:"old", t:"Отложенные вопросы", goal:"Ждут вашего решения с прошлых недель.", s:[
+  ["x1","you","«Да» на приватный репозиторий","Сейчас репозиторий публичный."],
+  ["x2","you","Имена и роли сотрудников студии",""],
+  ["x3","you","Выбрать голос JARVIS",""],
+  ["x4","you","Утвердить блоки 4–6 брендбука Qabat",""]]}
+];
+const WHO={you:"Вы",pc:"Claude на ПК",jv:"JARVIS"};
+let state={}, filter="all", db=null;
+const $=id=>document.getElementById(id);
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+function build(){
+  $("list").innerHTML=P.map(p=>`<section class="proj" id="p-${p.id}">
+   <div class="ph"><h2>${p.t}</h2><span class="count" id="c-${p.id}"></span></div>
+   <div class="bar"><i id="b-${p.id}"></i></div>
+   <p class="goal">${p.goal}</p>
+   <ol>${p.s.map(([id,w,txt,how])=>`<li class="step" id="st-${id}" data-who="${w}">
+     <input type="checkbox" id="cb-${id}" data-p="${p.id}" data-s="${id}">
+     <div class="t"><label for="cb-${id}"><span class="who ${w}">${WHO[w]}</span>${esc(txt)}</label>${how?`<span class="how">${how}</span>`:""}</div></li>`).join("")}</ol>
+   <div class="note"><label for="n-${p.id}">Комментарий для JARVIS</label>
+    <textarea id="n-${p.id}" data-p="${p.id}" placeholder="Что дополнить, что изменить, что уже сделали…"></textarea>
+    <div class="nrow"><button class="save" id="sv-${p.id}" data-p="${p.id}" disabled>Сохранить</button><span class="saved" id="ok-${p.id}"></span></div></div>
+  </section>`).join("");
+  document.querySelectorAll(".step input").forEach(cb=>cb.addEventListener("change",onTick));
+  document.querySelectorAll("textarea").forEach(t=>t.addEventListener("input",()=>{const b=$("sv-"+t.dataset.p);b.disabled=!db;$("ok-"+t.dataset.p).textContent=""}));
+  document.querySelectorAll(".save").forEach(b=>b.addEventListener("click",onSave));
+}
+function render(){
+  let you=0,left=0,done=0;
+  P.forEach(p=>{
+    const d=(state[p.id]&&state[p.id].done)||{}; let pd=0;
+    p.s.forEach(([id,w])=>{
+      const on=!!d[id]; const li=$("st-"+id);
+      $("cb-"+id).checked=on; li.classList.toggle("done",on);
+      if(on){done++;pd++}else{left++; if(w==="you")you++}
+      const vis=filter==="all"||(filter==="you"&&w==="you"&&!on)||(filter==="open"&&!on);
+      li.classList.toggle("hide",!vis);
+    });
+    $("c-"+p.id).textContent=pd+" из "+p.s.length;
+    $("b-"+p.id).style.width=(pd/p.s.length*100)+"%";
+    const ta=$("n-"+p.id), note=(state[p.id]&&state[p.id].note)||"";
+    if(document.activeElement!==ta && $("sv-"+p.id).disabled) ta.value=note;
+    const anyVis=p.s.some(([id])=>!$("st-"+id).classList.contains("hide"));
+    $("p-"+p.id).classList.toggle("hide",!anyVis && filter!=="all");
+  });
+  $("s-you").textContent=you; $("s-left").textContent=left; $("s-done").textContent=done;
+}
+async function write(pid,patch){
+  const cur=Object.assign({done:{},note:""},state[pid]||{});
+  const next={done:Object.assign({},cur.done,patch.done||{}),note:patch.note!==undefined?patch.note:cur.note,updated:new Date().toISOString()};
+  state[pid]=next; render();
+  if(!db){return}
+  try{await db.doc("progress/"+pid).set(next)}catch(e){$("status").textContent="Не сохранилось: "+(e&&e.message||"ошибка")+". Обновите страницу и попробуйте ещё раз."}
+}
+function onTick(e){const cb=e.target;write(cb.dataset.p,{done:{[cb.dataset.s]:cb.checked}})}
+async function onSave(e){const pid=e.target.dataset.p;e.target.disabled=true;await write(pid,{note:$("n-"+pid).value.trim()});$("ok-"+pid).textContent="Сохранено"}
+["all","you","open"].forEach(f=>$("f-"+f).addEventListener("click",()=>{filter=f;["all","you","open"].forEach(g=>$("f-"+g).setAttribute("aria-pressed",g===f));render()}));
+
+build(); render();
+(async()=>{
+  try{ db = window.claude && window.claude.use ? await window.claude.use("db") : null }catch(e){ db=null }
+  if(!db){$("status").textContent="Отметки здесь не сохраняются: откройте страницу в Claude под своим аккаунтом.";document.querySelectorAll(".step input").forEach(c=>c.disabled=true);return}
+  $("status").textContent="Отметки и комментарии сохраняются, JARVIS их видит.";
+  db.collection("progress").onSnapshot(snap=>{snap.docs.forEach(d=>{state[d.id]=d.data()});render()},err=>{$("status").textContent="Связь с сохранёнными отметками прервалась. Обновите страницу."});
+})();
+</script>
